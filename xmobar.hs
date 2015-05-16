@@ -39,7 +39,7 @@ Config {
 	],
 	sepChar = "%",
 	alignSep = "}{",
-	template = "%StdinReader% }{ %cpu% / %multicpu% <fc=gray>|</fc> <fc=skyblue>%memory%</fc>/<fc=skyblue>%swap%</fc> <fc=gray>|</fc> %dynnetwork% <fc=gray>|</fc> <fc=#ee9a00>%date%</fc>"
+	template = "%StdinReader% }{ <fc=#FFB6B0>]</fc>   %cpu% / %multicpu% <fc=gray>|</fc> <fc=skyblue>%memory%</fc>/<fc=skyblue>%swap%</fc> <fc=gray>|</fc> %dynnetwork% <fc=gray>|</fc> <fc=#ee9a00>%date%</fc>"
 }
 
 -- vim: ft=haskell :
