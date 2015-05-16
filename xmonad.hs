@@ -59,7 +59,7 @@ main = do
 	xmonad $ myConfig {
 		logHook = dynamicLogWithPP $ defaultPP {
 			ppOutput = System.IO.hPutStrLn xmproc,
-			ppTitle = xmobarColor "#FFB6B0" "" . shorten 100 .wrap "  [ <fc=gray>" "</fc> ]  ",
+			ppTitle = xmobarColor "gray" "" . shorten 100 .wrap "  <fc=#FFB6B0>[</fc> " " <fc=#FFB6B0>]</fc>  ",
 			ppCurrent = xmobarColor "green" "" . wrap "[" "]",
 			ppSep = "  ",
 			ppWsSep = " ",
