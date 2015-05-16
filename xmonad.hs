@@ -4,6 +4,10 @@ import XMonad.Util.Run (spawnPipe)
 import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
+import XMonad.Layout.Accordion
+import XMonad.Layout.ThreeColumns
+import XMonad.Layout.Spiral
+import XMonad.Layout.Cross
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -36,13 +40,19 @@ myTabTheme = defaultTheme {
 }
 
 myLayoutHook =
-	tiled ||| Mirror tiled ||| Full ||| Grid ||| Circle
+	tiled
+	||| Mirror tiled
+	||| Grid
+	||| Circle
+	||| simpleCross
+	||| spiral (6/7)
+	||| ThreeCol 1 delta (1/2)
+	||| ThreeColMid 1 delta (1/2)
 	||| tabbed shrinkText myTabTheme
 		where
-			tiled = Tall nmaster delta ration
-			nmaster = 1 -- default master count
+			tiled = Tall 1 delta ration
 			ration = 2/3 -- master proportion
-			delta = 5/100 -- percent of master resize
+			delta = 3/100 -- percent of master resize
 
 main = do
 	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
@@ -55,12 +65,15 @@ main = do
 			ppWsSep = " ",
 			--ppLayout = const ""
 			ppLayout  = (\ x -> case x of
-				"Tall"            -> "[:]"
-				"Mirror Tall"     -> "[=]"
-				"Full"            -> "[ ]"
+				"Tall"            -> "[>]"
+				"Mirror Tall"     -> "[v]"
 				"Grid"            -> "[+]"
 				"Circle"          -> "[o]"
+				"Cross"           -> "[x]"
+				"Spiral"          -> "[0]"
+				"ThreeCol"        -> "[3]"
 				"Tabbed Simplest" -> "[t]"
+				"Full"            -> "[ ]"
 				_                 ->   x   ),
 			ppHiddenNoWindows = showNamedWorkspaces
 		}
