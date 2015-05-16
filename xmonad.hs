@@ -20,7 +20,7 @@ myWorkspaces :: [String]
 myWorkspaces =
 	["1:main"]
 	++ map show [2..6]
-	++ ["7:media","8:im","9:im"]
+	++ ["7:media","8:x","9:im"]
 
 myConfig = defaultConfig {
 	manageHook = manageDocks <+> manageHook defaultConfig,
