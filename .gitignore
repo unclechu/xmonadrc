@@ -1,0 +1,6 @@
+*.swp
+*.swo
+xmonad.o
+xmonad.hi
+xmonad.errors
+xmonad-*
