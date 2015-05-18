@@ -17,10 +17,7 @@ import System.IO
 myTerm = "terminator"
 
 myWorkspaces :: [String]
-myWorkspaces =
-	["1:main"]
-	++ map show [2..6]
-	++ ["7:media","8:x","9:im"]
+myWorkspaces = map show [1..9]
 
 myConfig = defaultConfig {
 	manageHook = manageDocks <+> manageHook defaultConfig,
@@ -77,4 +74,4 @@ main = do
 				_                 ->   x   ),
 			ppHiddenNoWindows = showNamedWorkspaces
 		}
-	} where showNamedWorkspaces wsId = if any (`elem` wsId) ['a'..'z'] then pad wsId else ""
+	} where showNamedWorkspaces wsId = wsId
