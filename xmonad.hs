@@ -22,7 +22,7 @@ myWorkspaces = map show [1..9]
 
 myConfig = defaultConfig {
 	manageHook  = manageDocks <+> manageHook defaultConfig,
-	layoutHook  = avoidStruts $ myLayoutHook,
+	layoutHook  = myLayoutHook,
 	
 	borderWidth = 2,
 	
@@ -43,15 +43,15 @@ myTabTheme = defaultTheme {
 }
 
 myLayoutHook =
-	tiled
-	||| Mirror tiled
-	||| Grid
-	||| Circle
-	||| simpleCross
-	||| spiral (6/7)
-	||| ThreeCol 1 delta (1/2)
-	||| ThreeColMid 1 delta (1/2)
-	||| tabbed shrinkText myTabTheme
+	avoidStruts (tiled)
+	||| avoidStruts (Mirror tiled)
+	||| avoidStruts (Grid)
+	||| avoidStruts (Circle)
+	||| avoidStruts (simpleCross)
+	||| avoidStruts (spiral (6/7))
+	||| avoidStruts (ThreeCol 1 delta (1/2))
+	||| avoidStruts (ThreeColMid 1 delta (1/2))
+	||| avoidStruts (tabbed shrinkText myTabTheme)
 	||| noBorders Full
 		where
 			tiled = Tall 1 delta ration
