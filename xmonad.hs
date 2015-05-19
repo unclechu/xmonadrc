@@ -20,12 +20,14 @@ myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
 
 myConfig = defaultConfig {
-	manageHook = manageDocks <+> manageHook defaultConfig,
-	layoutHook = avoidStruts $ myLayoutHook,
+	manageHook  = manageDocks <+> manageHook defaultConfig,
+	layoutHook  = avoidStruts $ myLayoutHook,
 	
-	modMask    = mod4Mask, -- mod4 instead of alt key
-	terminal   = myTerm,
-	workspaces = myWorkspaces
+	borderWidth = 2,
+	
+	modMask     = mod4Mask, -- mod4 instead of alt key
+	terminal    = myTerm,
+	workspaces  = myWorkspaces
 }
 
 myTabTheme = defaultTheme {
