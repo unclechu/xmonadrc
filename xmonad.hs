@@ -8,6 +8,8 @@ import XMonad.Layout.Accordion
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
 import XMonad.Layout.Cross
+import XMonad.Layout.Fullscreen
+import XMonad.Layout.NoBorders
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -48,6 +50,7 @@ myLayoutHook =
 	||| ThreeCol 1 delta (1/2)
 	||| ThreeColMid 1 delta (1/2)
 	||| tabbed shrinkText myTabTheme
+	||| noBorders (fullscreenFull Full)
 		where
 			tiled = Tall 1 delta ration
 			ration = 2/3 -- master proportion
