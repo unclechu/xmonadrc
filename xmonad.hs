@@ -8,7 +8,6 @@ import XMonad.Layout.Accordion
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
 import XMonad.Layout.Cross
-import XMonad.Layout.Fullscreen
 import XMonad.Layout.NoBorders
 
 import XMonad.Hooks.ManageDocks
@@ -33,11 +32,14 @@ myConfig = defaultConfig {
 }
 
 myTabTheme = defaultTheme {
-	activeColor         = "#3c5863",
-	activeBorderColor   = "#000000",
-	inactiveColor       = "#666666",
-	inactiveBorderColor = "#000000",
-	decoHeight          = 10
+	activeColor         = "#3c5863"   ,
+	activeBorderColor   = "#000000"   ,
+	inactiveColor       = "#666666"   ,
+	inactiveBorderColor = "#000000"   ,
+	activeTextColor     = "lightgray" ,
+	inactiveTextColor   = "#aaa"      ,
+	decoHeight          = 12          ,
+	fontName            = "terminus"
 }
 
 myLayoutHook =
@@ -50,7 +52,7 @@ myLayoutHook =
 	||| ThreeCol 1 delta (1/2)
 	||| ThreeColMid 1 delta (1/2)
 	||| tabbed shrinkText myTabTheme
-	||| noBorders (fullscreenFull Full)
+	||| noBorders Full
 		where
 			tiled = Tall 1 delta ration
 			ration = 2/3 -- master proportion
