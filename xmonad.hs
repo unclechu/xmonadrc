@@ -1,7 +1,6 @@
 import XMonad
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig (additionalKeys)
-import XMonad.Core
 
 import XMonad.Layout.Circle
 import XMonad.Layout.Grid
@@ -16,17 +15,6 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.FadeInactive
 
 import System.IO
-
-import XMonad.Layout.PerWorkspace (onWorkspace)
-import XMonad.Layout.SimplestFloat
-import XMonad.Layout.IM
-import Data.Ratio ((%))
-import XMonad.Hooks.EwmhDesktops
-import qualified XMonad.StackSet as W
-import qualified Data.Map as M
-import Data.Monoid
-import System.Exit
-import XMonad.Layout.Spacing
 
 myTerm = "terminator"
 
