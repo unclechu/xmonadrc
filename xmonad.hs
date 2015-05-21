@@ -1,10 +1,11 @@
 import XMonad
 import XMonad.Util.Run (spawnPipe)
+import XMonad.Util.EZConfig (additionalKeys)
+import XMonad.Core
 
 import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
-import XMonad.Layout.Accordion
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
 import XMonad.Layout.Cross
@@ -16,10 +17,23 @@ import XMonad.Hooks.FadeInactive
 
 import System.IO
 
+import XMonad.Layout.PerWorkspace (onWorkspace)
+import XMonad.Layout.SimplestFloat
+import XMonad.Layout.IM
+import Data.Ratio ((%))
+import XMonad.Hooks.EwmhDesktops
+import qualified XMonad.StackSet as W
+import qualified Data.Map as M
+import Data.Monoid
+import System.Exit
+import XMonad.Layout.Spacing
+
 myTerm = "terminator"
 
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
+
+myMetaKey = mod4Mask
 
 myConfig = defaultConfig {
 	manageHook  = manageDocks <+> manageHook defaultConfig,
@@ -27,7 +41,7 @@ myConfig = defaultConfig {
 	
 	borderWidth = 1,
 	
-	modMask     = mod4Mask, -- mod4 instead of alt key
+	modMask     = myMetaKey,
 	terminal    = myTerm,
 	workspaces  = myWorkspaces
 }
@@ -59,6 +73,13 @@ myLayoutHook =
 			ration = 2/3 -- master proportion
 			delta = 3/100 -- percent of master resize
 
+
+-- required this app: https://github.com/ierton/xkb-switch
+myKeys = [
+	((myMetaKey, xK_z), spawn "xkb-switch -s us &>/dev/null"),
+	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null")
+	]
+
 main = do
 	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 	xmonad $ myConfig {
@@ -84,4 +105,5 @@ main = do
 				ppHiddenNoWindows = showNamedWorkspaces
 			}
 			fadeInactiveLogHook 0.8
-	} where showNamedWorkspaces wsId = wsId
+	} `additionalKeys` myKeys
+		where showNamedWorkspaces wsId = wsId
