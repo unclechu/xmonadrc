@@ -12,6 +12,7 @@ import XMonad.Layout.NoBorders
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.FadeInactive
 
 import System.IO
 
@@ -24,7 +25,7 @@ myConfig = defaultConfig {
 	manageHook  = manageDocks <+> manageHook defaultConfig,
 	layoutHook  = myLayoutHook,
 	
-	borderWidth = 2,
+	borderWidth = 1,
 	
 	modMask     = mod4Mask, -- mod4 instead of alt key
 	terminal    = myTerm,
@@ -61,24 +62,26 @@ myLayoutHook =
 main = do
 	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 	xmonad $ myConfig {
-		logHook = dynamicLogWithPP $ defaultPP {
-			ppOutput = System.IO.hPutStrLn xmproc,
-			ppTitle = xmobarColor "gray" "" .wrap " <fc=#FFB6B0>[</fc> " "",
-			ppCurrent = xmobarColor "green" "" . wrap "[" "]",
-			ppSep = "  ",
-			ppWsSep = " ",
-			--ppLayout = const ""
-			ppLayout  = (\ x -> case x of
-				"Tall"            -> "[>]"
-				"Mirror Tall"     -> "[v]"
-				"Grid"            -> "[+]"
-				"Circle"          -> "[o]"
-				"Cross"           -> "[x]"
-				"Spiral"          -> "[0]"
-				"ThreeCol"        -> "[3]"
-				"Tabbed Simplest" -> "[t]"
-				"Full"            -> "[ ]"
-				_                 ->   x   ),
-			ppHiddenNoWindows = showNamedWorkspaces
-		}
+		logHook = do
+			dynamicLogWithPP $ defaultPP {
+				ppOutput = System.IO.hPutStrLn xmproc,
+				ppTitle = xmobarColor "gray" "" .wrap " <fc=#FFB6B0>[</fc> " "",
+				ppCurrent = xmobarColor "green" "" . wrap "[" "]",
+				ppSep = "  ",
+				ppWsSep = " ",
+				--ppLayout = const ""
+				ppLayout  = (\ x -> case x of
+					"Tall"            -> "[>]"
+					"Mirror Tall"     -> "[v]"
+					"Grid"            -> "[+]"
+					"Circle"          -> "[o]"
+					"Cross"           -> "[x]"
+					"Spiral"          -> "[0]"
+					"ThreeCol"        -> "[3]"
+					"Tabbed Simplest" -> "[t]"
+					"Full"            -> "[ ]"
+					_                 ->   x   ),
+				ppHiddenNoWindows = showNamedWorkspaces
+			}
+			fadeInactiveLogHook 0.8
 	} where showNamedWorkspaces wsId = wsId
