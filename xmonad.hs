@@ -9,6 +9,7 @@ import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
 import XMonad.Layout.Cross
 import XMonad.Layout.NoBorders
+import XMonad.Layout.SimplestFloat
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -55,6 +56,7 @@ myLayoutHook =
 	||| avoidStruts (ThreeCol 1 delta (1/2))
 	||| avoidStruts (ThreeColMid 1 delta (1/2))
 	||| avoidStruts (tabbed shrinkText myTabTheme)
+	||| simplestFloat
 	||| noBorders Full
 		where
 			tiled = Tall 1 delta ration
@@ -88,8 +90,9 @@ main = do
 					"Spiral"          -> "[0]"
 					"ThreeCol"        -> "[3]"
 					"Tabbed Simplest" -> "[t]"
+					"SimplestFloat"   -> "[f]"
 					"Full"            -> "[ ]"
-					_                 ->   x   ),
+					_                 ->   x  ),
 				ppHiddenNoWindows = showNamedWorkspaces
 			}
 			fadeInactiveLogHook 0.8
