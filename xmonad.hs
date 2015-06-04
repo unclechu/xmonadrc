@@ -95,6 +95,6 @@ main = do
 					_                 ->   x  ),
 				ppHiddenNoWindows = showNamedWorkspaces
 			}
-			fadeInactiveLogHook 0.8
+			fadeInactiveLogHook 0.9
 	} `additionalKeys` myKeys
 		where showNamedWorkspaces wsId = wsId
