@@ -36,11 +36,12 @@ Config {
 		] 10,
 		Run Date "%a %b %_d %l:%M" "date" 10,
 		Run Kbd [("us", "<fc=red>US</fc>"), ("ru", "<fc=green>RU</fc>")],
+		Run Locks,
 		Run StdinReader
 	],
 	sepChar = "%",
 	alignSep = "}{",
-	template = "%StdinReader% }{ <fc=#FFB6B0>]</fc>   %cpu% / %multicpu% <fc=gray>|</fc> <fc=skyblue>%memory%</fc>/<fc=skyblue>%swap%</fc> <fc=gray>|</fc> %dynnetwork% <fc=gray>|</fc> %kbd% <fc=gray>|</fc> <fc=#ee9a00>%date%</fc>"
+	template = "%StdinReader% }{ <fc=#FFB6B0>]</fc>   %cpu% / %multicpu% <fc=gray>|</fc> <fc=skyblue>%memory%</fc>/<fc=skyblue>%swap%</fc> <fc=gray>|</fc> %dynnetwork% <fc=gray>|</fc> %locks% <fc=gray>|</fc> %kbd% <fc=gray>|</fc> <fc=#ee9a00>%date%</fc>"
 }
 
 -- vim: ft=haskell :
