@@ -14,6 +14,7 @@ import XMonad.Layout.SimplestFloat
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.FadeInactive
+import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO
 
@@ -24,8 +25,13 @@ myWorkspaces = map show [1..9]
 
 myMetaKey = mod4Mask
 
+myManageHook :: ManageHook
+myManageHook = composeAll $ [
+	title =? "gpaste-zenity" --> doCenterFloat
+	]
+
 myConfig = defaultConfig {
-	manageHook  = manageDocks <+> manageHook defaultConfig,
+	manageHook  = manageDocks <+> manageHook defaultConfig <+> myManageHook,
 	layoutHook  = myLayoutHook,
 	
 	borderWidth = 1,
@@ -63,11 +69,11 @@ myLayoutHook =
 			ration = 2/3 -- master proportion
 			delta = 3/100 -- percent of master resize
 
-
 -- required this app: https://github.com/ierton/xkb-switch
 myKeys = [
 	((myMetaKey, xK_z), spawn "xkb-switch -s us &>/dev/null"),
-	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null")
+	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null"),
+	((myMetaKey, xK_v), spawn "gpaste-zenity.sh &>/dev/null")
 	]
 
 main = do
