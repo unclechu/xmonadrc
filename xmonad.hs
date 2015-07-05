@@ -69,11 +69,15 @@ myLayoutHook =
 			ration = 2/3 -- master proportion
 			delta = 3/100 -- percent of master resize
 
--- required this app: https://github.com/ierton/xkb-switch
 myKeys = [
+	
+	-- required https://github.com/ierton/xkb-switch
 	((myMetaKey, xK_z), spawn "xkb-switch -s us &>/dev/null"),
 	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null"),
+	
+	-- required https://github.com/unclechu/gpaste-zenity
 	((myMetaKey, xK_v), spawn "gpaste-zenity.sh &>/dev/null")
+	
 	]
 
 main = do
