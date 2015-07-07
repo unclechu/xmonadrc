@@ -72,19 +72,31 @@ myLayoutHook =
 			ration = 2/3 -- master proportion
 			delta = 3/100 -- percent of master resize
 
-cmdScrnShot       = "gnome-screenshot     &>/dev/null"
-cmdScrnShotArea   = "gnome-screenshot -a  &>/dev/null"
-cmdScrnShotX      = "gnome-screenshot -i  &>/dev/null"
-cmdScrnShotAreaX  = "gnome-screenshot -ia &>/dev/null"
+cmdStdSuffix = " &>/dev/null"
+
+cmd   (cmdStr) = cmdStr ++ cmdStdSuffix
+cmdKb (layout) = cmd ("xkb-switch -s " ++ layout)
+cmdAudioSetVol (vol) = "pactl set-sink-volume 0 " ++ vol
+
+cmdAudioMute     = cmd "pactl set-sink-mute 0 true"
+cmdAudioUnmute   = cmd "pactl set-sink-mute 0 false"
+cmdAudioToggle   = cmd "pactl set-sink-mute 0 toggle"
+cmdAudioInc      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "+3%"))
+cmdAudioDec      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "-3%"))
+
+cmdScrnShot      = cmd "gnome-screenshot"
+cmdScrnShotArea  = cmd "gnome-screenshot -a"
+cmdScrnShotX     = cmd "gnome-screenshot -i"
+cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 myKeys = [
 	
 	-- required https://github.com/ierton/xkb-switch
-	((myMetaKey, xK_z), spawn "xkb-switch -s us &>/dev/null"),
-	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null"),
+	((myMetaKey, xK_z), spawn (cmdKb "us")),
+	((myMetaKey, xK_x), spawn (cmdKb "ru")),
 	
 	-- required https://github.com/unclechu/gpaste-zenity
-	((myMetaKey, xK_v), spawn "gpaste-zenity.sh &>/dev/null"),
+	((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh")),
 	
 	-- screenshots (basic keyboard)
 	
@@ -98,7 +110,13 @@ myKeys = [
 	((myMetaKey, xF86XK_Launch5), spawn cmdScrnShotArea),
 	-- interactive options
 	((0, xF86XK_Launch6),         spawn cmdScrnShotX),
-	((myMetaKey, xF86XK_Launch6), spawn cmdScrnShotAreaX)
+	((myMetaKey, xF86XK_Launch6), spawn cmdScrnShotAreaX),
+	
+	-- pulseaudio volume control
+	
+	((0, xF86XK_AudioMute),        spawn cmdAudioToggle),
+	((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec),
+	((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc)
 	
 	]
 
