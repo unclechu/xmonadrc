@@ -17,6 +17,7 @@ import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO
+import Graphics.X11.ExtraTypes.XF86
 
 myTerm = "terminator"
 
@@ -69,6 +70,11 @@ myLayoutHook =
 			ration = 2/3 -- master proportion
 			delta = 3/100 -- percent of master resize
 
+cmdScrnShot       = "gnome-screenshot     &>/dev/null"
+cmdScrnShotArea   = "gnome-screenshot -a  &>/dev/null"
+cmdScrnShotX      = "gnome-screenshot -i  &>/dev/null"
+cmdScrnShotAreaX  = "gnome-screenshot -ia &>/dev/null"
+
 myKeys = [
 	
 	-- required https://github.com/ierton/xkb-switch
@@ -76,7 +82,21 @@ myKeys = [
 	((myMetaKey, xK_x), spawn "xkb-switch -s ru &>/dev/null"),
 	
 	-- required https://github.com/unclechu/gpaste-zenity
-	((myMetaKey, xK_v), spawn "gpaste-zenity.sh &>/dev/null")
+	((myMetaKey, xK_v), spawn "gpaste-zenity.sh &>/dev/null"),
+	
+	-- screenshots (basic keyboard)
+	
+	((0, xK_Print),         spawn cmdScrnShot),
+	((myMetaKey, xK_Print), spawn cmdScrnShotArea),
+	
+	-- screenshots (apple keyboard)
+	
+	-- save to file
+	((0, xF86XK_Launch5),         spawn cmdScrnShot),
+	((myMetaKey, xF86XK_Launch5), spawn cmdScrnShotArea),
+	-- interactive options
+	((0, xF86XK_Launch6),         spawn cmdScrnShotX),
+	((myMetaKey, xF86XK_Launch6), spawn cmdScrnShotAreaX)
 	
 	]
 
