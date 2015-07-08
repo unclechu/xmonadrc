@@ -81,8 +81,8 @@ cmdAudioSetVol (vol) = "pactl set-sink-volume 0 " ++ vol
 cmdAudioMute     = cmd "pactl set-sink-mute 0 true"
 cmdAudioUnmute   = cmd "pactl set-sink-mute 0 false"
 cmdAudioToggle   = cmd "pactl set-sink-mute 0 toggle"
-cmdAudioInc      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "+3%"))
-cmdAudioDec      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "-3%"))
+cmdAudioInc      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "+1.0dB"))
+cmdAudioDec      = cmd (cmdAudioUnmute ++ ";" ++ (cmdAudioSetVol "-1.0dB"))
 
 cmdScrnShot      = cmd "gnome-screenshot"
 cmdScrnShotArea  = cmd "gnome-screenshot -a"
