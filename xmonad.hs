@@ -120,6 +120,7 @@ myKeys = [
 	
 	-- audacious playback
 	
+	((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play")),
 	((0, xF86XK_AudioPlay), spawn (cmd "pidof audacious && audacious --pause || audacious --play")),
 	((0, xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
 	((0, xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
