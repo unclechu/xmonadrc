@@ -116,7 +116,13 @@ myKeys = [
 	
 	((0, xF86XK_AudioMute),        spawn cmdAudioToggle),
 	((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec),
-	((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc)
+	((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc),
+	
+	-- audacious playback
+	
+	((0, xF86XK_AudioPlay), spawn (cmd "pidof audacious && audacious --pause || audacious --play")),
+	((0, xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
+	((0, xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
 	
 	]
 
