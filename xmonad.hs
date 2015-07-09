@@ -61,7 +61,6 @@ myLayoutHook =
 		||| (Circle)
 		||| (simpleCross)
 		||| (spiral (6/7))
-		||| (ThreeCol 1 delta (1/2))
 		||| (ThreeColMid 1 delta (1/2))
 		||| (tabbed shrinkText myTabTheme)
 	)
