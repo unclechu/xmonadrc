@@ -122,7 +122,11 @@ myKeys = [
 	((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play")),
 	((0, xF86XK_AudioPlay), spawn (cmd "audacious --play-pause")),
 	((0, xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
-	((0, xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
+	((0, xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
+	
+	-- gmrun
+	
+	((0, xF86XK_Launch7), spawn (cmd "gmrun"))
 	
 	]
 
