@@ -99,16 +99,16 @@ myKeys = [
 	
 	-- screenshots (basic keyboard)
 	
-	((0, xK_Print),         spawn cmdScrnShot),
+	((0,         xK_Print), spawn cmdScrnShot),
 	((myMetaKey, xK_Print), spawn cmdScrnShotArea),
 	
 	-- screenshots (apple keyboard)
 	
 	-- save to file
-	((0, xF86XK_Launch5),         spawn cmdScrnShot),
+	((0,         xF86XK_Launch5), spawn cmdScrnShot),
 	((myMetaKey, xF86XK_Launch5), spawn cmdScrnShotArea),
 	-- interactive options
-	((0, xF86XK_Launch6),         spawn cmdScrnShotX),
+	((0,         xF86XK_Launch6), spawn cmdScrnShotX),
 	((myMetaKey, xF86XK_Launch6), spawn cmdScrnShotAreaX),
 	
 	-- pulseaudio volume control
@@ -120,9 +120,9 @@ myKeys = [
 	-- audacious playback
 	
 	((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play")),
-	((0, xF86XK_AudioPlay), spawn (cmd "audacious --play-pause")),
-	((0, xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
-	((0, xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
+	((0,         xF86XK_AudioPlay), spawn (cmd "audacious --play-pause")),
+	((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
+	((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
 	
 	-- gmrun
 	
