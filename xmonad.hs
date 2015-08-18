@@ -133,7 +133,7 @@ myKeys = [
 main = do
 	xmproc <- spawnPipe ("/usr/bin/dzen2"
 		++ " -h 12 -ta l -fg '#ccc' -bg '#333'"
-		++ " -fn '-*-terminus-bold-r-*-*-12-*-*-*-*-*-*-*'")
+		++ " -fn '-*-*-*-*-*-*-12-*-*-*-*-*-*-*'")
 	xmonad $ myConfig {
 		logHook = do
 			dynamicLogWithPP $ defaultPP {
