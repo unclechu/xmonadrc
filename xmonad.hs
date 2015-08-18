@@ -131,17 +131,19 @@ myKeys = [
 	]
 
 main = do
-	xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
+	xmproc <- spawnPipe ("/usr/bin/dzen2"
+		++ " -h 12 -ta l -fg '#ccc' -bg '#333'"
+		++ " -fn '-*-terminus-bold-r-*-*-12-*-*-*-*-*-*-*'")
 	xmonad $ myConfig {
 		logHook = do
 			dynamicLogWithPP $ defaultPP {
 				ppOutput = System.IO.hPutStrLn xmproc,
-				ppTitle = xmobarColor "gray" "" .wrap " <fc=#FFB6B0>[</fc> " "",
-				ppCurrent = xmobarColor "green" "" . wrap "[" "]",
+				ppTitle = dzenColor "#fff" "#666" . pad,
+				ppCurrent = dzenColor "green" "#000" . wrap "[" "]",
 				ppSep = "  ",
 				ppWsSep = " ",
-				--ppLayout = const ""
-				ppLayout  = (\ x -> case x of
+				ppLayout = dzenColor "yellow" "#000" .
+					(\ x -> case x of
 					"Tall"            -> "[>]"
 					"Mirror Tall"     -> "[v]"
 					"Grid"            -> "[+]"
