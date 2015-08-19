@@ -124,9 +124,9 @@ myKeys = [
 	((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
 	((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
 	
-	-- gmrun
+	-- replace default launcher to 'gmrun'
 	
-	((0, xF86XK_Launch7), spawn (cmd "gmrun"))
+	((myMetaKey, xK_p), spawn (cmd "gmrun"))
 	
 	]
 
