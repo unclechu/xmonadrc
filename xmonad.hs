@@ -126,7 +126,11 @@ myKeys = [
 	
 	-- replace default launcher to 'gmrun'
 	
-	((myMetaKey, xK_p), spawn (cmd "gmrun"))
+	((myMetaKey, xK_p), spawn (cmd "gmrun")),
+	
+	-- terminal by F16 and F17 (apple keyboard)
+	((0, xF86XK_Launch7), spawn $ cmd $ myTerm ++ " --profile=light"),
+	((0, xF86XK_Launch8), spawn $ cmd $ myTerm ++ " --profile=dark")
 	
 	]
 
