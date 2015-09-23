@@ -2,12 +2,10 @@ import XMonad
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig (additionalKeys)
 
-import XMonad.Layout.Circle
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
-import XMonad.Layout.Cross
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SimplestFloat
 
@@ -40,7 +38,7 @@ myConfig = defaultConfig {
 	modMask     = myMetaKey,
 	terminal    = myTerm,
 	workspaces  = myWorkspaces
-}
+	}
 
 myTabTheme = defaultTheme {
 	activeColor         = "#3c5863"   ,
@@ -51,19 +49,17 @@ myTabTheme = defaultTheme {
 	inactiveTextColor   = "#aaa"      ,
 	decoHeight          = 12          ,
 	fontName            = "terminus"
-}
+	}
 
 myLayoutHook =
 	avoidStruts (
 		(tiled)
 		||| (Mirror tiled)
 		||| (Grid)
-		||| (Circle)
-		||| (simpleCross)
 		||| (spiral (6/7))
 		||| (ThreeColMid 1 delta (1/2))
 		||| (tabbed shrinkText myTabTheme)
-	)
+		)
 	||| simplestFloat
 	||| noBorders Full
 		where
@@ -160,7 +156,7 @@ main = do
 					"Full"            -> "[ ]"
 					_                 ->   x  ),
 				ppHiddenNoWindows = showNamedWorkspaces
-			}
+				}
 			fadeInactiveLogHook 0.9
-	} `additionalKeys` myKeys
-		where showNamedWorkspaces wsId = wsId
+		} `additionalKeys` myKeys
+			where showNamedWorkspaces wsId = wsId
