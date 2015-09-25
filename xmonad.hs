@@ -147,8 +147,6 @@ main = do
 					"Tall"            -> "[>]"
 					"Mirror Tall"     -> "[v]"
 					"Grid"            -> "[+]"
-					"Circle"          -> "[o]"
-					"Cross"           -> "[x]"
 					"Spiral"          -> "[0]"
 					"ThreeCol"        -> "[3]"
 					"Tabbed Simplest" -> "[t]"
