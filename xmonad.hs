@@ -97,15 +97,8 @@ myKeys = [
 	
 	((0,         xK_Print), spawn cmdScrnShot),
 	((myMetaKey, xK_Print), spawn cmdScrnShotArea),
-	
-	-- screenshots (apple keyboard)
-	
-	-- save to file
-	((0,         xF86XK_Launch5), spawn cmdScrnShot),
-	((myMetaKey, xF86XK_Launch5), spawn cmdScrnShotArea),
-	-- interactive options
-	((0,         xF86XK_Launch6), spawn cmdScrnShotX),
-	((myMetaKey, xF86XK_Launch6), spawn cmdScrnShotAreaX),
+	((0,         xK_Pause), spawn cmdScrnShotX),
+	((myMetaKey, xK_Pause), spawn cmdScrnShotAreaX),
 	
 	-- pulseaudio volume control
 	
@@ -122,11 +115,7 @@ myKeys = [
 	
 	-- replace default launcher to 'gmrun'
 	
-	((myMetaKey, xK_p), spawn (cmd "gmrun")),
-	
-	-- terminal by F16 and F17 (apple keyboard)
-	((0, xF86XK_Launch7), spawn $ cmd $ myTerm ++ " --profile=light"),
-	((0, xF86XK_Launch8), spawn $ cmd $ myTerm ++ " --profile=dark")
+	((myMetaKey, xK_p), spawn (cmd "gmrun"))
 	
 	]
 
