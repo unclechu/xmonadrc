@@ -22,7 +22,7 @@ myTerm = "terminator"
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
 
-myMetaKey = mod4Mask
+myMetaKey = mod1Mask
 
 myManageHook :: ManageHook
 myManageHook = composeAll $ [
