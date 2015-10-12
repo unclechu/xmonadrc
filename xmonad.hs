@@ -4,7 +4,6 @@ import XMonad.Util.EZConfig (additionalKeys)
 
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
-import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Spiral
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SimplestFloat
@@ -57,7 +56,6 @@ myLayoutHook =
 		||| (Mirror tiled)
 		||| (Grid)
 		||| (spiral (6/7))
-		||| (ThreeColMid 1 delta (1/2))
 		||| (tabbed shrinkText myTabTheme)
 		)
 	||| simplestFloat
@@ -137,7 +135,6 @@ main = do
 					"Mirror Tall"     -> "[v]"
 					"Grid"            -> "[+]"
 					"Spiral"          -> "[0]"
-					"ThreeCol"        -> "[3]"
 					"Tabbed Simplest" -> "[t]"
 					"SimplestFloat"   -> "[f]"
 					"Full"            -> "[ ]"
