@@ -16,7 +16,9 @@ import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import System.IO
 import Graphics.X11.ExtraTypes.XF86
 
-myTerm = "terminator"
+myTerm      = "terminator"
+myTermLight = myTerm ++ " --profile light"
+myTermDark  = myTerm ++ " --profile dark"
 
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
@@ -113,7 +115,10 @@ myKeys = [
 	
 	-- replace default launcher to 'gmrun'
 	
-	((myMetaKey, xK_p), spawn (cmd "gmrun"))
+	((myMetaKey, xK_r), spawn (cmd "gmrun")),
+	((myMetaKey, xK_h), spawn (cmd "nautilus")),
+	(((myMetaKey .|. shiftMask), xK_Return), spawn (cmd myTermLight)),
+	(((myMetaKey .|. controlMask), xK_Return), spawn (cmd myTermDark))
 	
 	]
 
@@ -144,3 +149,5 @@ main = do
 			fadeInactiveLogHook 0.9
 		} `additionalKeys` myKeys
 			where showNamedWorkspaces wsId = wsId
+
+-- vim: set noet :
