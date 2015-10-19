@@ -20,6 +20,9 @@ myTerm      = "terminator"
 myTermLight = myTerm ++ " --profile light"
 myTermDark  = myTerm ++ " --profile dark"
 
+launcherApp = "gmrun"
+fileManager = "thunar"
+
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
 
@@ -113,10 +116,9 @@ myKeys = [
 	((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
 	((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
 	
-	-- replace default launcher to 'gmrun'
 	
-	((myMetaKey, xK_r), spawn (cmd "gmrun")),
-	((myMetaKey, xK_h), spawn (cmd "nautilus")),
+	((myMetaKey, xK_r), spawn (cmd launcherApp)),
+	((myMetaKey, xK_h), spawn (cmd fileManager)),
 	(((myMetaKey .|. shiftMask), xK_Return), spawn (cmd myTermLight)),
 	(((myMetaKey .|. controlMask), xK_Return), spawn (cmd myTermDark))
 	
