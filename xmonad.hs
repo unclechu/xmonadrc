@@ -117,8 +117,8 @@ myKeys = [
 	((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
 	
 	
-	((myMetaKey, xK_r), spawn (cmd launcherApp)),
-	((myMetaKey, xK_h), spawn (cmd fileManager)),
+	((myMetaKey, xK_p), spawn (cmd launcherApp)),
+	((myMetaKey, xK_f), spawn (cmd fileManager)),
 	(((myMetaKey .|. shiftMask), xK_Return), spawn (cmd myTermLight)),
 	(((myMetaKey .|. controlMask), xK_Return), spawn (cmd myTermDark))
 	
