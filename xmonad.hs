@@ -30,45 +30,45 @@ myMetaKey = mod1Mask
 
 myManageHook :: ManageHook
 myManageHook = composeAll $ [
-	title =? "gpaste-zenity" --> doCenterFloat
-	]
+  title =? "gpaste-zenity" --> doCenterFloat
+  ]
 
 myConfig = defaultConfig {
-	manageHook  = manageDocks <+> manageHook defaultConfig <+> myManageHook,
-	layoutHook  = myLayoutHook,
-	
-	borderWidth = 1,
-	
-	modMask     = myMetaKey,
-	terminal    = myTerm,
-	workspaces  = myWorkspaces
-	}
+  manageHook  = manageDocks <+> manageHook defaultConfig <+> myManageHook,
+  layoutHook  = myLayoutHook,
+
+  borderWidth = 1,
+
+  modMask     = myMetaKey,
+  terminal    = myTerm,
+  workspaces  = myWorkspaces
+  }
 
 myTabTheme = defaultTheme {
-	activeColor         = "#3c5863"   ,
-	activeBorderColor   = "#000000"   ,
-	inactiveColor       = "#666666"   ,
-	inactiveBorderColor = "#000000"   ,
-	activeTextColor     = "lightgray" ,
-	inactiveTextColor   = "#aaa"      ,
-	decoHeight          = 12          ,
-	fontName            = "terminus"
-	}
+  activeColor         = "#3c5863"   ,
+  activeBorderColor   = "#000000"   ,
+  inactiveColor       = "#666666"   ,
+  inactiveBorderColor = "#000000"   ,
+  activeTextColor     = "lightgray" ,
+  inactiveTextColor   = "#aaa"      ,
+  decoHeight          = 12          ,
+  fontName            = "terminus"
+  }
 
 myLayoutHook =
-	avoidStruts (
-		(tiled)
-		||| (Mirror tiled)
-		||| (Grid)
-		||| (spiral (6/7))
-		||| (tabbed shrinkText myTabTheme)
-		)
-	||| simplestFloat
-	||| noBorders Full
-		where
-			tiled = Tall 1 delta ration
-			ration = 2/3 -- master proportion
-			delta = 3/100 -- percent of master resize
+  avoidStruts (
+    (tiled)
+    ||| (Mirror tiled)
+    ||| (Grid)
+    ||| (spiral (6/7))
+    ||| (tabbed shrinkText myTabTheme)
+    )
+  ||| simplestFloat
+  ||| noBorders Full
+    where
+      tiled = Tall 1 delta ration
+      ration = 2/3 -- master proportion
+      delta = 3/100 -- percent of master resize
 
 cmdStdSuffix = " &>/dev/null"
 
@@ -88,68 +88,67 @@ cmdScrnShotX     = cmd "gnome-screenshot -i"
 cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 myKeys = [
-	
-	-- required https://github.com/ierton/xkb-switch
-	((myMetaKey, xK_z), spawn (cmdKb "us")),
-	((myMetaKey, xK_x), spawn (cmdKb "ru")),
-	
-	-- required https://github.com/unclechu/gpaste-zenity
-	((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh")),
-	
-	-- screenshots (basic keyboard)
-	
-	((0,         xK_Print), spawn cmdScrnShot),
-	((myMetaKey, xK_Print), spawn cmdScrnShotArea),
-	((0,         xK_Pause), spawn cmdScrnShotX),
-	((myMetaKey, xK_Pause), spawn cmdScrnShotAreaX),
-	
-	-- pulseaudio volume control
-	
-	((0, xF86XK_AudioMute),        spawn cmdAudioToggle),
-	((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec),
-	((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc),
-	
-	-- audacious playback
-	
-	((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play")),
-	((0,         xF86XK_AudioPlay), spawn (cmd "audacious --play-pause")),
-	((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
-	((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
-	
-	
-	((myMetaKey, xK_p), spawn (cmd launcherApp)),
-	((myMetaKey, xK_f), spawn (cmd fileManager)),
-	(((myMetaKey .|. shiftMask), xK_Return), spawn (cmd myTermLight)),
-	(((myMetaKey .|. controlMask), xK_Return), spawn (cmd myTermDark))
-	
-	]
+
+
+  -- required https://github.com/unclechu/gpaste-zenity
+  ((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh")),
+
+
+  -- screenshots (basic keyboard)
+
+  ((0,         xK_Print), spawn cmdScrnShot),
+  ((myMetaKey, xK_Print), spawn cmdScrnShotArea),
+  ((0,         xK_Pause), spawn cmdScrnShotX),
+  ((myMetaKey, xK_Pause), spawn cmdScrnShotAreaX),
+
+
+  -- pulseaudio volume control
+
+  ((0, xF86XK_AudioMute),        spawn cmdAudioToggle),
+  ((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec),
+  ((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc),
+
+
+  -- audacious playback
+
+  ((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play")),
+  ((0,         xF86XK_AudioPlay), spawn (cmd "audacious --play-pause")),
+  ((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew")),
+  ((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd")),
+
+
+  ((myMetaKey, xK_p), spawn (cmd launcherApp)),
+  ((myMetaKey, xK_f), spawn (cmd fileManager)),
+  (((myMetaKey .|. shiftMask), xK_Return), spawn (cmd myTermLight)),
+  (((myMetaKey .|. controlMask), xK_Return), spawn (cmd myTermDark))
+
+
+  ]
 
 main = do
-	xmproc <- spawnPipe ("/usr/bin/dzen2"
-		++ " -h 12 -ta l -fg '#ccc' -bg '#333'"
-		++ " -fn 'DejaVu Sans Mono:size=9'")
-	xmonad $ myConfig {
-		logHook = do
-			dynamicLogWithPP $ defaultPP {
-				ppOutput = System.IO.hPutStrLn xmproc,
-				ppTitle = dzenColor "#fff" "#666" . pad,
-				ppCurrent = dzenColor "green" "#000" . wrap "[" "]",
-				ppSep = "  ",
-				ppWsSep = " ",
-				ppLayout = dzenColor "yellow" "#000" .
-					(\ x -> case x of
-					"Tall"            -> "[>]"
-					"Mirror Tall"     -> "[v]"
-					"Grid"            -> "[+]"
-					"Spiral"          -> "[0]"
-					"Tabbed Simplest" -> "[t]"
-					"SimplestFloat"   -> "[f]"
-					"Full"            -> "[ ]"
-					_                 ->   x  ),
-				ppHiddenNoWindows = showNamedWorkspaces
-				}
-			fadeInactiveLogHook 0.9
-		} `additionalKeys` myKeys
-			where showNamedWorkspaces wsId = wsId
+  xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
+  xmonad $ myConfig {
+    logHook = do
+      dynamicLogWithPP $ defaultPP {
+        ppOutput = System.IO.hPutStrLn xmproc,
+        ppTitle = xmobarColor "gray" "#444" .wrap " " " ",
+        ppCurrent = xmobarColor "green" "" . wrap "[" "]",
+        ppSep = "  ",
+        ppWsSep = " ",
+        ppLayout = xmobarColor "yellow" "" .
+          (\ x -> case x of
+          "Tall"            -> "[>]"
+          "Mirror Tall"     -> "[v]"
+          "Grid"            -> "[+]"
+          "Spiral"          -> "[0]"
+          "Tabbed Simplest" -> "[t]"
+          "SimplestFloat"   -> "[f]"
+          "Full"            -> "[ ]"
+          _                 ->   x  ),
+        ppHiddenNoWindows = showNamedWorkspaces
+        }
+      fadeInactiveLogHook 0.9
+    } `additionalKeys` myKeys
+      where showNamedWorkspaces wsId = wsId
 
--- vim: set noet :
+-- vim: set et ts=2 sts=2 sw=2 :
