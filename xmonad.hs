@@ -21,7 +21,7 @@ myTermLight = myTerm ++ " --profile light"
 myTermDark  = myTerm ++ " --profile dark"
 
 launcherApp = "gmrun"
-fileManager = "thunar"
+fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
@@ -32,6 +32,8 @@ myManageHook :: ManageHook
 myManageHook = composeAll
   [ title =? "gpaste-zenity" --> doCenterFloat
   , title =? "File Operation Progress" --> doCenterFloat
+  , title =? "Copying files" --> doCenterFloat
+  , title =? "Compress" --> doCenterFloat
   ]
 
 myConfig = defaultConfig
