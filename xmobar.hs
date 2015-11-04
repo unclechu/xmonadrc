@@ -14,5 +14,3 @@ Config {
   alignSep = "}{",
   template = "%StdinReader% }{ %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
 }
-
--- vim: set et ts=2 sts=2 sw=2 :

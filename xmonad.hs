@@ -152,5 +152,3 @@ main = do
         fadeInactiveLogHook 0.9
     } `additionalKeys` myKeys
       where showNamedWorkspaces wsId = wsId
-
--- vim: set et ts=2 sts=2 sw=2 :
