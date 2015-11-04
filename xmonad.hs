@@ -26,7 +26,7 @@ fileManager = "pcmanfm"
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
 
-myMetaKey = mod1Mask
+myMetaKey = mod4Mask
 
 myManageHook :: ManageHook
 myManageHook = composeAll
