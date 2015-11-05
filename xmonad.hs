@@ -14,6 +14,7 @@ import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO
+import System.Directory
 import Graphics.X11.ExtraTypes.XF86
 
 myTerm      = "terminator"
@@ -26,8 +27,6 @@ fileManager = "pcmanfm"
 myWorkspaces :: [String]
 myWorkspaces = map show [1..9]
 
-myMetaKey = mod4Mask
-
 myManageHook :: ManageHook
 myManageHook = composeAll
   [ title =? "gpaste-zenity" --> doCenterFloat
@@ -36,7 +35,7 @@ myManageHook = composeAll
   , title =? "Compress" --> doCenterFloat
   ]
 
-myConfig = defaultConfig
+myConfig myMetaKey = defaultConfig
   { manageHook  = manageDocks <+> manageHook defaultConfig <+> myManageHook
   , layoutHook  = myLayoutHook
 
@@ -90,7 +89,9 @@ cmdScrnShotArea  = cmd "gnome-screenshot -a"
 cmdScrnShotX     = cmd "gnome-screenshot -i"
 cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
-myKeys =
+(&) = flip ($)
+
+myKeys myMetaKey =
   [
 
   -- required https://github.com/unclechu/gpaste-zenity
@@ -127,9 +128,23 @@ myKeys =
 
   ]
 
+parseMyMetaKey x = case x of
+  "Mod1" -> mod1Mask
+  _      -> mod4Mask
+
 main = do
+
+  homeDir <- getHomeDirectory
+  let filePath = homeDir ++ "/.xmonad/myMetaKey"
+
+  handle   <- openFile filePath ReadMode
+  contents <- hGetContents handle
+
+  let fileContents = contents & filter (\x -> x /= '\r' && x /= '\n')
+  let myMetaKey = parseMyMetaKey fileContents
+
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
-  xmonad $ myConfig
+  xmonad $ (myConfig myMetaKey)
     { logHook = do
         dynamicLogWithPP $ defaultPP
           { ppOutput  = System.IO.hPutStrLn xmproc
@@ -150,5 +165,5 @@ main = do
           , ppHiddenNoWindows = showNamedWorkspaces
           }
         fadeInactiveLogHook 0.9
-    } `additionalKeys` myKeys
+    } `additionalKeys` (myKeys myMetaKey)
       where showNamedWorkspaces wsId = wsId
