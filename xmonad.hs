@@ -94,8 +94,11 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 myKeys myMetaKey =
   [
 
+    ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
+
+
   -- required https://github.com/unclechu/gpaste-zenity
-  ((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
