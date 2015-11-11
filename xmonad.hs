@@ -15,7 +15,9 @@ import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO
 import System.Directory
+import System.Exit
 import Graphics.X11.ExtraTypes.XF86
+import qualified XMonad.StackSet as W
 
 myTerm      = "terminator"
 myTermLight = myTerm ++ " --profile light"
@@ -92,9 +94,7 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 (&) = flip ($)
 
 myKeys myMetaKey =
-  [
-
-    ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
+  [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
   -- required https://github.com/unclechu/gpaste-zenity
@@ -129,7 +129,16 @@ myKeys myMetaKey =
   , ((myMetaKey .|. shiftMask, xK_Return), spawn (cmd myTermLight))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
 
-  ]
+
+  -- quit, or restart (because we used 'q' key move between displays
+  , ((myMetaKey .|. shiftMask, xK_z), io (exitWith ExitSuccess))
+  , ((myMetaKey              , xK_z), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+  ] ++
+  -- move between displays by q,w,e instead of w,e,r
+  [((m .|. myMetaKey, key), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
+        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+
 
 parseMyMetaKey x = case x of
   "Mod1" -> mod1Mask
