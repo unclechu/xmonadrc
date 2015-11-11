@@ -74,17 +74,19 @@ myLayoutHook =
       ration = 2/3 -- master proportion
       delta = 3/100 -- percent of master resize
 
-cmdStdSuffix = " &>/dev/null"
+cmd = (++ " &>/dev/null")
 
-cmd   (cmdStr) = cmdStr ++ cmdStdSuffix
-cmdKb (layout) = cmd ("xkb-switch -s " ++ layout)
-cmdAudioSetVol (vol) = "pactl set-sink-volume 0 " ++ vol
+cmdActiveSink =
+  "\"`(pactl info"
+    ++ "| grep -i 'default sink:'"
+    ++ "| sed 's/^default sink:[ ]*//i') 2>/dev/null`\""
+cmdAudioSetVol vol = "pactl set-sink-volume " ++ cmdActiveSink ++ ' ':vol
 
-cmdAudioMute     = cmd "pactl set-sink-mute 0 true"
-cmdAudioUnmute   = cmd "pactl set-sink-mute 0 false"
-cmdAudioToggle   = cmd "pactl set-sink-mute 0 toggle"
-cmdAudioInc      = cmd (cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB")
-cmdAudioDec      = cmd (cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB")
+cmdAudioMute     = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " true"
+cmdAudioUnmute   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " false"
+cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
+cmdAudioInc      = cmd $ cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
+cmdAudioDec      = cmd $ cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
 
 cmdScrnShot      = cmd "gnome-screenshot"
 cmdScrnShotArea  = cmd "gnome-screenshot -a"
@@ -111,7 +113,7 @@ myKeys myMetaKey =
 
   -- pulseaudio volume control
 
-  , ((0, xF86XK_AudioMute),        spawn cmdAudioToggle)
+  , ((0, xF86XK_AudioMute),        spawn cmdAudioMute)
   , ((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec)
   , ((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc)
 
