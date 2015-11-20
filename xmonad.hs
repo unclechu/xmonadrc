@@ -100,7 +100,7 @@ myKeys myMetaKey =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey .|. shiftMask, xK_v), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
@@ -127,15 +127,18 @@ myKeys myMetaKey =
 
 
   , ((myMetaKey, xK_p), spawn (cmd launcherApp))
-  , ((myMetaKey, xK_f), spawn (cmd fileManager))
-  , ((myMetaKey .|. shiftMask, xK_Return), spawn (cmd myTermLight))
+  , ((myMetaKey .|. shiftMask,   xK_f),      spawn (cmd fileManager))
+  , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
 
 
   -- quit, or restart (because we used 'q' key move between displays
   , ((myMetaKey .|. shiftMask, xK_z), io (exitWith ExitSuccess))
   , ((myMetaKey              , xK_z), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
-  ] ++
+  ]
+
+  ++
+
   -- move between displays by q,w,e instead of w,e,r
   [((m .|. myMetaKey, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
