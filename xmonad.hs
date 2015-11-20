@@ -124,6 +124,7 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioPlay), spawn (cmd "audacious --play-pause"))
   , ((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew"))
   , ((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
+  , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
   , ((myMetaKey, xK_p), spawn (cmd launcherApp))
@@ -133,7 +134,7 @@ myKeys myMetaKey =
 
 
   -- quit, or restart (because we used 'q' key move between displays
-  , ((myMetaKey .|. shiftMask, xK_z), io (exitWith ExitSuccess))
+  , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
   , ((myMetaKey              , xK_z), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
   ]
 
