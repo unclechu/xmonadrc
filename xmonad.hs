@@ -132,6 +132,8 @@ myKeys myMetaKey =
   , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
 
+  , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
+
 
   -- quit, or restart (because we used 'q' key move between displays
   , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
@@ -183,5 +185,5 @@ main = do
           , ppHiddenNoWindows = showNamedWorkspaces
           }
         fadeInactiveLogHook 0.9
-    } `additionalKeys` (myKeys myMetaKey)
+    } `additionalKeys` myKeys myMetaKey
       where showNamedWorkspaces wsId = wsId
