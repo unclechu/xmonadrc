@@ -195,13 +195,13 @@ myKeys myMetaKey =
   ++
 
   -- switching layouts by '0' and '.' keys
-  [ ((0, numpadHackMap  0), asks config >>= setLayout . layoutHook)
-  , ((0, numpadHackMap 10), sendMessage NextLayout)
+  [ ((0, numpadHackMap 11), asks config >>= setLayout . layoutHook)
+  , ((0, numpadHackMap 12), sendMessage NextLayout)
 
   -- increase or decrease number of windows
   -- in the master area by '0' and '.' numpad keys
-  , ((mod4Mask, numpadHackMap 10), sendMessage (IncMasterN 1))
-  , ((mod4Mask, numpadHackMap  0), sendMessage (IncMasterN (-1)))
+  , ((mod4Mask, numpadHackMap 11), sendMessage (IncMasterN (-1)))
+  , ((mod4Mask, numpadHackMap 12), sendMessage (IncMasterN 1))
 
   -- focus and move windows by +/- numpad keys
   , ((0,        numpadHackMap 13), windows W.focusUp)
@@ -210,11 +210,11 @@ myKeys myMetaKey =
   , ((mod4Mask, numpadHackMap 14), windows W.swapDown)
 
   -- resizing the master/slave ratio by '/' and '*' numpad keys
-  , ((0, numpadHackMap 11), sendMessage Shrink)
-  , ((0, numpadHackMap 12), sendMessage Expand)
+  , ((0, numpadHackMap 10), sendMessage Shrink)
+  , ((0, numpadHackMap  0), sendMessage Expand)
 
-  , ((mod4Mask, numpadHackMap 11), kill)
-  , ((mod4Mask, numpadHackMap 12), spawn (cmd launcherApp))
+  , ((mod4Mask, numpadHackMap 10), kill)
+  , ((mod4Mask, numpadHackMap  0), spawn (cmd launcherApp))
   ]
 
     where myMask x = x .|. optionalShift myMetaKey
