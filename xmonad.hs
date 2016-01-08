@@ -150,10 +150,10 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey,               xK_p),      spawn (cmd launcherApp))
-  , ((myMask myMetaKey,        xK_f),      spawn (cmd fileManager))
-  , ((myMask myMetaKey,        xK_Return), spawn (cmd myTermDark))
-  , ((myMetaKey .|. shiftMask, xK_Return), spawn (cmd myTermLight))
+  , ((myMetaKey,                 xK_p),      spawn (cmd launcherApp))
+  , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
+  , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
+  , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
