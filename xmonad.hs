@@ -96,10 +96,7 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 (&) = flip ($)
 
 numpadHackMap x = case x of
-  10 -> xK_KP_Delete -- dot
-
   0  -> xK_KP_Insert
-
   1  -> xK_KP_End
   2  -> xK_KP_Down
   3  -> xK_KP_Next
@@ -109,6 +106,12 @@ numpadHackMap x = case x of
   7  -> xK_KP_Home
   8  -> xK_KP_Up
   9  -> xK_KP_Prior
+
+  10 -> xK_KP_Delete   -- .
+  11 -> xK_KP_Divide   -- /
+  12 -> xK_KP_Multiply -- *
+  13 -> xK_KP_Subtract -- -
+  14 -> xK_KP_Add      -- +
 
 -- we don't need shift modifier if we use super key
 optionalShift x
@@ -147,13 +150,15 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey, xK_p), spawn (cmd launcherApp))
-  , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
-  , ((myMask myMetaKey,          xK_Return), spawn (cmd myTermLight))
-  , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
+  , ((myMetaKey,               xK_p),      spawn (cmd launcherApp))
+  , ((myMask myMetaKey,        xK_f),      spawn (cmd fileManager))
+  , ((myMask myMetaKey,        xK_Return), spawn (cmd myTermDark))
+  , ((myMetaKey .|. shiftMask, xK_Return), spawn (cmd myTermLight))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
+  -- close focused window with optional shift modifier
+  , ((myMask myMetaKey, xK_c), kill)
 
   -- quit, or restart (because we used 'q' key move between displays
   , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
@@ -186,6 +191,24 @@ myKeys myMetaKey =
   -- switching layouts by '0' and '.' keys
   [ ((0, numpadHackMap  0), asks config >>= setLayout . layoutHook)
   , ((0, numpadHackMap 10), sendMessage NextLayout)
+
+  -- increase or decrease number of windows
+  -- in the master area by '0' and '.' numpad keys
+  , ((mod4Mask, numpadHackMap 10), sendMessage (IncMasterN 1))
+  , ((mod4Mask, numpadHackMap  0), sendMessage (IncMasterN (-1)))
+
+  -- focus and move windows by +/- numpad keys
+  , ((0,        numpadHackMap 13), windows W.focusUp)
+  , ((0,        numpadHackMap 14), windows W.focusDown)
+  , ((mod4Mask, numpadHackMap 13), windows W.swapUp)
+  , ((mod4Mask, numpadHackMap 14), windows W.swapDown)
+
+  -- resizing the master/slave ratio by '/' and '*' numpad keys
+  , ((0, numpadHackMap 11), sendMessage Shrink)
+  , ((0, numpadHackMap 12), sendMessage Expand)
+
+  , ((mod4Mask, numpadHackMap 11), kill)
+  , ((mod4Mask, numpadHackMap 12), spawn (cmd launcherApp))
   ]
 
     where myMask x = x .|. optionalShift myMetaKey
