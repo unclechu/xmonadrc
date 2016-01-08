@@ -170,7 +170,7 @@ myKeys myMetaKey =
   -- move between displays by q,w,e instead of w,e,r
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
 
@@ -181,10 +181,16 @@ myKeys myMetaKey =
   -- numpad enter key as mod4Mask modifier:
   --   xmodmap -e 'keycode 104 = Hyper_L'
 
+  [((m, k), screenWorkspace sc >>= flip whenJust (windows . f))
+     | (k, sc) <- zip (map numpadHackMap [1..4]) [0..]
+     , (f, m)  <- [(W.view, shiftMask), (W.shift, shiftMask .|. mod4Mask)]]
+
+  ++
+
   -- move between workspaces by numpad
   [((m, k), windows $ f i)
-        | (i, k) <- zip myWorkspaces (map numpadHackMap [1..9])
-        , (f, m) <- [(W.greedyView, 0), (W.shift, mod4Mask)]]
+     | (i, k) <- zip myWorkspaces (map numpadHackMap [1..9])
+     , (f, m) <- [(W.greedyView, 0), (W.shift, mod4Mask)]]
 
   ++
 
