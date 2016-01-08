@@ -95,12 +95,32 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 (&) = flip ($)
 
+numpadHackMap x = case x of
+  10 -> xK_KP_Delete -- dot
+
+  0  -> xK_KP_Insert
+
+  1  -> xK_KP_End
+  2  -> xK_KP_Down
+  3  -> xK_KP_Next
+  4  -> xK_KP_Left
+  5  -> xK_KP_Begin
+  6  -> xK_KP_Right
+  7  -> xK_KP_Home
+  8  -> xK_KP_Up
+  9  -> xK_KP_Prior
+
+-- we don't need shift modifier if we use super key
+optionalShift x
+  | x == mod4Mask = 0
+  | otherwise     = shiftMask
+
 myKeys myMetaKey =
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey .|. shiftMask, xK_v), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMask myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
@@ -128,8 +148,8 @@ myKeys myMetaKey =
 
 
   , ((myMetaKey, xK_p), spawn (cmd launcherApp))
-  , ((myMetaKey .|. shiftMask,   xK_f),      spawn (cmd fileManager))
-  , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
+  , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
+  , ((myMask myMetaKey,          xK_Return), spawn (cmd myTermLight))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
@@ -143,9 +163,32 @@ myKeys myMetaKey =
   ++
 
   -- move between displays by q,w,e instead of w,e,r
-  [((m .|. myMetaKey, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
+  [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
         , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+
+  ++
+
+
+  -- numpad hacks
+
+  -- !!!WARNING!!!
+  -- numpad enter key as mod4Mask modifier:
+  --   xmodmap -e 'keycode 104 = Hyper_L'
+
+  -- move between workspaces by numpad
+  [((m, k), windows $ f i)
+        | (i, k) <- zip myWorkspaces (map numpadHackMap [1..9])
+        , (f, m) <- [(W.greedyView, 0), (W.shift, mod4Mask)]]
+
+  ++
+
+  -- switching layouts by '0' and '.' keys
+  [ ((0, numpadHackMap  0), asks config >>= setLayout . layoutHook)
+  , ((0, numpadHackMap 10), sendMessage NextLayout)
+  ]
+
+    where myMask x = x .|. optionalShift myMetaKey
 
 
 parseMyMetaKey x = case x of
@@ -162,9 +205,11 @@ main = do
 
   let fileContents = contents & filter (\x -> x /= '\r' && x /= '\n')
   let myMetaKey = parseMyMetaKey fileContents
+  let conf = myConfig myMetaKey
+  let keys = myKeys myMetaKey
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
-  xmonad $ (myConfig myMetaKey)
+  xmonad $ conf
     { logHook = do
         dynamicLogWithPP $ defaultPP
           { ppOutput  = System.IO.hPutStrLn xmproc
@@ -185,5 +230,5 @@ main = do
           , ppHiddenNoWindows = showNamedWorkspaces
           }
         fadeInactiveLogHook 0.9
-    } `additionalKeys` myKeys myMetaKey
+    } `additionalKeys` keys
       where showNamedWorkspaces wsId = wsId
