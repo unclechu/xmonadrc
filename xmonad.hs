@@ -204,10 +204,12 @@ myKeys myMetaKey =
   , ((mod4Mask, numpadHackMap 12), sendMessage (IncMasterN 1))
 
   -- focus and move windows by +/- numpad keys
-  , ((0,        numpadHackMap 13), windows W.focusUp)
-  , ((0,        numpadHackMap 14), windows W.focusDown)
-  , ((mod4Mask, numpadHackMap 13), windows W.swapUp)
-  , ((mod4Mask, numpadHackMap 14), windows W.swapDown)
+  , ((0,         numpadHackMap 13), windows W.focusUp)
+  , ((0,         numpadHackMap 14), windows W.focusDown)
+  , ((mod4Mask,  numpadHackMap 13), windows W.swapUp)
+  , ((mod4Mask,  numpadHackMap 14), windows W.swapDown)
+  -- show on top focused floating window
+  , ((shiftMask, numpadHackMap 14), windows W.shiftMaster)
 
   -- resizing the master/slave ratio by '/' and '*' numpad keys
   , ((0, numpadHackMap 10), sendMessage Shrink)
