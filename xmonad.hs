@@ -27,7 +27,7 @@ launcherApp = "gmrun"
 fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
-myWorkspaces = map show [1..9]
+myWorkspaces = [ "y","u","i","o", "7","8","9","0" ]
 
 myManageHook :: ManageHook
 myManageHook = composeAll
@@ -186,6 +186,13 @@ myKeys myMetaKey =
 
   ++
 
+  -- move between workspaces
+  [((m .|. myMetaKey, k), windows $ f i)
+        | (i, k) <- zip myWorkspaces [xK_y, xK_u, xK_i, xK_o, xK_7, xK_8, xK_9, xK_0]
+        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+
+  ++
+
 
   -- numpad hacks
 
@@ -201,7 +208,7 @@ myKeys myMetaKey =
 
   -- move between workspaces by numpad
   [((m, k), windows $ f i)
-     | (i, k) <- zip myWorkspaces (map numpadHackMap [1..9])
+     | (i, k) <- zip myWorkspaces (map numpadHackMap [1..])
      , (f, m) <- [(W.greedyView, 0), (W.shift, mod4Mask)]]
 
   ++
