@@ -158,7 +158,7 @@ myKeys myMetaKey =
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
   -- close focused window with optional shift modifier
-  , ((myMask myMetaKey, xK_c), kill)
+  , ((myMask myMetaKey, xK_b), kill)
 
   -- quit, or restart (because we used 'q' key move between displays)
   , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
@@ -179,8 +179,12 @@ myKeys myMetaKey =
   -- [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
   --       | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
   --       , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
-  --
-  -- ++
+  -- !!! x,c,v for 4 fingers
+  [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (k, sc) <- zip [xK_x, xK_c, xK_v] [0..]
+        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
+
+  ++
 
 
   -- numpad hacks
