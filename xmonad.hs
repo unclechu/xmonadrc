@@ -160,19 +160,27 @@ myKeys myMetaKey =
   -- close focused window with optional shift modifier
   , ((myMask myMetaKey, xK_c), kill)
 
-  -- quit, or restart (because we used 'q' key move between displays
+  -- quit, or restart (because we used 'q' key move between displays)
   , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
-  , ((myMetaKey              , xK_z), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+  , ((myMetaKey              , xK_z), spawn (
+      "if type xmonad; then " ++
+        "xmonad --recompile && xmonad --restart; " ++
+      "else " ++
+        "xmessage xmonad not in \\$PATH: \"$PATH\"; " ++
+      "fi"
+  ))
   ]
 
   ++
 
+  -- !!! move back to w,e,r because I have only 3 displays
+  --     and w,e,r more comfortable with mod4 modifier
   -- move between displays by q,w,e instead of w,e,r
-  [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
-
-  ++
+  -- [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
+  --       | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
+  --       , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
+  --
+  -- ++
 
 
   -- numpad hacks
@@ -182,7 +190,7 @@ myKeys myMetaKey =
   --   xmodmap -e 'keycode 104 = Hyper_L'
 
   [((m, k), screenWorkspace sc >>= flip whenJust (windows . f))
-     | (k, sc) <- zip (map numpadHackMap [1..4]) [0..]
+     | (k, sc) <- zip (map numpadHackMap [1..3]) [0..]
      , (f, m)  <- [(W.view, shiftMask), (W.shift, shiftMask .|. mod4Mask)]]
 
   ++
