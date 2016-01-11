@@ -123,7 +123,7 @@ myKeys myMetaKey =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMask myMetaKey, xK_v), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMask myMetaKey, xK_z), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
@@ -161,14 +161,14 @@ myKeys myMetaKey =
   , ((myMask myMetaKey, xK_b), kill)
 
   -- quit, or restart (because we used 'q' key move between displays)
-  , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
-  , ((myMetaKey              , xK_z), spawn (
-      "if type xmonad; then " ++
-        "xmonad --recompile && xmonad --restart; " ++
-      "else " ++
-        "xmessage xmonad not in \\$PATH: \"$PATH\"; " ++
-      "fi"
-  ))
+  -- , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
+  -- , ((myMetaKey              , xK_z), spawn (
+  --     "if type xmonad; then " ++
+  --       "xmonad --recompile && xmonad --restart; " ++
+  --     "else " ++
+  --       "xmessage xmonad not in \\$PATH: \"$PATH\"; " ++
+  --     "fi"
+  -- ))
   ]
 
   ++
