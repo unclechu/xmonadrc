@@ -30,11 +30,11 @@ myWorkspaces :: [String]
 myWorkspaces = [ "u","i","o","p", "8","9","0","-" ]
 
 myManageHook :: ManageHook
-myManageHook = composeAll
-  [ title     =? "gpaste-zenity"           --> doCenterFloat
-  , title     =? "File Operation Progress" --> doCenterFloat
-  , title     =? "Copying files"           --> doCenterFloat
-  , title     =? "Compress"                --> doCenterFloat
+myManageHook =  composeAll
+  [ title    =? "gpaste-zenity"           --> doCenterFloat
+  , title    =? "File Operation Progress" --> doCenterFloat
+  , title    =? "Copying files"           --> doCenterFloat
+  , title    =? "Compress"                --> doCenterFloat
   ]
 
 myConfig myMetaKey = defaultConfig
