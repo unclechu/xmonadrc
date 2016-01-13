@@ -27,7 +27,7 @@ launcherApp = "gmrun"
 fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
-myWorkspaces = [ "u","i","o","p", "8","9","0","-","+" ]
+myWorkspaces = [ "u","i","o","p", "8","9","0","-","=" ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
