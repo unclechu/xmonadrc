@@ -38,7 +38,7 @@ myManageHook = composeAll
   ]
 
 myConfig myMetaKey = defaultConfig
-  { manageHook  = manageDocks <+> manageHook defaultConfig <+> myManageHook
+  { manageHook  = manageDocks <+> myManageHook
   , layoutHook  = myLayoutHook
 
   , borderWidth = 1
