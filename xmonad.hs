@@ -27,14 +27,14 @@ launcherApp = "gmrun"
 fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
-myWorkspaces = [ "y","u","i","o", "7","8","9","0" ]
+myWorkspaces = [ "u","i","o","p", "8","9","0","-" ]
 
 myManageHook :: ManageHook
 myManageHook = composeAll
-  [ title =? "gpaste-zenity" --> doCenterFloat
-  , title =? "File Operation Progress" --> doCenterFloat
-  , title =? "Copying files" --> doCenterFloat
-  , title =? "Compress" --> doCenterFloat
+  [ title     =? "gpaste-zenity"           --> doCenterFloat
+  , title     =? "File Operation Progress" --> doCenterFloat
+  , title     =? "Copying files"           --> doCenterFloat
+  , title     =? "Compress"                --> doCenterFloat
   ]
 
 myConfig myMetaKey = defaultConfig
@@ -150,7 +150,7 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey,                 xK_p),      spawn (cmd launcherApp))
+  , ((myMetaKey,                 xK_y),      spawn (cmd launcherApp))
   , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
   , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
@@ -188,7 +188,8 @@ myKeys myMetaKey =
 
   -- move between workspaces
   [((m .|. myMetaKey, k), windows $ f i)
-        | (i, k) <- zip myWorkspaces [xK_y, xK_u, xK_i, xK_o, xK_7, xK_8, xK_9, xK_0]
+        | (i, k) <- zip myWorkspaces [ xK_u, xK_i, xK_o, xK_p,
+                                       xK_8, xK_9, xK_0, xK_minus ]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 
   ++
