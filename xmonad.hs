@@ -27,7 +27,7 @@ launcherApp = "gmrun"
 fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
-myWorkspaces = [ "u","i","o","p", "8","9","0","-" ]
+myWorkspaces = [ "u","i","o","p", "8","9","0","-","+" ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -189,7 +189,7 @@ myKeys myMetaKey =
   -- move between workspaces
   [((m .|. myMetaKey, k), windows $ f i)
         | (i, k) <- zip myWorkspaces [ xK_u, xK_i, xK_o, xK_p,
-                                       xK_8, xK_9, xK_0, xK_minus ]
+                                       xK_8, xK_9, xK_0, xK_minus, xK_equal ]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 
   ++
