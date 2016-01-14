@@ -1,6 +1,7 @@
 import XMonad
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig (additionalKeys)
+import qualified XMonad.StackSet as W
 
 import XMonad.Layout.Grid
 import XMonad.Layout.Tabbed
@@ -18,7 +19,6 @@ import System.IO
 import System.Directory
 import System.Exit
 import Graphics.X11.ExtraTypes.XF86
-import qualified XMonad.StackSet as W
 
 myTerm      = "terminator"
 myTermLight = myTerm ++ " --profile light"
@@ -28,7 +28,7 @@ launcherApp = "gmrun"
 fileManager = "pcmanfm"
 
 myWorkspaces :: [String]
-myWorkspaces = [ "u","i","o", "7","8","9","0","-","=" ]
+myWorkspaces =  [ "u","i","o", "7","8","9","0","-","=" ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -254,18 +254,25 @@ parseMyMetaKey x = case x of
   "Mod1" -> mod1Mask
   _      -> mod4Mask
 
-main = do
-
+getMyMetaKeyFileContents = do
   homeDir <- getHomeDirectory
   let filePath = homeDir ++ "/.xmonad/myMetaKey"
+  fileExists <- doesFileExist filePath
 
-  handle   <- openFile filePath ReadMode
-  contents <- hGetContents handle
+  if fileExists
+     then do
+          handle   <- openFile filePath ReadMode
+          contents <- hGetContents handle
+          let fileContents = contents & filter (\x -> x /= '\r' && x /= '\n')
+          return fileContents
+     else return "Mod4"
 
-  let fileContents = contents & filter (\x -> x /= '\r' && x /= '\n')
-  let myMetaKey = parseMyMetaKey fileContents
-  let conf = myConfig myMetaKey
-  let keys = myKeys myMetaKey
+main = do
+  myMetaKeyFileContents <- getMyMetaKeyFileContents
+
+  let myMetaKey = parseMyMetaKey myMetaKeyFileContents
+  let conf      = myConfig myMetaKey
+  let keys      = myKeys myMetaKey
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
   xmonad $ conf
