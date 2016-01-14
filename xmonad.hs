@@ -123,7 +123,7 @@ myKeys myMetaKey =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMask myMetaKey, xK_z), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMask myMetaKey, xK_b), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
@@ -154,11 +154,16 @@ myKeys myMetaKey =
   , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
   , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
   , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
+  , ((myMetaKey, xK_d), spawn (cmd myTermDark))
+  , ((myMetaKey, xK_s), spawn (cmd myTermLight))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
   -- close focused window with optional shift modifier
-  , ((myMask myMetaKey, xK_b), kill)
+  , ((myMask myMetaKey, xK_n), kill)
+
+  -- rebind to 'r' because we use 'n' for kill
+  , ((myMask myMetaKey, xK_r), refresh)
 
   -- quit, or restart (because we used 'q' key move between displays)
   -- , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
