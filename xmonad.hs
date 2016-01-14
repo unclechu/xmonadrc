@@ -7,6 +7,7 @@ import XMonad.Layout.Tabbed
 import XMonad.Layout.Spiral
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SimplestFloat
+import XMonad.Layout.PerWorkspace
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -60,19 +61,21 @@ myTabTheme = defaultTheme
   }
 
 myLayoutHook =
+  onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
   avoidStruts (
     tiled
     ||| Mirror tiled
     ||| Grid
     ||| spiral (6/7)
-    ||| tabbed shrinkText myTabTheme
+    ||| tabbedLayout
     )
   ||| simplestFloat
   ||| noBorders Full
     where
-      tiled = Tall 1 delta ration
-      ration = 2/3 -- master proportion
-      delta = 3/100 -- percent of master resize
+      tiled        = Tall 1 delta ration
+      ration       = 2/3 -- master proportion
+      delta        = 3/100 -- percent of master resize
+      tabbedLayout = tabbed shrinkText myTabTheme
 
 cmd = (++ " &>/dev/null")
 
