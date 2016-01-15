@@ -98,28 +98,10 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 (&) = flip ($)
 
-numpadHackMap x = case x of
-  0  -> xK_KP_Insert
-  1  -> xK_KP_End
-  2  -> xK_KP_Down
-  3  -> xK_KP_Next
-  4  -> xK_KP_Left
-  5  -> xK_KP_Begin
-  6  -> xK_KP_Right
-  7  -> xK_KP_Home
-  8  -> xK_KP_Up
-  9  -> xK_KP_Prior
-
-  10 -> xK_KP_Delete   -- .
-  11 -> xK_KP_Divide   -- /
-  12 -> xK_KP_Multiply -- *
-  13 -> xK_KP_Subtract -- -
-  14 -> xK_KP_Add      -- +
-
--- we don't need shift modifier if we use super key
-optionalShift x
+-- we don't need additional modifier if we use Super key
+optionalAdditionalModifier x
   | x == mod4Mask = 0
-  | otherwise     = shiftMask
+  | otherwise     = controlMask
 
 myKeys myMetaKey =
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
@@ -153,12 +135,10 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey,                 xK_p),      spawn (cmd launcherApp))
-  , ((myMask myMetaKey,          xK_f),      spawn (cmd fileManager))
-  , ((myMetaKey .|. controlMask, xK_Return), spawn (cmd myTermDark))
-  , ((myMetaKey .|. shiftMask,   xK_Return), spawn (cmd myTermLight))
-  , ((myMetaKey, xK_d), spawn (cmd myTermDark))
-  , ((myMetaKey, xK_s), spawn (cmd myTermLight))
+  , ((myMetaKey,        xK_p), spawn (cmd launcherApp))
+  , ((myMask myMetaKey, xK_f), spawn (cmd fileManager))
+  , ((myMetaKey,        xK_d), spawn (cmd myTermDark))
+  , ((myMetaKey,        xK_s), spawn (cmd myTermLight))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
@@ -168,29 +148,21 @@ myKeys myMetaKey =
   -- rebind to 'r' because we use 'n' for kill
   , ((myMask myMetaKey, xK_r), refresh)
 
-  -- quit, or restart (because we used 'q' key move between displays)
-  -- , ((myMetaKey .|. shiftMask, xK_z), io exitSuccess)
-  -- , ((myMetaKey              , xK_z), spawn (
-  --     "if type xmonad; then " ++
-  --       "xmonad --recompile && xmonad --restart; " ++
-  --     "else " ++
-  --       "xmessage xmonad not in \\$PATH: \"$PATH\"; " ++
-  --     "fi"
-  -- ))
+  , ((myMetaKey .|. controlMask, xK_q), io exitSuccess)
+
+  , ((myMetaKey .|. controlMask, xK_space), asks config >>= setLayout . layoutHook)
+  , ((myMetaKey,                 xK_space), sendMessage NextLayout)
+
+  , ((myMetaKey .|. controlMask, xK_j), windows W.swapDown)
+  , ((myMetaKey .|. controlMask, xK_k), windows W.swapUp)
   ]
 
   ++
 
-  -- !!! move back to w,e,r because I have only 3 displays
-  --     and w,e,r more comfortable with mod4 modifier
-  -- move between displays by q,w,e instead of w,e,r
-  -- [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-  --       | (k, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-  --       , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
-  -- !!! x,c,v for 4 fingers
+  -- move between displays by x,c,v keys
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_x, xK_c, xK_v] [0..]
-        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
+        , (f, m)  <- [(W.view, 0), (W.shift, controlMask)]]
 
   ++
 
@@ -198,56 +170,9 @@ myKeys myMetaKey =
   [((m .|. myMetaKey, k), windows $ f i)
         | (i, k) <- zip myWorkspaces [       xK_u, xK_i, xK_o,
                                        xK_7, xK_8, xK_9, xK_0, xK_minus, xK_equal ]
-        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+        , (f, m) <- [(W.greedyView, 0), (W.shift, controlMask)]]
 
-  ++
-
-
-  -- numpad hacks
-
-  -- !!!WARNING!!!
-  -- numpad enter key as mod4Mask modifier:
-  --   xmodmap -e 'keycode 104 = Hyper_L'
-
-  [((m, k), screenWorkspace sc >>= flip whenJust (windows . f))
-     | (k, sc) <- zip (map numpadHackMap [1..3]) [0..]
-     , (f, m)  <- [(W.view, shiftMask), (W.shift, shiftMask .|. mod4Mask)]]
-
-  ++
-
-  -- move between workspaces by numpad
-  [((m, k), windows $ f i)
-     | (i, k) <- zip myWorkspaces (map numpadHackMap [1..])
-     , (f, m) <- [(W.greedyView, 0), (W.shift, mod4Mask)]]
-
-  ++
-
-  -- switching layouts by '0' and '.' keys
-  [ ((0, numpadHackMap 11), asks config >>= setLayout . layoutHook)
-  , ((0, numpadHackMap 12), sendMessage NextLayout)
-
-  -- increase or decrease number of windows
-  -- in the master area by '0' and '.' numpad keys
-  , ((mod4Mask, numpadHackMap 11), sendMessage (IncMasterN (-1)))
-  , ((mod4Mask, numpadHackMap 12), sendMessage (IncMasterN 1))
-
-  -- focus and move windows by +/- numpad keys
-  , ((0,         numpadHackMap 13), windows W.focusUp)
-  , ((0,         numpadHackMap 14), windows W.focusDown)
-  , ((mod4Mask,  numpadHackMap 13), windows W.swapUp)
-  , ((mod4Mask,  numpadHackMap 14), windows W.swapDown)
-  -- show on top focused floating window
-  , ((shiftMask, numpadHackMap 14), windows W.shiftMaster)
-
-  -- resizing the master/slave ratio by '/' and '*' numpad keys
-  , ((0, numpadHackMap 10), sendMessage Shrink)
-  , ((0, numpadHackMap  0), sendMessage Expand)
-
-  , ((mod4Mask, numpadHackMap 10), kill)
-  , ((mod4Mask, numpadHackMap  0), spawn (cmd launcherApp))
-  ]
-
-    where myMask x = x .|. optionalShift myMetaKey
+    where myMask x = x .|. optionalAdditionalModifier myMetaKey
 
 
 parseMyMetaKey x = case x of
