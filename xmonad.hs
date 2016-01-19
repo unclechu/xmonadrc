@@ -25,7 +25,7 @@ myTermLight = myTerm ++ " --profile light"
 myTermDark  = myTerm ++ " --profile dark"
 
 launcherApp = "gmrun"
-fileManager = "pcmanfm"
+fileManager = "nautilus"
 
 myWorkspaces :: [String]
 myWorkspaces =  [ "u","i","o", "7","8","9","0","-","=" ]
