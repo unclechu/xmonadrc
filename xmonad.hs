@@ -28,7 +28,7 @@ launcherApp = "gmrun"
 fileManager = "nautilus"
 
 myWorkspaces :: [String]
-myWorkspaces =  [ "u","i","o", "7","8","9","0","-","=" ]
+myWorkspaces =  [ "u","i","o", "8","9","0", "-","=" ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -143,10 +143,7 @@ myKeys myMetaKey =
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
   -- close focused window with optional shift modifier
-  , ((myMask myMetaKey, xK_n), kill)
-
-  -- rebind to 'r' because we use 'n' for kill
-  , ((myMask myMetaKey, xK_r), refresh)
+  , ((myMask myMetaKey, xK_slash), kill)
 
   , ((myMetaKey .|. controlMask, xK_q), io exitSuccess)
 
@@ -168,8 +165,8 @@ myKeys myMetaKey =
 
   -- move between workspaces
   [((m .|. myMetaKey, k), windows $ f i)
-        | (i, k) <- zip myWorkspaces [       xK_u, xK_i, xK_o,
-                                       xK_7, xK_8, xK_9, xK_0, xK_minus, xK_equal ]
+        | (i, k) <- zip myWorkspaces [ xK_u, xK_i, xK_o,
+                                       xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
         , (f, m) <- [(W.greedyView, 0), (W.shift, controlMask)]]
 
     where myMask x = x .|. optionalAdditionalModifier myMetaKey
