@@ -171,6 +171,7 @@ myKeys myMetaKey =
 
   ++
 
+  -- do nothing by default workspaces keys
   [((m .|. myMetaKey, k), return ())
         | k <- [ xK_1 .. xK_7 ]
         , m <- [ 0, controlMask, shiftMask ]]
