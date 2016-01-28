@@ -169,6 +169,12 @@ myKeys myMetaKey =
                                        xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
         , (f, m) <- [(W.greedyView, 0), (W.shift, controlMask)]]
 
+  ++
+
+  [((m .|. myMetaKey, k), return ())
+        | k <- [ xK_1 .. xK_7 ]
+        , m <- [ 0, controlMask, shiftMask ]]
+
     where myMask x = x .|. optionalAdditionalModifier myMetaKey
 
 
