@@ -8,9 +8,9 @@ Config {
   commands = [
     Run Date "%A %d %B %H:%M" "date" 10,
     Run Kbd [("us", "<fc=red>US</fc>"), ("ru", "<fc=green>RU</fc>")],
-    Run StdinReader
+    Run UnsafeStdinReader
   ],
   sepChar = "%",
   alignSep = "}{",
-  template = "%StdinReader% }{ %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
+  template = "%UnsafeStdinReader% }{ %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
 }

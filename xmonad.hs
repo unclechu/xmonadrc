@@ -20,6 +20,10 @@ import System.Directory
 import System.Exit
 import Graphics.X11.ExtraTypes.XF86
 
+xmobarEscape = concatMap doubleLts
+  where doubleLts '<' = "<<"
+        doubleLts x   = [x]
+
 myTerm      = "terminator"
 myTermLight = myTerm ++ " --profile light"
 myTermDark  = myTerm ++ " --profile dark"
@@ -27,8 +31,16 @@ myTermDark  = myTerm ++ " --profile dark"
 launcherApp = "gmrun"
 fileManager = "nautilus"
 
+myWorkspacesBareList :: [String]
+myWorkspacesBareList = [ "u","i","o", "8","9","0", "-",    "=" ]
+myWorkspacesKeysList :: [String]
+myWorkspacesKeysList = [ "u","i","o", "8","9","0", "minus","equal" ]
+
 myWorkspaces :: [String]
-myWorkspaces =  [ "u","i","o", "8","9","0", "-","=" ]
+myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
+  where
+    clickable l = [ "<action=xdotool key super+" ++ k ++ ">" ++ ws ++ "</action>"
+                  | (k,ws) <- zip myWorkspacesKeysList l ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -196,6 +208,17 @@ getMyMetaKeyFileContents = do
           return fileContents
      else return "Mod4"
 
+layoutNameHandler x = wrap $ xmobarEscape $ case x of
+  "Tall"            -> "[>]"
+  "Mirror Tall"     -> "[v]"
+  "Grid"            -> "[+]"
+  "Spiral"          -> "[0]"
+  "Tabbed Simplest" -> "[t]"
+  "SimplestFloat"   -> "[f]"
+  "Full"            -> "[ ]"
+  _                 ->   x
+  where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
+
 main = do
   myMetaKeyFileContents <- getMyMetaKeyFileContents
 
@@ -212,16 +235,7 @@ main = do
           , ppCurrent = xmobarColor "green" ""    . wrap "[" "]"
           , ppSep     = "  "
           , ppWsSep   = " "
-          , ppLayout  = xmobarColor "yellow" "" .
-              (\x -> case x of
-                "Tall"            -> "[>]"
-                "Mirror Tall"     -> "[v]"
-                "Grid"            -> "[+]"
-                "Spiral"          -> "[0]"
-                "Tabbed Simplest" -> "[t]"
-                "SimplestFloat"   -> "[f]"
-                "Full"            -> "[ ]"
-                _                 ->   x)
+          , ppLayout  = xmobarColor "yellow" "" . layoutNameHandler
           , ppHiddenNoWindows = showNamedWorkspaces
           }
         fadeInactiveLogHook 0.9
