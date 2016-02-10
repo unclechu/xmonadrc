@@ -16,7 +16,6 @@ import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO
-import System.Directory
 import System.Exit
 import Graphics.X11.ExtraTypes.XF86
 
@@ -100,8 +99,8 @@ cmdAudioSetVol vol = "pactl set-sink-volume " ++ cmdActiveSink ++ ' ':vol
 cmdAudioMute     = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " true"
 cmdAudioUnmute   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " false"
 cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
-cmdAudioInc      = cmd $ cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
-cmdAudioDec      = cmd $ cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
+cmdAudioInc      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
+cmdAudioDec      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
 
 cmdScrnShot      = cmd "gnome-screenshot"
 cmdScrnShotArea  = cmd "gnome-screenshot -a"
@@ -110,17 +109,12 @@ cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 (&) = flip ($)
 
--- we don't need additional modifier if we use Super key
-optionalAdditionalModifier x
-  | x == mod4Mask = 0
-  | otherwise     = controlMask
-
 myKeys myMetaKey =
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMask myMetaKey, xK_b), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey, xK_b), spawn (cmd "gpaste-zenity.sh"))
 
 
   -- screenshots (basic keyboard)
@@ -147,23 +141,23 @@ myKeys myMetaKey =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey,        xK_p), spawn (cmd launcherApp))
-  , ((myMask myMetaKey, xK_f), spawn (cmd fileManager))
-  , ((myMetaKey,        xK_d), spawn (cmd myTermDark))
-  , ((myMetaKey,        xK_s), spawn (cmd myTermLight))
+  , ((myMetaKey, xK_p), spawn (cmd launcherApp))
+  , ((myMetaKey, xK_f), spawn (cmd fileManager))
+  , ((myMetaKey, xK_d), spawn (cmd myTermDark))
+  , ((myMetaKey, xK_s), spawn (cmd myTermLight))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
   -- close focused window with optional shift modifier
-  , ((myMask myMetaKey, xK_slash), kill)
+  , ((myMetaKey, xK_slash), kill)
 
   , ((myMetaKey .|. controlMask, xK_q), io exitSuccess)
 
-  , ((myMetaKey .|. controlMask, xK_space), asks config >>= setLayout . layoutHook)
-  , ((myMetaKey,                 xK_space), sendMessage NextLayout)
+  , ((myMetaKey .|. mod1Mask, xK_space), asks config >>= setLayout . layoutHook)
+  , ((myMetaKey,              xK_space), sendMessage NextLayout)
 
-  , ((myMetaKey .|. controlMask, xK_j), windows W.swapDown)
-  , ((myMetaKey .|. controlMask, xK_k), windows W.swapUp)
+  , ((myMetaKey .|. mod1Mask, xK_j), windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask, xK_k), windows W.swapUp)
   ]
 
   ++
@@ -188,26 +182,6 @@ myKeys myMetaKey =
         | k <- [ xK_1 .. xK_7 ]
         , m <- [ 0, controlMask, shiftMask ]]
 
-    where myMask x = x .|. optionalAdditionalModifier myMetaKey
-
-
-parseMyMetaKey x = case x of
-  "Mod1" -> mod1Mask
-  _      -> mod4Mask
-
-getMyMetaKeyFileContents = do
-  homeDir <- getHomeDirectory
-  let filePath = homeDir ++ "/.xmonad/myMetaKey"
-  fileExists <- doesFileExist filePath
-
-  if fileExists
-     then do
-          handle   <- openFile filePath ReadMode
-          contents <- hGetContents handle
-          let fileContents = contents & filter (\x -> x /= '\r' && x /= '\n')
-          return fileContents
-     else return "Mod4"
-
 layoutNameHandler x = wrap $ xmobarEscape $ case x of
   "Tall"            -> "[>]"
   "Mirror Tall"     -> "[v]"
@@ -220,9 +194,7 @@ layoutNameHandler x = wrap $ xmobarEscape $ case x of
   where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
 
 main = do
-  myMetaKeyFileContents <- getMyMetaKeyFileContents
-
-  let myMetaKey = parseMyMetaKey myMetaKeyFileContents
+  let myMetaKey = mod4Mask
   let conf      = myConfig myMetaKey
   let keys      = myKeys myMetaKey
 
