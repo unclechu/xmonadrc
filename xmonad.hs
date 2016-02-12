@@ -165,7 +165,7 @@ myKeys myMetaKey =
   -- move between displays by x,c,v keys
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_x, xK_c, xK_v] [0..]
-        , (f, m)  <- [(W.view, 0), (W.shift, controlMask)]]
+        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
 
   ++
 
@@ -173,7 +173,7 @@ myKeys myMetaKey =
   [((m .|. myMetaKey, k), windows $ f i)
         | (i, k) <- zip myWorkspaces [ xK_u, xK_i, xK_o,
                                        xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
-        , (f, m) <- [(W.greedyView, 0), (W.shift, controlMask)]]
+        , (f, m) <- [(W.greedyView, 0), (W.shift, mod1Mask)]]
 
   ++
 
