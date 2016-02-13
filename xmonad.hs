@@ -114,7 +114,8 @@ myKeys myMetaKey =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey, xK_b), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey,              xK_b), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey .|. mod1Mask, xK_b), spawn (cmd "gpaste-zenity.sh -m=delete"))
 
 
   -- screenshots (basic keyboard)
