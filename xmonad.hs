@@ -43,11 +43,13 @@ myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
-  [ title    =? "gpaste-zenity"           --> doCenterFloat
-  , title    =? "File Operation Progress" --> doCenterFloat
-  , title    =? "Copying files"           --> doCenterFloat
-  , title    =? "Compress"                --> doCenterFloat
+  [ title    =? "gpaste-zenity"             --> doCenterFloat
+  , title    =? "File Operation Progress"   --> doCenterFloat
+  , title    =? "Copying files"             --> doCenterFloat
+  , title    =? "Compress"                  --> doCenterFloat
+  , role     =? "gimp-toolbox-color-dialog" --> doCenterFloat
   ]
+    where role = stringProperty "WM_WINDOW_ROLE"
 
 myConfig myMetaKey = defaultConfig
   { manageHook  = manageDocks <+> myManageHook
