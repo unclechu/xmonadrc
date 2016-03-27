@@ -159,8 +159,14 @@ myKeys myMetaKey =
   , ((myMetaKey .|. mod1Mask, xK_space), asks config >>= setLayout . layoutHook)
   , ((myMetaKey,              xK_space), sendMessage NextLayout)
 
-  , ((myMetaKey .|. mod1Mask, xK_j), windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask, xK_k), windows W.swapUp)
+  , ((myMetaKey .|. mod1Mask, xK_j),    windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask, xK_k),    windows W.swapUp)
+  , ((myMetaKey .|. mod1Mask, xK_Down), windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask, xK_Up),   windows W.swapUp)
+  , ((myMetaKey, xK_Right),             windows W.focusDown)
+  , ((myMetaKey, xK_Down),              windows W.focusDown)
+  , ((myMetaKey, xK_Left),              windows W.focusUp)
+  , ((myMetaKey, xK_Up),                windows W.focusUp)
   ]
 
   ++
