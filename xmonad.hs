@@ -39,7 +39,7 @@ myWorkspaces :: [String]
 myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
   where
     clickable l = [ "<action=xdotool key super+" ++ k ++ ">" ++ ws ++ "</action>"
-                  | (k,ws) <- zip myWorkspacesKeysList l ]
+                  | (k, ws) <- zip myWorkspacesKeysList l ]
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -61,6 +61,23 @@ myConfig myMetaKey = defaultConfig
   , terminal    = myTerm
   , workspaces  = myWorkspaces
   }
+  where
+    myLayoutHook =
+      onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
+      avoidStruts (
+        tiled
+        ||| Mirror tiled
+        ||| Grid
+        ||| spiral (6/7)
+        ||| tabbedLayout
+        )
+      ||| simplestFloat
+      ||| noBorders Full
+        where
+          tiled        = Tall 1 delta ration
+          ration       = 2/3 -- master proportion
+          delta        = 3/100 -- percent of master resize
+          tabbedLayout = tabbed shrinkText myTabTheme
 
 myTabTheme = defaultTheme
   { activeColor         = "#3c5863"
@@ -72,44 +89,6 @@ myTabTheme = defaultTheme
   , decoHeight          = 12
   , fontName            = "terminus"
   }
-
-myLayoutHook =
-  onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
-  avoidStruts (
-    tiled
-    ||| Mirror tiled
-    ||| Grid
-    ||| spiral (6/7)
-    ||| tabbedLayout
-    )
-  ||| simplestFloat
-  ||| noBorders Full
-    where
-      tiled        = Tall 1 delta ration
-      ration       = 2/3 -- master proportion
-      delta        = 3/100 -- percent of master resize
-      tabbedLayout = tabbed shrinkText myTabTheme
-
-cmd = (++ " &>/dev/null")
-
-cmdActiveSink =
-  "\"`(pactl info"
-    ++ "| grep -i 'default sink:'"
-    ++ "| sed 's/^default sink:[ ]*//i') 2>/dev/null`\""
-cmdAudioSetVol vol = "pactl set-sink-volume " ++ cmdActiveSink ++ ' ':vol
-
-cmdAudioMute     = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " true"
-cmdAudioUnmute   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " false"
-cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
-cmdAudioInc      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
-cmdAudioDec      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
-
-cmdScrnShot      = cmd "gnome-screenshot"
-cmdScrnShotArea  = cmd "gnome-screenshot -a"
-cmdScrnShotX     = cmd "gnome-screenshot -i"
-cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
-
-(&) = flip ($)
 
 myKeys myMetaKey =
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
@@ -185,23 +164,36 @@ myKeys myMetaKey =
         | k <- [ xK_1 .. xK_7 ]
         , m <- [ 0, controlMask, shiftMask ]]
 
-layoutNameHandler x = wrap $ xmobarEscape $ case x of
-  "Tall"            -> "[>]"
-  "Mirror Tall"     -> "[v]"
-  "Grid"            -> "[+]"
-  "Spiral"          -> "[0]"
-  "Tabbed Simplest" -> "[t]"
-  "SimplestFloat"   -> "[f]"
-  "Full"            -> "[ ]"
-  _                 ->   x
-  where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
+  where
+    cmd = (++ " &>/dev/null")
 
+    cmdActiveSink =
+      "\"`(pactl info"
+        ++ "| grep -i 'default sink:'"
+        ++ "| sed 's/^default sink:[ ]*//i') 2>/dev/null`\""
+    cmdAudioSetVol vol = "pactl set-sink-volume " ++ cmdActiveSink ++ ' ':vol
+
+    cmdAudioMute     = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " true"
+    cmdAudioUnmute   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " false"
+    cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
+    cmdAudioInc      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
+    cmdAudioDec      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
+
+    cmdScrnShot      = cmd "gnome-screenshot"
+    cmdScrnShotArea  = cmd "gnome-screenshot -a"
+    cmdScrnShotX     = cmd "gnome-screenshot -i"
+    cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
+
+
+main :: IO ()
 main = do
+
   let myMetaKey = mod4Mask
-  let conf      = myConfig myMetaKey
-  let keys      = myKeys myMetaKey
+      conf      = myConfig myMetaKey
+      keys      = myKeys myMetaKey
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
+
   xmonad $ conf
     { logHook = do
         dynamicLogWithPP $ defaultPP
@@ -215,4 +207,15 @@ main = do
           }
         fadeInactiveLogHook 0.9
     } `additionalKeys` keys
-      where showNamedWorkspaces wsId = wsId
+      where
+        showNamedWorkspaces wsId = wsId
+        layoutNameHandler x = wrap $ xmobarEscape $ case x of
+          "Tall"            -> "[>]"
+          "Mirror Tall"     -> "[v]"
+          "Grid"            -> "[+]"
+          "Spiral"          -> "[0]"
+          "Tabbed Simplest" -> "[t]"
+          "SimplestFloat"   -> "[f]"
+          "Full"            -> "[ ]"
+          _                 ->   x
+          where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
