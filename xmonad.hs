@@ -19,6 +19,14 @@ import System.IO
 import System.Exit
 import Graphics.X11.ExtraTypes.XF86
 
+import System.Directory (getHomeDirectory)
+import System.IO (readFile)
+import qualified System.IO.Error as Error
+import qualified Control.Exception as Exception
+import Data.Maybe (fromMaybe)
+import Control.Applicative ((<$>))
+import Data.Char (toLower)
+
 xmobarEscape = concatMap doubleLts
   where doubleLts '<' = "<<"
         doubleLts x   = [x]
@@ -51,7 +59,7 @@ myManageHook =  composeAll
   ]
     where role = stringProperty "WM_WINDOW_ROLE"
 
-myConfig myMetaKey = defaultConfig
+myConfig customConfig = defaultConfig
   { manageHook  = manageDocks <+> myManageHook
   , layoutHook  = myLayoutHook
 
@@ -62,6 +70,7 @@ myConfig myMetaKey = defaultConfig
   , workspaces  = myWorkspaces
   }
   where
+    myMetaKey = metaKey customConfig
     myLayoutHook =
       onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
       avoidStruts (
@@ -90,7 +99,7 @@ myTabTheme = defaultTheme
   , fontName            = "terminus"
   }
 
-myKeys myMetaKey =
+myKeys customConfig =
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
@@ -154,7 +163,7 @@ myKeys myMetaKey =
 
   -- move between displays by x,c,v keys
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_x, xK_c, xK_v] [0..]
+        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ displaysOrder customConfig
         , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
 
   ++
@@ -173,6 +182,8 @@ myKeys myMetaKey =
         , m <- [ 0, controlMask, shiftMask ]]
 
   where
+    myMetaKey = metaKey customConfig
+
     cmd = (++ " &>/dev/null")
 
     cmdActiveSink =
@@ -193,12 +204,103 @@ myKeys myMetaKey =
     cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
 
+-- TODO implement independent workspaces
+data Config = Config { independentWorkspaces :: Bool
+                     , displaysOrder         :: [ScreenId]
+                     , metaKey               :: KeyMask
+                     } deriving Show
+
+defaultCustomConfig = Config { independentWorkspaces = False
+                             , displaysOrder         = [1,2,3]
+                             , metaKey               = mod4Mask
+                             }
+
+-- example of config.txt (all keys are optional, see defaultCustomConfig):
+-- independent-workspaces = yes
+-- displays-order = 3,2,1
+configFile :: IO String
+configFile = getHomeDirectory >>= return . (++ "/.xmonad/config.txt")
+
+parseCustomConfig config configFromFile =
+  case configFromFile of
+    Nothing -> lastPreparations config
+    Just x  -> lastPreparations
+             . resolvePairs config
+             . pairs
+             . lines
+             $ configFromFile
+  where isSpaceSym :: Char -> Bool
+        isSpaceSym x = x == ' ' || x == '\t'
+        lines :: Maybe String -> [String]
+        lines (Just x)
+                    | x == ""   = []
+                    | otherwise = foldr reducer [""] x
+                    where reducer symbol (x:xs)
+                            | symbol == '\n' = "":x:xs
+                            | otherwise      = (symbol:x):xs
+        pairs :: [String] -> [(String, String)]
+        pairs = map checkForAvailableKey
+              . foldr splitReducer []
+              . filter (/= "")
+              . map clearSidesSpaces
+          where clearSidesSpaces = reverse
+                                 . dropWhile isSpaceSym
+                                 . reverse
+                                 . dropWhile isSpaceSym
+                splitReducer line acc = (k, v) : acc
+                  where k = clearSidesSpaces $ takeWhile (/= '=') line
+                        v = clearSidesSpaces $ tail $ dropWhile (/= '=') line
+                checkForAvailableKey (k, v)
+                  | k `elem` availableKeys = (k, v)
+                  | otherwise = error "Unknown config key"
+                  where availableKeys = [ "independent-workspaces"
+                                        , "displays-order"
+                                        ]
+        resolvePairs :: Config -> [(String, String)] -> Config
+        resolvePairs config [] = config
+        resolvePairs config ((k, v):pairs) = resolvePairs newConfig pairs
+          where newConfig = case k of
+                  "independent-workspaces" ->
+                    let nv = map toLower v
+                    in case nv of
+                         "yes" -> config { independentWorkspaces = True }
+                         "no"  -> config { independentWorkspaces = False }
+                         _ -> error "Unexpected value of independent-workspaces in config"
+                  "displays-order" ->
+                    let cleanStr = filter (not . isSpaceSym) v
+                        isValidSym x = x `elem` ',':['0'..'9']
+                        validStr
+                          | all isValidSym cleanStr = cleanStr
+                          | otherwise = error "Unexpected value of displays-order in config"
+                        listReducer :: Char -> [String] -> [String]
+                        listReducer ',' acc = "":acc
+                        listReducer c (x:xs) = (c:x):xs
+                        order
+                          | length result >= 2 = result
+                          | otherwise = error "displays-order should have at least 2 items"
+                          where result = map read
+                                       $ foldr listReducer [""] validStr
+                    in config { displaysOrder = order }
+        lastPreparations :: Config -> Config
+        lastPreparations config =
+          config { displaysOrder = map (subtract 1) $ displaysOrder config }
+
+getCustomConfig :: IO Config
+getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile
+  where readConfigFile = do
+          filePath <- configFile
+          Exception.catch (Just <$> readFile filePath) handleExists
+        handleExists e
+          | Error.isDoesNotExistError e = return Nothing
+          | otherwise = Exception.throwIO e
+
 main :: IO ()
 main = do
 
-  let myMetaKey = mod4Mask
-      conf      = myConfig myMetaKey
-      keys      = myKeys myMetaKey
+  customConfig <- getCustomConfig
+
+  let conf = myConfig customConfig
+      keys = myKeys   customConfig
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 
