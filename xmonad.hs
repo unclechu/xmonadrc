@@ -20,7 +20,6 @@ import System.Exit
 import Graphics.X11.ExtraTypes.XF86
 
 import System.Directory (getHomeDirectory)
-import System.IO (readFile)
 import qualified System.IO.Error as Error
 import qualified Control.Exception as Exception
 import Data.Maybe (fromMaybe)
@@ -31,17 +30,10 @@ xmobarEscape = concatMap doubleLts
   where doubleLts '<' = "<<"
         doubleLts x   = [x]
 
-myTerm      = "terminator"
-myTermLight = myTerm ++ " --profile light"
-myTermDark  = myTerm ++ " --profile dark"
-
-launcherApp = "gmrun"
-fileManager = "nautilus"
-
 myWorkspacesBareList :: [String]
-myWorkspacesBareList = [ "u","i","o", "8","9","0", "-",    "=" ]
+myWorkspacesBareList  = [ "u","i","o", "8","9","0", "-",    "=" ]
 myWorkspacesKeysList :: [String]
-myWorkspacesKeysList = [ "u","i","o", "8","9","0", "minus","equal" ]
+myWorkspacesKeysList  = [ "u","i","o", "8","9","0", "minus","equal" ]
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
@@ -65,12 +57,11 @@ myConfig customConfig = defaultConfig
 
   , borderWidth = 1
 
-  , modMask     = myMetaKey
-  , terminal    = myTerm
+  , modMask     = cfgMetaKey customConfig
+  , terminal    = cfgTerminal customConfig
   , workspaces  = myWorkspaces
   }
   where
-    myMetaKey = metaKey customConfig
     myLayoutHook =
       onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
       avoidStruts (
@@ -132,10 +123,10 @@ myKeys customConfig =
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
 
-  , ((myMetaKey, xK_p), spawn (cmd launcherApp))
-  , ((myMetaKey, xK_f), spawn (cmd fileManager))
-  , ((myMetaKey, xK_d), spawn (cmd myTermDark))
-  , ((myMetaKey, xK_s), spawn (cmd myTermLight))
+  , ((myMetaKey, xK_p), spawn (cmd $ cfgLauncher      customConfig))
+  , ((myMetaKey, xK_f), spawn (cmd $ cfgFileManager   customConfig))
+  , ((myMetaKey, xK_d), spawn (cmd $ cfgTerminalDark  customConfig))
+  , ((myMetaKey, xK_s), spawn (cmd $ cfgTerminalLight customConfig))
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
@@ -163,7 +154,7 @@ myKeys customConfig =
 
   -- move between displays by x,c,v keys
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ displaysOrder customConfig
+        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ cfgDisplaysOrder customConfig
         , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
 
   ++
@@ -182,7 +173,7 @@ myKeys customConfig =
         , m <- [ 0, controlMask, shiftMask ]]
 
   where
-    myMetaKey = metaKey customConfig
+    myMetaKey = cfgMetaKey customConfig
 
     cmd = (++ " &>/dev/null")
 
@@ -205,15 +196,27 @@ myKeys customConfig =
 
 
 -- TODO implement independent workspaces
-data Config = Config { independentWorkspaces :: Bool
-                     , displaysOrder         :: [ScreenId]
-                     , metaKey               :: KeyMask
-                     } deriving Show
+data Config =
+  Config { cfgIndependentWorkspaces :: Bool
+         , cfgDisplaysOrder         :: [ScreenId]
+         , cfgMetaKey               :: KeyMask
+         , cfgTerminal              :: String
+         , cfgTerminalDark          :: String
+         , cfgTerminalLight         :: String
+         , cfgFileManager           :: String
+         , cfgLauncher              :: String
+         } deriving Show
 
-defaultCustomConfig = Config { independentWorkspaces = False
-                             , displaysOrder         = [1,2,3]
-                             , metaKey               = mod4Mask
-                             }
+defaultCustomConfig =
+  Config { cfgIndependentWorkspaces = False
+         , cfgDisplaysOrder         = [1,2,3]
+         , cfgMetaKey               = mod4Mask
+         , cfgTerminal              = "terminator"
+         , cfgTerminalDark          = "terminator --profile dark"
+         , cfgTerminalLight         = "terminator --profile light"
+         , cfgFileManager           = "nautilus"
+         , cfgLauncher              = "gmrun"
+         }
 
 -- example of config.txt (all keys are optional, see defaultCustomConfig):
 -- independent-workspaces = yes
@@ -263,8 +266,8 @@ parseCustomConfig config configFromFile =
                   "independent-workspaces" ->
                     let nv = map toLower v
                     in case nv of
-                         "yes" -> config { independentWorkspaces = True }
-                         "no"  -> config { independentWorkspaces = False }
+                         "yes" -> config { cfgIndependentWorkspaces = True  }
+                         "no"  -> config { cfgIndependentWorkspaces = False }
                          _ -> error "Unexpected value of independent-workspaces in config"
                   "displays-order" ->
                     let cleanStr = filter (not . isSpaceSym) v
@@ -280,10 +283,10 @@ parseCustomConfig config configFromFile =
                           | otherwise = error "displays-order should have at least 2 items"
                           where result = map read
                                        $ foldr listReducer [""] validStr
-                    in config { displaysOrder = order }
+                    in config { cfgDisplaysOrder = order }
         lastPreparations :: Config -> Config
         lastPreparations config =
-          config { displaysOrder = map (subtract 1) $ displaysOrder config }
+          config { cfgDisplaysOrder = map (subtract 1) $ cfgDisplaysOrder config }
 
 getCustomConfig :: IO Config
 getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile
