@@ -196,6 +196,7 @@ myKeys customConfig =
 
 
 -- TODO implement independent workspaces
+-- TODO fix displays order
 data Config =
   Config { cfgIndependentWorkspaces :: Bool
          , cfgDisplaysOrder         :: [ScreenId]
@@ -258,6 +259,11 @@ parseCustomConfig config configFromFile =
                   | otherwise = error "Unknown config key"
                   where availableKeys = [ "independent-workspaces"
                                         , "displays-order"
+                                        , "terminal"
+                                        , "terminal-dark"
+                                        , "terminal-light"
+                                        , "file-manager"
+                                        , "launcher"
                                         ]
         resolvePairs :: Config -> [(String, String)] -> Config
         resolvePairs config [] = config
@@ -284,6 +290,11 @@ parseCustomConfig config configFromFile =
                           where result = map read
                                        $ foldr listReducer [""] validStr
                     in config { cfgDisplaysOrder = order }
+                  "terminal"       -> config { cfgTerminal      = v }
+                  "terminal-dark"  -> config { cfgTerminalDark  = v }
+                  "terminal-light" -> config { cfgTerminalLight = v }
+                  "file-manager"   -> config { cfgFileManager   = v }
+                  "launcher"       -> config { cfgLauncher      = v }
         lastPreparations :: Config -> Config
         lastPreparations config =
           config { cfgDisplaysOrder = map (subtract 1) $ cfgDisplaysOrder config }
