@@ -155,10 +155,7 @@ myKeys customConfig =
   -- move between displays by x,c,v keys
   let order = map screenNum $ cfgDisplaysOrder customConfig
       screenNum :: Int -> ScreenId
-      screenNum x = case x of
-                         1 -> 0
-                         2 -> 1
-                         3 -> 2
+      screenNum x = [0..] !! (x-1)
   in
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_x, xK_c, xK_v] $ order
