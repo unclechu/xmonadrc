@@ -162,8 +162,7 @@ myKeys customConfig =
   in
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_x, xK_c, xK_v] $ order
-        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]
-        ]
+        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
 
   ++
 
