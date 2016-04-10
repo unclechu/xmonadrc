@@ -153,9 +153,16 @@ myKeys customConfig =
   ++
 
   -- move between displays by x,c,v keys
-  [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ cfgDisplaysOrder customConfig
-        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
+  let order = map screenNum $ cfgDisplaysOrder customConfig
+      screenNum :: Int -> ScreenId
+      screenNum x = case x of
+                         1 -> 0
+                         2 -> 1
+                         3 -> 2
+  in [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
+        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ order
+        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]
+        ]
 
   ++
 
@@ -196,10 +203,9 @@ myKeys customConfig =
 
 
 -- TODO implement independent workspaces
--- TODO fix displays order
 data Config =
   Config { cfgIndependentWorkspaces :: Bool
-         , cfgDisplaysOrder         :: [ScreenId]
+         , cfgDisplaysOrder         :: [Int]
          , cfgMetaKey               :: KeyMask
          , cfgTerminal              :: String
          , cfgTerminalDark          :: String
@@ -227,9 +233,8 @@ configFile = getHomeDirectory >>= return . (++ "/.xmonad/config.txt")
 
 parseCustomConfig config configFromFile =
   case configFromFile of
-    Nothing -> lastPreparations config
-    Just x  -> lastPreparations
-             . resolvePairs config
+    Nothing -> config
+    Just x  -> resolvePairs config
              . pairs
              . lines
              $ configFromFile
@@ -295,9 +300,6 @@ parseCustomConfig config configFromFile =
                   "terminal-light" -> config { cfgTerminalLight = v }
                   "file-manager"   -> config { cfgFileManager   = v }
                   "launcher"       -> config { cfgLauncher      = v }
-        lastPreparations :: Config -> Config
-        lastPreparations config =
-          config { cfgDisplaysOrder = map (subtract 1) $ cfgDisplaysOrder config }
 
 getCustomConfig :: IO Config
 getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile
