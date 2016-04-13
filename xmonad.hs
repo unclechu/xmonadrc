@@ -15,6 +15,8 @@ import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.FadeInactive
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
+import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
+
 import System.IO
 import System.Exit
 import Graphics.X11.ExtraTypes.XF86
@@ -25,6 +27,7 @@ import qualified Control.Exception as Exception
 import Data.Maybe (fromMaybe)
 import Control.Applicative ((<$>))
 import Data.Char (toLower)
+import Control.Monad (liftM)
 
 xmobarEscape = concatMap doubleLts
   where doubleLts '<' = "<<"
@@ -140,14 +143,19 @@ myKeys customConfig =
 
   , ((myMetaKey .|. mod1Mask, xK_j),     windows W.swapDown)
   , ((myMetaKey .|. mod1Mask, xK_k),     windows W.swapUp)
-  , ((myMetaKey .|. mod1Mask, xK_Right), windows W.swapDown)
   , ((myMetaKey .|. mod1Mask, xK_Down),  windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask, xK_Left),  windows W.swapUp)
   , ((myMetaKey .|. mod1Mask, xK_Up),    windows W.swapUp)
-  , ((myMetaKey, xK_Right),              windows W.focusDown)
   , ((myMetaKey, xK_Down),               windows W.focusDown)
-  , ((myMetaKey, xK_Left),               windows W.focusUp)
   , ((myMetaKey, xK_Up),                 windows W.focusUp)
+
+  , ((myMetaKey, xK_Left),                  prevWS)
+  , ((myMetaKey, xK_Right),                 nextWS)
+  , ((myMetaKey .|. mod1Mask, xK_Left),     shiftToPrev)
+  , ((myMetaKey .|. mod1Mask, xK_Right),    shiftToNext)
+  , ((myMetaKey .|. controlMask, xK_Up),    sendMessage (IncMasterN 1))
+  , ((myMetaKey .|. controlMask, xK_Down),  sendMessage (IncMasterN (-1)))
+  , ((myMetaKey .|. controlMask, xK_Left),  sendMessage Shrink)
+  , ((myMetaKey .|. controlMask, xK_Right), sendMessage Expand)
   ]
 
   ++
@@ -158,7 +166,7 @@ myKeys customConfig =
       screenNum x = [0..] !! (x-1)
   in
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_x, xK_c, xK_v] $ order
+        | (k, sc) <- zip [xK_x, xK_c, xK_v] order
         , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
 
   ++
@@ -226,7 +234,7 @@ defaultCustomConfig =
 -- independent-workspaces = yes
 -- displays-order = 3,2,1
 configFile :: IO String
-configFile = getHomeDirectory >>= return . (++ "/.xmonad/config.txt")
+configFile = liftM (++ "/.xmonad/config.txt") getHomeDirectory
 
 parseCustomConfig config configFromFile =
   case configFromFile of
