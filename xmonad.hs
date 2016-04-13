@@ -172,10 +172,25 @@ myKeys customConfig =
   ++
 
   -- move between workspaces
-  [((m .|. myMetaKey, k), windows $ f i)
-        | (i, k) <- zip myWorkspaces [ xK_u, xK_i, xK_o,
-                                       xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
-        , (f, m) <- [(W.greedyView, 0), (W.shift, mod1Mask)]]
+  let keys1 = [ xK_u, xK_i, xK_o,  xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
+      keys2 = map numpadHackMap [ 1..8 ]
+        where numpadHackMap x =
+                case x of
+                     0 -> xK_KP_Insert
+                     1 -> xK_KP_End
+                     2 -> xK_KP_Down
+                     3 -> xK_KP_Next
+                     4 -> xK_KP_Left
+                     5 -> xK_KP_Begin
+                     6 -> xK_KP_Right
+                     7 -> xK_KP_Home
+                     8 -> xK_KP_Up
+                     9 -> xK_KP_Prior
+      bind keys =
+        [((m .|. myMetaKey, k), windows $ f i)
+              | (i, k) <- zip myWorkspaces keys
+              , (f, m) <- [(W.greedyView, 0), (W.shift, mod1Mask)]]
+  in (bind keys1) ++ (bind keys2)
 
   ++
 
