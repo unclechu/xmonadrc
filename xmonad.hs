@@ -189,7 +189,9 @@ myKeys customConfig =
       bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
-              , (f, m) <- [(W.greedyView, 0), (W.shift, mod1Mask)]]
+              , (f, m) <- [ (W.view, 0)
+                          , (W.greedyView, controlMask)
+                          , (W.shift, mod1Mask) ]]
   in (bind keys1) ++ (bind keys2)
 
   ++
