@@ -28,6 +28,7 @@ import Data.Maybe (fromMaybe)
 import Control.Applicative ((<$>))
 import Data.Char (toLower)
 import Control.Monad (liftM)
+import qualified Data.List as L
 
 xmobarEscape = concatMap doubleLts
   where doubleLts '<' = "<<"
@@ -189,9 +190,20 @@ myKeys customConfig =
       bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
-              , (f, m) <- [ (W.view, 0)
+              , (f, m) <- [ (myView, 0)
                           , (W.greedyView, controlMask)
                           , (W.shift, mod1Mask) ]]
+
+      -- switch to workspace only if it's hidden (not visible on any screen)
+      myView :: (Eq s, Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
+      myView i s
+        | Just x <- L.find ((i==) . W.tag) (W.hidden s)
+        = s { W.current = (W.current s) { W.workspace = x }
+            , W.hidden  = W.workspace (W.current s)
+                        : L.deleteBy (equating W.tag) x (W.hidden s) }
+        | otherwise = s
+        where equating f = \x y -> f x == f y
+
   in (bind keys1) ++ (bind keys2)
 
   ++
