@@ -64,6 +64,9 @@ myConfig customConfig = defaultConfig
   , modMask     = cfgMetaKey customConfig
   , terminal    = cfgTerminal customConfig
   , workspaces  = myWorkspaces
+
+  , focusFollowsMouse = False
+  , clickJustFocuses  = True
   }
   where
     myLayoutHook =
