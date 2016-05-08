@@ -35,15 +35,25 @@ xmobarEscape = concatMap doubleLts
         doubleLts x   = [x]
 
 myWorkspacesBareList :: [String]
-myWorkspacesBareList  = [ "u","i","o", "8","9","0", "-",    "=" ]
-myWorkspacesKeysList :: [String]
-myWorkspacesKeysList  = [ "u","i","o", "8","9","0", "minus","equal" ]
+myWorkspacesBareList  = map show [1..8]
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
   where
     clickable l = [ "<action=xdotool key super+" ++ k ++ ">" ++ ws ++ "</action>"
                   | (k, ws) <- zip myWorkspacesKeysList l ]
+    myWorkspacesKeysList = map numpadHackMap [1..8]
+    numpadHackMap x = case x of
+                           0 -> "KP_Insert"
+                           1 -> "KP_End"
+                           2 -> "KP_Down"
+                           3 -> "KP_Next"
+                           4 -> "KP_Left"
+                           5 -> "KP_Begin"
+                           6 -> "KP_Right"
+                           7 -> "KP_Home"
+                           8 -> "KP_Up"
+                           9 -> "KP_Prior"
 
 myManageHook :: ManageHook
 myManageHook =  composeAll
@@ -176,8 +186,16 @@ myKeys customConfig =
   ++
 
   -- move between workspaces
-  let keys1 = [ xK_u, xK_i, xK_o,  xK_8, xK_9, xK_0,  xK_minus, xK_equal ]
-      keys2 = map numpadHackMap [ 1..8 ]
+  let keys1 = [ xK_u, xK_i, xK_o
+              , xK_8, xK_9, xK_0
+              , xK_minus, xK_equal
+              ]
+      -- support https://github.com/unclechu/X11-my-custom-layouts
+      keys2 = [ xK_u, xK_i, xK_o
+              , xK_asterisk, xK_parenleft, xK_parenright
+              , xK_minus, xK_equal
+              ]
+      keys3 = map numpadHackMap [ 1..8 ]
         where numpadHackMap x =
                 case x of
                      0 -> xK_KP_Insert
@@ -207,7 +225,7 @@ myKeys customConfig =
         | otherwise = s
         where equating f = \x y -> f x == f y
 
-  in (bind keys1) ++ (bind keys2)
+  in (bind keys1) ++ (bind keys2) ++ (bind keys3)
 
   ++
 
