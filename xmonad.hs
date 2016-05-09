@@ -9,6 +9,7 @@ import XMonad.Layout.Spiral
 import XMonad.Layout.NoBorders
 import XMonad.Layout.SimplestFloat
 import XMonad.Layout.PerWorkspace
+import XMonad.Layout.Cross
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -86,6 +87,7 @@ myConfig customConfig = defaultConfig
         ||| Mirror tiled
         ||| Grid
         ||| spiral (6/7)
+        ||| simpleCross
         ||| tabbedLayout
         )
       ||| simplestFloat
@@ -396,6 +398,7 @@ main = do
           "Grid"            -> "[+]"
           "Spiral"          -> "[0]"
           "Tabbed Simplest" -> "[t]"
+          "Cross"           -> "[x]"
           "SimplestFloat"   -> "[f]"
           "Full"            -> "[ ]"
           _                 ->   x
