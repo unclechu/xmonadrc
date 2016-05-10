@@ -57,18 +57,24 @@ myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
                            9 -> "KP_Prior"
 
 myManageHook :: ManageHook
-myManageHook =  composeAll
+myManageHook =  composeAll $
   [ title    =? "gpaste-zenity"             --> doCenterFloat
-  , title    =? "File Operation Progress"   --> doCenterFloat
-  , title    =? "Copying files"             --> doCenterFloat
-  , title    =? "Compress"                  --> doCenterFloat
 
   -- gimp
-  , role     =? "gimp-toolbox-color-dialog" --> doCenterFloat
-  , role     =? "gimp-layer-new"            --> doCenterFloat
-  , role     =? "gimp-image-new"            --> doCenterFloat
+  , wmRole   =? "gimp-toolbox-color-dialog" --> doCenterFloat
+  , wmRole   =? "gimp-layer-new"            --> doCenterFloat
+  , wmRole   =? "gimp-image-new"            --> doCenterFloat
   ]
-    where role = stringProperty "WM_WINDOW_ROLE"
+  -- audacious
+  ++ [ className =? "Audacious" <&&> title =? x --> doCenterFloat
+     | x <- [ "Song Info"
+            , "Audacious Settings"
+            , "JACK Output Settings"
+            , "Add Files"
+            , "Open Files"
+            ]
+     ]
+    where wmRole = stringProperty "WM_WINDOW_ROLE"
 
 myConfig customConfig = defaultConfig
   { manageHook  = manageDocks <+> myManageHook
