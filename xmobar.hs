@@ -8,9 +8,11 @@ Config {
   commands = [ Run Date "%A %d %B %H:%M" "date" 10
              , Run Locks
              , Run Kbd [ ("us", "<fc=red>US</fc>")
-                       , ("usmy", "<fc=red>US</fc><fc=#900000>*</fc>")
+                       , ("mine(us)", "<fc=red>US</fc><fc=#900000>*</fc>")
+                       , ("mine(origus)", "<fc=red>US</fc><fc=#900000>~</fc>")
                        , ("ru", "<fc=green>RU</fc>")
-                       , ("rumy", "<fc=green>RU</fc><fc=#009000>*</fc>")
+                       , ("mine(ru)", "<fc=green>RU</fc><fc=#009000>*</fc>")
+                       , ("mine(origru)", "<fc=green>RU</fc><fc=#009000>~</fc>")
                        ]
              , Run UnsafeStdinReader
              ],
