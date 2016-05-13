@@ -91,7 +91,8 @@ myConfig customConfig = defaultConfig
   }
   where
     myLayoutHook =
-      onWorkspace (last myWorkspaces) (avoidStruts tabbedLayout) $
+      onWorkspace (last myWorkspaces)
+                  (avoidStruts (simpleCross ||| tabbedLayout)) $
       avoidStruts (
         tiled
         ||| Mirror tiled
@@ -235,9 +236,9 @@ myKeys customConfig =
             , W.hidden  = W.workspace (W.current s)
                         : L.deleteBy (equating W.tag) x (W.hidden s) }
         | otherwise = s
-        where equating f = \x y -> f x == f y
+        where equating f x y = f x == f y
 
-  in (bind keys1) ++ (bind keys2) ++ (bind keys3)
+  in bind keys1 ++ bind keys2 ++ bind keys3
 
   ++
 
@@ -296,7 +297,7 @@ defaultCustomConfig =
 -- independent-workspaces = yes
 -- displays-order = 3,2,1
 configFile :: IO String
-configFile = liftM (++ "/.xmonad/config.txt") getHomeDirectory
+configFile = fmap (++ "/.xmonad/config.txt") getHomeDirectory
 
 parseCustomConfig config configFromFile =
   case configFromFile of
