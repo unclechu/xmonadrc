@@ -64,6 +64,7 @@ myManageHook =  composeAll $
 
   -- gimp
   , wmRole   =? "gimp-toolbox-color-dialog" --> doCenterFloat
+  , wmRole   =? "gimp-message-dialog"       --> doCenterFloat
   , wmRole   =? "gimp-layer-new"            --> doCenterFloat
   , wmRole   =? "gimp-image-new"            --> doCenterFloat
 
