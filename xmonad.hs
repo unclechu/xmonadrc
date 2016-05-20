@@ -88,14 +88,14 @@ myManageHook =  composeAll $
           moveTo = doF . W.shift
 
 myConfig customConfig = defaultConfig
-  { manageHook  = manageDocks <+> myManageHook
-  , layoutHook  = myLayoutHook
+  { manageHook        = manageDocks <+> myManageHook
+  , layoutHook        = myLayoutHook
 
-  , borderWidth = 1
+  , borderWidth       = 1
 
-  , modMask     = cfgMetaKey customConfig
-  , terminal    = cfgTerminal customConfig
-  , workspaces  = myWorkspaces
+  , modMask           = cfgMetaKey customConfig
+  , terminal          = cfgTerminal customConfig
+  , workspaces        = myWorkspaces
 
   , focusFollowsMouse = False
   , clickJustFocuses  = True
@@ -184,7 +184,8 @@ myKeys customConfig =
   -- close focused window with optional shift modifier
   , ((myMetaKey, xK_slash), kill)
 
-  , ((myMetaKey .|. controlMask, xK_q), io exitSuccess)
+  , ((myMetaKey .|. shiftMask, xK_grave), io exitSuccess)
+  , ((myMetaKey, xK_grave), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
 
   , ((myMetaKey .|. mod1Mask, xK_space), asks config >>= setLayout . layoutHook)
   , ((myMetaKey,              xK_space), sendMessage NextLayout)
@@ -229,7 +230,16 @@ myKeys customConfig =
               , xK_asterisk, xK_parenleft, xK_parenright
               , xK_minus, xK_equal
               ]
-      keys3 = map numpadHackMap [ 1..8 ]
+      keys3 = [ xK_q, xK_w, xK_e
+              , xK_1, xK_2, xK_3
+              , xK_4, xK_5
+              ]
+      -- support https://github.com/unclechu/X11-my-custom-layouts
+      keys4 = [ xK_q, xK_w, xK_e
+              , xK_exclam, xK_at, xK_numbersign
+              , xK_dollar, xK_percent
+              ]
+      keys5 = map numpadHackMap [ 1..8 ]
         where numpadHackMap x =
                 case x of
                      0 -> xK_KP_Insert
@@ -259,13 +269,13 @@ myKeys customConfig =
         | otherwise = s
         where equating f x y = f x == f y
 
-  in bind keys1 ++ bind keys2 ++ bind keys3
+  in bind keys1 ++ bind keys2 ++ bind keys3 ++ bind keys4 ++ bind keys5
 
   ++
 
   -- do nothing by default workspaces keys
   [((m .|. myMetaKey, k), return ())
-        | k <- [ xK_1 .. xK_7 ]
+        | k <- [ xK_6 .. xK_7 ]
         , m <- [ 0, controlMask, shiftMask ]]
 
   where
