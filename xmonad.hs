@@ -66,6 +66,12 @@ myManageHook =  composeAll $
   , wmRole   =? "gimp-image-new"            --> doCenterFloat
 
   , className =? "qjackctl"                 --> doCenterFloat
+
+  , className =? "Gajim"                    --> moveTo (last myWorkspaces)
+  , className =? "Hexchat"                  --> moveTo (last myWorkspaces)
+  , className =? "utox"                     --> moveTo (last myWorkspaces)
+
+  , className =? "Firefox"                  --> moveTo (head myWorkspaces)
   ]
   -- audacious
   ++ [ className =? "Audacious" <&&> title =? x --> doCenterFloat
@@ -77,6 +83,7 @@ myManageHook =  composeAll $
             ]
      ]
     where wmRole = stringProperty "WM_WINDOW_ROLE"
+          moveTo = doF . W.shift
 
 myConfig customConfig = defaultConfig
   { manageHook  = manageDocks <+> myManageHook
@@ -93,23 +100,31 @@ myConfig customConfig = defaultConfig
   }
   where
     myLayoutHook =
+
       onWorkspace (last myWorkspaces)
-                  (avoidStruts (simpleCross ||| tabbedLayout)) $
-      avoidStruts (
-        tiled
-        ||| Mirror tiled
-        ||| Grid
-        ||| spiral (6/7)
-        ||| simpleCross
-        ||| tabbedLayout
-        )
+                  (avoidStruts $ simpleCross ||| tabbedLayout) $
+
+      onWorkspace (myWorkspaces !! 2) -- 3th ws
+                  (  (avoidStruts $ simpleCross ||| tabbedLayout)
+                 ||| (avoidStruts $ tiled ||| Mirror tiled ||| Grid ||| mySpiral)
+                 ||| (simplestFloat ||| noBorders Full)
+                  )  $
+
+      (avoidStruts $  tiled
+                  ||| Mirror tiled
+                  ||| Grid
+                  ||| mySpiral
+                  ||| simpleCross
+                  ||| tabbedLayout)
       ||| simplestFloat
       ||| noBorders Full
+
         where
           tiled        = Tall 1 delta ration
           ration       = 2/3 -- master proportion
           delta        = 3/100 -- percent of master resize
           tabbedLayout = tabbed shrinkText myTabTheme
+          mySpiral     = spiral (6/7)
 
 myTabTheme = defaultTheme
   { activeColor         = "#3c5863"
