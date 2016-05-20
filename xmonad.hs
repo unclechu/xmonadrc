@@ -10,6 +10,8 @@ import XMonad.Layout.NoBorders
 import XMonad.Layout.SimplestFloat
 import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Cross
+import XMonad.Layout.Circle
+import XMonad.Layout.CenteredMaster
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -102,10 +104,10 @@ myConfig customConfig = defaultConfig
     myLayoutHook =
 
       onWorkspace (last myWorkspaces)
-                  (avoidStruts $ simpleCross ||| tabbedLayout) $
+                  (avoidStruts $ simpleCross ||| Circle ||| centerMaster Grid ||| tabbedLayout) $
 
       onWorkspace (myWorkspaces !! 2) -- 3th ws
-                  (  (avoidStruts $ simpleCross ||| tabbedLayout)
+                  (  (avoidStruts $ simpleCross ||| Circle ||| centerMaster Grid ||| tabbedLayout)
                  ||| (avoidStruts $ tiled ||| Mirror tiled ||| Grid ||| mySpiral)
                  ||| (simplestFloat ||| noBorders Full)
                   )  $
@@ -115,6 +117,8 @@ myConfig customConfig = defaultConfig
                   ||| Grid
                   ||| mySpiral
                   ||| simpleCross
+                  ||| Circle
+                  ||| centerMaster Grid
                   ||| tabbedLayout)
       ||| simplestFloat
       ||| noBorders Full
@@ -427,6 +431,7 @@ main = do
           "Spiral"          -> "[0]"
           "Tabbed Simplest" -> "[t]"
           "Cross"           -> "[x]"
+          "Circle"          -> "[o]"
           "SimplestFloat"   -> "[f]"
           "Full"            -> "[ ]"
           _                 ->   x
