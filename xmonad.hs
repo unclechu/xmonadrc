@@ -108,10 +108,16 @@ myConfig customConfig = defaultConfig
                   (avoidStruts $ simpleCross ||| Circle ||| centerMaster Grid ||| tabbedLayout) $
 
       onWorkspace (myWorkspaces !! 2) -- 3th ws
-                  (  (avoidStruts $ simpleCross ||| Circle ||| centerMaster Grid ||| tabbedLayout)
-                 ||| (avoidStruts $ tiled ||| Mirror tiled ||| Grid ||| mySpiral)
-                 ||| (simplestFloat ||| noBorders Full)
-                  )  $
+                  ((avoidStruts $ simpleCross
+                               ||| Circle
+                               ||| centerMaster Grid
+                               ||| tabbedLayout
+                               ||| tiled
+                               ||| Mirror tiled
+                               ||| Grid
+                               ||| mySpiral)
+                  ||| simplestFloat ||| noBorders Full
+                  ) $
 
       (avoidStruts $  tiled
                   ||| Mirror tiled
@@ -231,6 +237,7 @@ myKeys customConfig =
               , xK_asterisk, xK_parenleft, xK_parenright
               , xK_minus, xK_equal
               ]
+
       keys3 = [ xK_q, xK_w, xK_e
               , xK_1, xK_2, xK_3
               , xK_4, xK_5
@@ -240,6 +247,7 @@ myKeys customConfig =
               , xK_exclam, xK_at, xK_numbersign
               , xK_dollar, xK_percent
               ]
+
       keys5 = map numpadHackMap [ 1..8 ]
         where numpadHackMap x =
                 case x of
@@ -253,12 +261,13 @@ myKeys customConfig =
                      7 -> xK_KP_Home
                      8 -> xK_KP_Up
                      9 -> xK_KP_Prior
-      bind keys =
+      bind = bindWith mod1Mask
+      bindWith modifier keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
               , (f, m) <- [ (myView, 0)
                           , (W.greedyView, controlMask)
-                          , (W.shift, mod1Mask) ]]
+                          , (W.shift, modifier) ]]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
       myView :: (Eq s, Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
@@ -270,7 +279,11 @@ myKeys customConfig =
         | otherwise = s
         where equating f x y = f x == f y
 
-  in bind keys1 ++ bind keys2 ++ bind keys3 ++ bind keys4 ++ bind keys5
+  in ( bind keys1
+    ++ bind keys2
+    ++ bindWith shiftMask keys3
+    ++ bindWith shiftMask keys4
+    ++ bind keys5 )
 
   ++
 
