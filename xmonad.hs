@@ -59,23 +59,27 @@ myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
                            9 -> "KP_Prior"
 
 myManageHook :: ManageHook
-myManageHook =  composeAll $
-  [ title    =? "gpaste-zenity"             --> doCenterFloat
+myManageHook = composeAll $
+
+  [ className =? "Gmrun"                     --> doCenterFloat
+
+  , title     =? "gpaste-zenity"             --> doCenterFloat
 
   -- gimp
-  , wmRole   =? "gimp-toolbox-color-dialog" --> doCenterFloat
-  , wmRole   =? "gimp-message-dialog"       --> doCenterFloat
-  , wmRole   =? "gimp-layer-new"            --> doCenterFloat
-  , wmRole   =? "gimp-image-new"            --> doCenterFloat
+  , wmRole    =? "gimp-toolbox-color-dialog" --> doCenterFloat
+  , wmRole    =? "gimp-message-dialog"       --> doCenterFloat
+  , wmRole    =? "gimp-layer-new"            --> doCenterFloat
+  , wmRole    =? "gimp-image-new"            --> doCenterFloat
 
-  , className =? "qjackctl"                 --> doCenterFloat
+  , className =? "qjackctl"                  --> doCenterFloat
+  , className =? "Audacious"                 --> moveTo (last $ init myWorkspaces)
 
-  , className =? "Gajim"                    --> moveTo (last myWorkspaces)
-  , className =? "Hexchat"                  --> moveTo (last myWorkspaces)
-  , className =? "utox"                     --> moveTo (last myWorkspaces)
-  , className =? "qTox"                     --> moveTo (last myWorkspaces)
+  , className =? "Gajim"                     --> moveTo (last myWorkspaces)
+  , className =? "Hexchat"                   --> moveTo (last myWorkspaces)
+  , className =? "utox"                      --> moveTo (last myWorkspaces)
+  , className =? "qTox"                      --> moveTo (last myWorkspaces)
 
-  , className =? "Firefox"                  --> moveTo (head myWorkspaces)
+  , className =? "Firefox"                   --> moveTo (head myWorkspaces)
   ]
   -- audacious
   ++ [ className =? "Audacious" <&&> title =? x --> doCenterFloat
@@ -105,8 +109,8 @@ myConfig customConfig = defaultConfig
   where
     myLayoutHook =
 
-      onWorkspace (last myWorkspaces)
-                  (avoidStruts $ simpleCross ||| Circle ||| centerMaster Grid ||| tabbedLayout) $
+      onWorkspace (last myWorkspaces)        lastWorkspacesLayouts $
+      onWorkspace (last $ init myWorkspaces) lastWorkspacesLayouts $
 
       onWorkspace (myWorkspaces !! 2) -- 3th ws
                   ((avoidStruts $ simpleCross
@@ -117,8 +121,7 @@ myConfig customConfig = defaultConfig
                                ||| Mirror tiled
                                ||| Grid
                                ||| mySpiral)
-                  ||| simplestFloat ||| noBorders Full
-                  ) $
+                  ||| simplestFloat ||| noBorders Full) $
 
       (avoidStruts $  tiled
                   ||| Mirror tiled
@@ -137,6 +140,12 @@ myConfig customConfig = defaultConfig
           delta        = 3/100 -- percent of master resize
           tabbedLayout = tabbed shrinkText myTabTheme
           mySpiral     = spiral (6/7)
+
+          lastWorkspacesLayouts = avoidStruts
+                                $  simpleCross
+                               ||| Circle
+                               ||| centerMaster Grid
+                               ||| tabbedLayout
 
 myTabTheme = defaultTheme
   { activeColor         = "#3c5863"
