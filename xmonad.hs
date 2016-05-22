@@ -73,6 +73,7 @@ myManageHook =  composeAll $
   , className =? "Gajim"                    --> moveTo (last myWorkspaces)
   , className =? "Hexchat"                  --> moveTo (last myWorkspaces)
   , className =? "utox"                     --> moveTo (last myWorkspaces)
+  , className =? "qTox"                     --> moveTo (last myWorkspaces)
 
   , className =? "Firefox"                  --> moveTo (head myWorkspaces)
   ]
