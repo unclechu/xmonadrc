@@ -6,7 +6,6 @@ Config {
   fgColor = "lightgray",
   position = Static { xpos = 0 , ypos = 0, width = 1919, height = 10 },
   commands = [ Run Date "%A %d %B %H:%M" "date" 10
-             , Run Locks
              , Run Kbd [ ("us", "<fc=red>US</fc>")
                        , ("mine(us)", "<fc=red>US</fc><fc=#900000>*</fc>")
                        , ("mine(origus)", "<fc=red>US</fc><fc=#900000>~</fc>")
@@ -18,5 +17,5 @@ Config {
              ],
   sepChar = "%",
   alignSep = "}{",
-  template = "%UnsafeStdinReader% }{ <fc=yellow>%locks%</fc> <fc=#666>/</fc> %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
+  template = "%UnsafeStdinReader% }{ %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
 }
