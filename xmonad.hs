@@ -201,23 +201,35 @@ myKeys customConfig =
   -- close focused window with optional shift modifier
   , ((myMetaKey, xK_slash), kill)
 
-  , ((myMetaKey .|. shiftMask, xK_grave), io exitSuccess)
+  , ((myMetaKey .|. shiftMask, xK_grave),   io exitSuccess)
   , ((myMetaKey, xK_grave), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
 
-  , ((myMetaKey .|. mod1Mask, xK_space), asks config >>= setLayout . layoutHook)
-  , ((myMetaKey,              xK_space), sendMessage NextLayout)
+  , ((myMetaKey .|. mod1Mask,  xK_space),   asks config >>= setLayout . layoutHook)
+  , ((myMetaKey .|. shiftMask, xK_space),   asks config >>= setLayout . layoutHook)
+  , ((myMetaKey,               xK_space),   sendMessage NextLayout)
 
-  , ((myMetaKey .|. mod1Mask, xK_j),     windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask, xK_k),     windows W.swapUp)
-  , ((myMetaKey .|. mod1Mask, xK_Down),  windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask, xK_Up),    windows W.swapUp)
-  , ((myMetaKey, xK_Down),               windows W.focusDown)
-  , ((myMetaKey, xK_Up),                 windows W.focusUp)
+  , ((myMetaKey .|. mod1Mask,  xK_j),       windows W.swapDown)
+  , ((myMetaKey .|. shiftMask, xK_j),       windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask,  xK_k),       windows W.swapUp)
+  , ((myMetaKey .|. shiftMask, xK_k),       windows W.swapUp)
+  , ((myMetaKey .|. mod1Mask,  xK_Down),    windows W.swapDown)
+  , ((myMetaKey .|. shiftMask, xK_Down),    windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask,  xK_Up),      windows W.swapUp)
+  , ((myMetaKey .|. shiftMask, xK_Up),      windows W.swapUp)
+  , ((myMetaKey, xK_Down),                  windows W.focusDown)
+  , ((myMetaKey, xK_Up),                    windows W.focusUp)
 
+  -- TODO only hidden workspace
   , ((myMetaKey, xK_Left),                  prevWS)
   , ((myMetaKey, xK_Right),                 nextWS)
-  , ((myMetaKey .|. mod1Mask, xK_Left),     shiftToPrev)
-  , ((myMetaKey .|. mod1Mask, xK_Right),    shiftToNext)
+
+  , ((myMetaKey .|. mod1Mask,  xK_Left),    prevWS)
+  , ((myMetaKey .|. mod1Mask,  xK_Right),   nextWS)
+
+  -- move windows
+  , ((myMetaKey .|. shiftMask,   xK_Left),  shiftToPrev)
+  , ((myMetaKey .|. shiftMask,   xK_Right), shiftToNext)
+
   , ((myMetaKey .|. controlMask, xK_Up),    sendMessage (IncMasterN 1))
   , ((myMetaKey .|. controlMask, xK_Down),  sendMessage (IncMasterN (-1)))
   , ((myMetaKey .|. controlMask, xK_Left),  sendMessage Shrink)
@@ -233,7 +245,7 @@ myKeys customConfig =
   in
   [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
         | (k, sc) <- zip [xK_x, xK_c, xK_v] order
-        , (f, m)  <- [(W.view, 0), (W.shift, mod1Mask)]]
+        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
 
@@ -271,13 +283,12 @@ myKeys customConfig =
                      7 -> xK_KP_Home
                      8 -> xK_KP_Up
                      9 -> xK_KP_Prior
-      bind = bindWith mod1Mask
-      bindWith modifier keys =
+      bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
               , (f, m) <- [ (myView, 0)
-                          , (W.greedyView, controlMask)
-                          , (W.shift, modifier) ]]
+                          , (W.greedyView, mod1Mask)
+                          , (W.shift, shiftMask) ]]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
       myView :: (Eq s, Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
@@ -291,8 +302,8 @@ myKeys customConfig =
 
   in ( bind keys1
     ++ bind keys2
-    ++ bindWith shiftMask keys3
-    ++ bindWith shiftMask keys4
+    ++ bind keys3
+    ++ bind keys4
     ++ bind keys5 )
 
   ++
@@ -300,7 +311,7 @@ myKeys customConfig =
   -- do nothing by default workspaces keys
   [((m .|. myMetaKey, k), return ())
         | k <- [ xK_6 .. xK_7 ]
-        , m <- [ 0, controlMask, shiftMask ]]
+        , m <- [ 0, controlMask, shiftMask, mod1Mask ]]
 
   where
     myMetaKey = cfgMetaKey customConfig
