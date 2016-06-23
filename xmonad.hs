@@ -27,7 +27,7 @@ import Graphics.X11.ExtraTypes.XF86
 import System.Directory (getHomeDirectory)
 import qualified System.IO.Error as Error
 import qualified Control.Exception as Exception
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Control.Applicative ((<$>))
 import Data.Char (toLower)
 import Control.Monad (liftM)
@@ -159,6 +159,25 @@ myTabTheme = defaultTheme
   }
 
 myKeys customConfig =
+  let jumpOverVisibleNext = windows $ jumpOverVisibleView (+1)
+      jumpOverVisiblePrev = windows $ jumpOverVisibleView (subtract 1)
+      jumpOverVisibleView affect s =
+        W.greedyView (myWorkspaces !! getIdx getCurIdx) s
+        where getCurIdx :: Int
+              getCurIdx = fromJust $ L.elemIndex (W.currentTag s) myWorkspaces
+              getIdx fromIdx
+                | isHidden x = x
+                | otherwise = getIdx x
+                where x = getNextIdx fromIdx
+                      isHidden i = (myWorkspaces !! i) `elem` hiddenTags
+                      hiddenTags = map W.tag $ W.hidden s
+              getNextIdx srcIdx
+                  | next < 0 = maxIdx
+                  | next > maxIdx = 0
+                  | otherwise = next
+                  where next   = affect srcIdx
+                        maxIdx = subtract 1 $ length myWorkspaces
+  in
   [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
@@ -219,10 +238,8 @@ myKeys customConfig =
   , ((myMetaKey, xK_Down),                  windows W.focusDown)
   , ((myMetaKey, xK_Up),                    windows W.focusUp)
 
-  -- TODO only hidden workspace
-  , ((myMetaKey, xK_Left),                  prevWS)
-  , ((myMetaKey, xK_Right),                 nextWS)
-
+  , ((myMetaKey, xK_Left),                  jumpOverVisiblePrev)
+  , ((myMetaKey, xK_Right),                 jumpOverVisibleNext)
   , ((myMetaKey .|. mod1Mask,  xK_Left),    prevWS)
   , ((myMetaKey .|. mod1Mask,  xK_Right),   nextWS)
 
