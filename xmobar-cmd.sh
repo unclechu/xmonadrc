@@ -19,11 +19,11 @@ capslock_is=off
 level3_is=off
 
 msg () {
-	local numlock='<fc=#999>NUM</fc>'
-	local capslock='<fc=#999>CAPS</fc>'
-	local level3='<fc=#999>LEVEL3</fc>'
+	local numlock='<fc=#999>num</fc>'
+	local capslock='<fc=#999>caps</fc>'
+	local level3='<fc=#999>level3</fc>'
 	if [ $numlock_is == on ]; then
-		numlock='<fc=#eee>NUM</fc>'
+		numlock='<fc=#eee>num</fc>'
 	fi
 	if [ $capslock_is == on ]; then
 		capslock='<fc=orange>CAPS</fc>'
