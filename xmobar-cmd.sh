@@ -6,6 +6,14 @@ if [[ ! -p "$PIPE_FILE" ]]; then
 	mkfifo "$PIPE_FILE"
 fi
 
+# need to restart xlib-keys-hack
+if [ -x "$HOME/.local/bin/kbd.sh" ]; then
+	{
+		sleep 1
+		"$HOME/.local/bin/kbd.sh"
+	} 0</dev/null 1>/dev/null 2>/dev/null &
+fi
+
 numlock_is=off
 capslock_is=off
 level3_is=off
