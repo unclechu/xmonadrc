@@ -19,19 +19,19 @@ capslock_is=off
 level3_is=off
 
 msg () {
-	local numlock_color='#999'
-	local capslock_color='#999'
-	local level3_color='#999'
+	local numlock='<fc=#999>NUM</fc>'
+	local capslock='<fc=#999>CAPS</fc>'
+	local level3='<fc=#999>LEVEL3</fc>'
 	if [ $numlock_is == on ]; then
-		numlock_color='#eee'
+		numlock='<fc=#eee>NUM</fc>'
 	fi
 	if [ $capslock_is == on ]; then
-		capslock_color='#eee'
+		capslock='<fc=orange>CAPS</fc>'
 	fi
 	if [ $level3_is == on ]; then
-		level3_color=yellow
+		level3='<fc=yellow>LEVEL3</fc>'
 	fi
-	echo "<fc=$numlock_color>N</fc> <fc=$capslock_color>C</fc> <fc=$level3_color>L3</fc>"
+	echo "$numlock $capslock $level3"
 }
 
 while true; do
