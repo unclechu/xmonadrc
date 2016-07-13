@@ -19,14 +19,14 @@ capslock_is=off
 level3_is=off
 
 msg () {
-	local numlock_color=blue
-	local capslock_color=blue
-	local level3_color=blue
+	local numlock_color='#999'
+	local capslock_color='#999'
+	local level3_color='#999'
 	if [ $numlock_is == on ]; then
-		numlock_color=purple
+		numlock_color='#eee'
 	fi
 	if [ $capslock_is == on ]; then
-		capslock_color=purple
+		capslock_color='#eee'
 	fi
 	if [ $level3_is == on ]; then
 		level3_color=yellow
