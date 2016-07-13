@@ -14,8 +14,9 @@ Config {
                        , ("mine(origru)", "<fc=green>RU</fc><fc=#009000>~</fc>")
                        ]
              , Run UnsafeStdinReader
+             , Run CommandReader "~/.xmonad/xmobar-cmd.sh" "cmd"
              ],
   sepChar = "%",
   alignSep = "}{",
-  template = "%UnsafeStdinReader% }{ %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
+  template = "%UnsafeStdinReader% }{ %cmd% <fc=#666>/</fc> %kbd% <fc=#666>/</fc> <fc=#999>%date%</fc>"
 }
