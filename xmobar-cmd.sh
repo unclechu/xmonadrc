@@ -6,6 +6,12 @@ if [[ ! -p "$PIPE_FILE" ]]; then
 	mkfifo "$PIPE_FILE"
 fi
 
+clean () {
+	rm -f "$PIPE_FILE"
+}
+
+trap clean EXIT
+
 # need to restart xlib-keys-hack
 if [ -x "$HOME/.local/bin/kbd.sh" ]; then
 	{
