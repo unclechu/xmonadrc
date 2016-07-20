@@ -2,13 +2,12 @@
 
 PIPE_FILE="$HOME/.xmonad/xmobar.fifo"
 
-if [[ ! -p "$PIPE_FILE" ]]; then
-	mkfifo "$PIPE_FILE"
-fi
-
 clean () {
 	rm -f "$PIPE_FILE"
 }
+
+clean
+mkfifo "$PIPE_FILE"
 
 trap clean EXIT
 
