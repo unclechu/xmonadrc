@@ -12,6 +12,7 @@ import XMonad.Layout.PerWorkspace
 import XMonad.Layout.Cross
 import XMonad.Layout.Circle
 import XMonad.Layout.CenteredMaster
+import XMonad.Layout.ThreeColumns
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -121,7 +122,8 @@ myConfig customConfig = defaultConfig
                                ||| Mirror tiled
                                ||| Grid
                                ||| mySpiral)
-                  ||| simplestFloat ||| noBorders Full) $
+                  ||| simplestFloat
+                  ||| noBorders Full) $
 
       (avoidStruts $  tiled
                   ||| Mirror tiled
@@ -130,7 +132,8 @@ myConfig customConfig = defaultConfig
                   ||| simpleCross
                   ||| Circle
                   ||| centerMaster Grid
-                  ||| tabbedLayout)
+                  ||| tabbedLayout
+                  ||| ThreeColMid 1 delta (1/2))
       ||| simplestFloat
       ||| noBorders Full
 
@@ -494,6 +497,7 @@ main = do
           "Tabbed Simplest" -> "[t]"
           "Cross"           -> "[x]"
           "Circle"          -> "[o]"
+          "ThreeCol"        -> "[3]"
           "SimplestFloat"   -> "[f]"
           "Full"            -> "[ ]"
           _                 ->   x
