@@ -1,10 +1,32 @@
 #!/bin/bash
 
 PIPE_FILE="$HOME/.xmonad/xmobar.fifo"
+PID_FILE="$HOME/.xmonad/xmobar-cmd.pid"
 
 clean () {
 	rm -f "$PIPE_FILE"
 }
+
+kill_old () {
+	local old_pid=$(cat "$PID_FILE")
+	if ps -p "$old_pid"; then
+		kill -TERM "$old_pid"
+		sleep 1
+		if ps -p "$old_pid"; then
+			kill -KILL "$old_pid"
+			sleep 1
+		fi
+	fi
+	rm -f "$PID_FILE"
+}
+
+# kill old process
+if [ -f "$PID_FILE" ]; then
+	kill_old 0<&- 1>/dev/null 2>/dev/null
+fi
+
+# store pid of current process
+echo $$ > "$PID_FILE"
 
 clean
 mkfifo "$PIPE_FILE"
@@ -14,9 +36,10 @@ trap clean EXIT
 # need to restart xlib-keys-hack
 if [ -x "$HOME/.local/bin/kbd.sh" ]; then
 	{
+		exec 0<&- 1>/dev/null 2>/dev/null
 		sleep 1
 		"$HOME/.local/bin/kbd.sh"
-	} 0</dev/null 1>/dev/null 2>/dev/null &
+	} &
 fi
 
 numlock_is=off
