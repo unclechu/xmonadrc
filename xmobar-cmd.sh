@@ -59,6 +59,9 @@ msg () {
 	if [ $level3_is == on ]; then
 		level3='<fc=yellow>LEVEL3</fc>'
 	fi
+	numlock="<action=simulate-keys NumLock>$numlock</action>"
+	capslock="<action=simulate-keys CapsLock>$capslock</action>"
+	level3="<action=simulate-keys --toggle Level3Shift>$level3</action>"
 	echo "$numlock $capslock $level3"
 }
 
