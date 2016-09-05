@@ -185,8 +185,10 @@ myKeys customConfig =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey,              xK_b), spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey .|. mod1Mask, xK_b), spawn (cmd "gpaste-zenity.sh -m=delete"))
+  , ((myMetaKey,              xK_b),          spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey,              xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey .|. mod1Mask, xK_b),          spawn (cmd "gpaste-zenity.sh -m=delete"))
+  , ((myMetaKey .|. mod1Mask, xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=delete"))
 
 
   -- screenshots (basic keyboard)
@@ -212,19 +214,31 @@ myKeys customConfig =
   , ((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
   , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
-
-  , ((myMetaKey, xK_p), spawn (cmd $ cfgLauncher      customConfig))
-  , ((myMetaKey, xK_f), spawn (cmd $ cfgFileManager   customConfig))
-  , ((myMetaKey, xK_d), spawn (cmd $ cfgTerminalDark  customConfig))
-  , ((myMetaKey, xK_s), spawn (cmd $ cfgTerminalLight customConfig))
+  -- calculator
 
   , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
+
+
+  , ((myMetaKey, xK_p),            spawn (cmd $ cfgLauncher      customConfig))
+
+  , ((myMetaKey, xK_d),            spawn (cmd $ cfgTerminalDark  customConfig))
+  , ((myMetaKey, xK_bracketleft),  spawn (cmd $ cfgTerminalDark  customConfig))
+  , ((myMetaKey, xK_s),            spawn (cmd $ cfgTerminalLight customConfig))
+  , ((myMetaKey, xK_bracketright), spawn (cmd $ cfgTerminalLight customConfig))
+
+  , ((myMetaKey, xK_f),            spawn (cmd $ cfgFileManager   customConfig))
+  , ((myMetaKey, xK_backslash),    spawn (cmd $ cfgFileManager   customConfig))
+
+
 
   -- close focused window with optional shift modifier
   , ((myMetaKey, xK_slash), kill)
 
   , ((myMetaKey .|. shiftMask, xK_grave),   io exitSuccess)
-  , ((myMetaKey, xK_grave), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+  , ((myMetaKey, xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
+                                  ++ " && xmonad --restart;"
+                                  ++ " else xmessage xmonad not in"
+                                  ++ " \\$PATH: \"$PATH\"; fi")
 
   , ((myMetaKey .|. mod1Mask,  xK_space),   asks config >>= setLayout . layoutHook)
   , ((myMetaKey .|. shiftMask, xK_space),   asks config >>= setLayout . layoutHook)
