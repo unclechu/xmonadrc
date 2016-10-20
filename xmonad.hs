@@ -244,6 +244,11 @@ myKeys customConfig =
   , ((myMetaKey .|. shiftMask, xK_space),   asks config >>= setLayout . layoutHook)
   , ((myMetaKey,               xK_space),   sendMessage NextLayout)
 
+  -- because enter taken for right control
+  -- and triggering real enter doesn't make it work
+  , ((myMetaKey .|. mod1Mask,  xK_m), windows W.swapMaster)
+  , ((myMetaKey .|. shiftMask, xK_m), windows W.swapMaster)
+
   , ((myMetaKey .|. mod1Mask,  xK_j),       windows W.swapDown)
   , ((myMetaKey .|. shiftMask, xK_j),       windows W.swapDown)
   , ((myMetaKey .|. mod1Mask,  xK_k),       windows W.swapUp)
