@@ -34,6 +34,11 @@ import Data.Char (toLower)
 import Control.Monad (liftM)
 import qualified Data.List as L
 
+doRepeat :: (Monad a) => Int -> a () -> a ()
+doRepeat c ff = repeat c ff
+  where repeat c f | c == 1    = f
+                   | otherwise = repeat (c - 1) $ f >> ff
+
 xmobarEscape = concatMap doubleLts
   where doubleLts '<' = "<<"
         doubleLts x   = [x]
@@ -240,9 +245,10 @@ myKeys customConfig =
                                   ++ " else xmessage xmonad not in"
                                   ++ " \\$PATH: \"$PATH\"; fi")
 
-  , ((myMetaKey .|. mod1Mask,  xK_space),   asks config >>= setLayout . layoutHook)
-  , ((myMetaKey .|. shiftMask, xK_space),   asks config >>= setLayout . layoutHook)
-  , ((myMetaKey,               xK_space),   sendMessage NextLayout)
+  , ((myMetaKey,                 xK_space), sendMessage NextLayout)
+  , ((myMetaKey .|. controlMask, xK_space), doRepeat 2 $ sendMessage NextLayout)
+  , ((myMetaKey .|. shiftMask,   xK_space), doRepeat 3 $ sendMessage NextLayout)
+  , ((myMetaKey .|. mod1Mask,    xK_space), asks config >>= setLayout . layoutHook)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
