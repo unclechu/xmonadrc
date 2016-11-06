@@ -84,6 +84,7 @@ myManageHook = composeAll $
   , className =? "Hexchat"                   --> moveTo (last myWorkspaces)
   , className =? "utox"                      --> moveTo (last myWorkspaces)
   , className =? "qTox"                      --> moveTo (last myWorkspaces)
+  , className =? "Gnome-ring"                --> moveTo (last myWorkspaces)
 
   , className =? "Firefox"                   --> moveTo (head myWorkspaces)
   ]
@@ -240,10 +241,11 @@ myKeys customConfig =
   , ((myMetaKey, xK_slash), kill)
 
   , ((myMetaKey .|. shiftMask, xK_grave),   io exitSuccess)
-  , ((myMetaKey, xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
-                                  ++ " && xmonad --restart;"
-                                  ++ " else xmessage xmonad not in"
-                                  ++ " \\$PATH: \"$PATH\"; fi")
+  -- temporay not available
+  -- , ((myMetaKey, xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
+  --                                 ++ " && xmonad --restart;"
+  --                                 ++ " else xmessage xmonad not in"
+  --                                 ++ " \\$PATH: \"$PATH\"; fi")
 
   , ((myMetaKey,                 xK_space), sendMessage NextLayout)
   , ((myMetaKey .|. controlMask, xK_space), doRepeat 2 $ sendMessage NextLayout)
