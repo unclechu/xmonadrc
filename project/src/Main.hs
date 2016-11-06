@@ -1,47 +1,65 @@
-import XMonad
+-- Author: Viacheslav Lotsmanov
+-- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
+
+{-# LANGUAGE PatternGuards #-}
+
+module Main (main) where
+
+import qualified XMonad as XM
+import XMonad ( (=?), (-->), (<&&>), (<+>), (|||), (.|.)
+
+              , Mirror(Mirror)
+              , Full(Full)
+              , Tall(Tall)
+
+              , windows
+              , spawn
+              , kill
+              , sendMessage
+              , setLayout
+              , asks
+
+              , shiftMask
+              , controlMask
+              , mod1Mask
+
+              )
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig (additionalKeys)
 import qualified XMonad.StackSet as W
 
-import XMonad.Layout.Grid
-import XMonad.Layout.Tabbed
-import XMonad.Layout.Spiral
-import XMonad.Layout.NoBorders
-import XMonad.Layout.SimplestFloat
-import XMonad.Layout.PerWorkspace
-import XMonad.Layout.Cross
-import XMonad.Layout.Circle
-import XMonad.Layout.CenteredMaster
-import XMonad.Layout.ThreeColumns
+import XMonad.Layout.Grid (Grid(Grid))
+import qualified XMonad.Layout.Tabbed as Tabbed
+import XMonad.Layout.Spiral (spiral)
+import XMonad.Layout.NoBorders (noBorders)
+import XMonad.Layout.SimplestFloat (simplestFloat)
+import XMonad.Layout.PerWorkspace (onWorkspace)
+import XMonad.Layout.Cross (simpleCross)
+import XMonad.Layout.Circle (Circle(Circle))
+import XMonad.Layout.CenteredMaster (centerMaster)
+import XMonad.Layout.ThreeColumns (ThreeCol(ThreeColMid))
 
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.FadeInactive
+import XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
+import qualified XMonad.Hooks.DynamicLog as DL
+import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
 
-import System.IO
-import System.Exit
-import Graphics.X11.ExtraTypes.XF86
+import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 
-import System.Directory (getHomeDirectory)
-import qualified System.IO.Error as Error
-import qualified Control.Exception as Exception
-import Data.Maybe (fromMaybe, fromJust)
+import System.IO (hPutStrLn)
+import System.Exit (exitSuccess)
+
 import Control.Applicative ((<$>))
-import Data.Char (toLower)
 import Control.Monad (liftM)
+
+import Data.Maybe (fromMaybe, fromJust)
 import qualified Data.List as L
 
-doRepeat :: (Monad a) => Int -> a () -> a ()
-doRepeat c ff = repeat c ff
-  where repeat c f | c == 1    = f
-                   | otherwise = repeat (c - 1) $ f >> ff
+import Utils (doRepeat, xmobarEscape)
+import Utils.CustomConfig (getCustomConfig, Config(..))
 
-xmobarEscape = concatMap doubleLts
-  where doubleLts '<' = "<<"
-        doubleLts x   = [x]
 
 myWorkspacesBareList :: [String]
 myWorkspacesBareList  = map show [1..8]
@@ -64,12 +82,12 @@ myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
                            8 -> "KP_Up"
                            9 -> "KP_Prior"
 
-myManageHook :: ManageHook
-myManageHook = composeAll $
+myManageHook :: XM.ManageHook
+myManageHook = XM.composeAll $
 
-  [ className =? "Gmrun"                     --> doCenterFloat
+  [ XM.className =? "Gmrun"                     --> doCenterFloat
 
-  , title     =? "gpaste-zenity"             --> doCenterFloat
+  , XM.title     =? "gpaste-zenity"             --> doCenterFloat
 
   -- gimp
   , wmRole    =? "gimp-toolbox-color-dialog" --> doCenterFloat
@@ -77,19 +95,20 @@ myManageHook = composeAll $
   , wmRole    =? "gimp-layer-new"            --> doCenterFloat
   , wmRole    =? "gimp-image-new"            --> doCenterFloat
 
-  , className =? "qjackctl"                  --> doCenterFloat
-  , className =? "Audacious"                 --> moveTo (last $ init myWorkspaces)
+  , XM.className =? "qjackctl"                  --> doCenterFloat
+  , XM.className =? "Audacious"                 --> moveTo (last $
+                                                            init myWorkspaces)
 
-  , className =? "Gajim"                     --> moveTo (last myWorkspaces)
-  , className =? "Hexchat"                   --> moveTo (last myWorkspaces)
-  , className =? "utox"                      --> moveTo (last myWorkspaces)
-  , className =? "qTox"                      --> moveTo (last myWorkspaces)
-  , className =? "Gnome-ring"                --> moveTo (last myWorkspaces)
+  , XM.className =? "Gajim"                     --> moveTo (last myWorkspaces)
+  , XM.className =? "Hexchat"                   --> moveTo (last myWorkspaces)
+  , XM.className =? "utox"                      --> moveTo (last myWorkspaces)
+  , XM.className =? "qTox"                      --> moveTo (last myWorkspaces)
+  , XM.className =? "Gnome-ring"                --> moveTo (last myWorkspaces)
 
-  , className =? "Firefox"                   --> moveTo (head myWorkspaces)
+  , XM.className =? "Firefox"                   --> moveTo (head myWorkspaces)
   ]
   -- audacious
-  ++ [ className =? "Audacious" <&&> title =? x --> doCenterFloat
+  ++ [ XM.className =? "Audacious" <&&> XM.title =? x --> doCenterFloat
      | x <- [ "Song Info"
             , "Audacious Settings"
             , "JACK Output Settings"
@@ -97,21 +116,21 @@ myManageHook = composeAll $
             , "Open Files"
             ]
      ]
-    where wmRole = stringProperty "WM_WINDOW_ROLE"
-          moveTo = doF . W.shift
+    where wmRole = XM.stringProperty "WM_WINDOW_ROLE"
+          moveTo = XM.doF . W.shift
 
-myConfig customConfig = defaultConfig
-  { manageHook        = manageDocks <+> myManageHook
-  , layoutHook        = myLayoutHook
+myConfig customConfig = XM.defaultConfig
+  { XM.manageHook        = manageDocks <+> myManageHook
+  , XM.layoutHook        = myLayoutHook
 
-  , borderWidth       = 1
+  , XM.borderWidth       = 1
 
-  , modMask           = cfgMetaKey customConfig
-  , terminal          = cfgTerminal customConfig
-  , workspaces        = myWorkspaces
+  , XM.modMask           = cfgMetaKey customConfig
+  , XM.terminal          = cfgTerminal customConfig
+  , XM.workspaces        = myWorkspaces
 
-  , focusFollowsMouse = False
-  , clickJustFocuses  = True
+  , XM.focusFollowsMouse = False
+  , XM.clickJustFocuses  = True
   }
   where
     myLayoutHook =
@@ -147,7 +166,7 @@ myConfig customConfig = defaultConfig
           tiled        = Tall 1 delta ration
           ration       = 2/3 -- master proportion
           delta        = 3/100 -- percent of master resize
-          tabbedLayout = tabbed shrinkText myTabTheme
+          tabbedLayout = Tabbed.tabbed Tabbed.shrinkText myTabTheme
           mySpiral     = spiral (6/7)
 
           lastWorkspacesLayouts = avoidStruts
@@ -156,15 +175,15 @@ myConfig customConfig = defaultConfig
                                ||| centerMaster Grid
                                ||| tabbedLayout
 
-myTabTheme = defaultTheme
-  { activeColor         = "#3c5863"
-  , activeBorderColor   = "#000000"
-  , inactiveColor       = "#666666"
-  , inactiveBorderColor = "#000000"
-  , activeTextColor     = "lightgray"
-  , inactiveTextColor   = "#aaa"
-  , decoHeight          = 12
-  , fontName            = "terminus"
+myTabTheme = Tabbed.defaultTheme
+  { Tabbed.activeColor         = "#3c5863"
+  , Tabbed.activeBorderColor   = "#000000"
+  , Tabbed.inactiveColor       = "#666666"
+  , Tabbed.inactiveBorderColor = "#000000"
+  , Tabbed.activeTextColor     = "lightgray"
+  , Tabbed.inactiveTextColor   = "#aaa"
+  , Tabbed.decoHeight          = 12
+  , Tabbed.fontName            = "terminus"
   }
 
 myKeys customConfig =
@@ -187,149 +206,149 @@ myKeys customConfig =
                   where next   = affect srcIdx
                         maxIdx = subtract 1 $ length myWorkspaces
   in
-  [ ((myMetaKey, xK_BackSpace), spawn (cmd "autostart.sh"))
+  [ ((myMetaKey, XM.xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey,              xK_b),          spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey,              xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey .|. mod1Mask, xK_b),          spawn (cmd "gpaste-zenity.sh -m=delete"))
-  , ((myMetaKey .|. mod1Mask, xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=delete"))
+  , ((myMetaKey,              XM.xK_b),          spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey,              XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
+  , ((myMetaKey .|. mod1Mask, XM.xK_b),          spawn (cmd "gpaste-zenity.sh -m=delete"))
+  , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=delete"))
 
 
   -- screenshots (basic keyboard)
 
-  , ((0,         xK_Print), spawn cmdScrnShot)
-  , ((myMetaKey, xK_Print), spawn cmdScrnShotArea)
-  , ((0,         xK_Pause), spawn cmdScrnShotX)
-  , ((myMetaKey, xK_Pause), spawn cmdScrnShotAreaX)
+  , ((0,         XM.xK_Print), spawn cmdScrnShot)
+  , ((myMetaKey, XM.xK_Print), spawn cmdScrnShotArea)
+  , ((0,         XM.xK_Pause), spawn cmdScrnShotX)
+  , ((myMetaKey, XM.xK_Pause), spawn cmdScrnShotAreaX)
 
 
   -- pulseaudio volume control
 
-  , ((0, xF86XK_AudioMute),        spawn cmdAudioMute)
-  , ((0, xF86XK_AudioLowerVolume), spawn cmdAudioDec)
-  , ((0, xF86XK_AudioRaiseVolume), spawn cmdAudioInc)
+  , ((0, XF86.xF86XK_AudioMute),        spawn cmdAudioMute)
+  , ((0, XF86.xF86XK_AudioLowerVolume), spawn cmdAudioDec)
+  , ((0, XF86.xF86XK_AudioRaiseVolume), spawn cmdAudioInc)
 
 
   -- audacious playback
 
-  , ((myMetaKey, xF86XK_AudioPlay), spawn (cmd "audacious --play"))
-  , ((0,         xF86XK_AudioPlay), spawn (cmd "audacious --play-pause"))
-  , ((0,         xF86XK_AudioPrev), spawn (cmd "audacious --rew"))
-  , ((0,         xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
-  , ((0,         xF86XK_AudioStop), spawn (cmd "audacious --stop"))
+  , ((myMetaKey, XF86.xF86XK_AudioPlay), spawn (cmd "audacious --play"))
+  , ((0,         XF86.xF86XK_AudioPlay), spawn (cmd "audacious --play-pause"))
+  , ((0,         XF86.xF86XK_AudioPrev), spawn (cmd "audacious --rew"))
+  , ((0,         XF86.xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
+  , ((0,         XF86.xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
   -- calculator
 
-  , ((0, xF86XK_Calculator), spawn (cmd "gnome-calculator"))
+  , ((0, XF86.xF86XK_Calculator), spawn (cmd "gnome-calculator"))
 
 
-  , ((myMetaKey, xK_p),            spawn (cmd $ cfgLauncher      customConfig))
+  , ((myMetaKey, XM.xK_p),            spawn (cmd $ cfgLauncher      customConfig))
 
-  , ((myMetaKey, xK_d),            spawn (cmd $ cfgTerminalDark  customConfig))
-  , ((myMetaKey, xK_bracketleft),  spawn (cmd $ cfgTerminalDark  customConfig))
-  , ((myMetaKey, xK_s),            spawn (cmd $ cfgTerminalLight customConfig))
-  , ((myMetaKey, xK_bracketright), spawn (cmd $ cfgTerminalLight customConfig))
+  , ((myMetaKey, XM.xK_d),            spawn (cmd $ cfgTerminalDark  customConfig))
+  , ((myMetaKey, XM.xK_bracketleft),  spawn (cmd $ cfgTerminalDark  customConfig))
+  , ((myMetaKey, XM.xK_s),            spawn (cmd $ cfgTerminalLight customConfig))
+  , ((myMetaKey, XM.xK_bracketright), spawn (cmd $ cfgTerminalLight customConfig))
 
-  , ((myMetaKey, xK_f),            spawn (cmd $ cfgFileManager   customConfig))
-  , ((myMetaKey, xK_backslash),    spawn (cmd $ cfgFileManager   customConfig))
+  , ((myMetaKey, XM.xK_f),            spawn (cmd $ cfgFileManager   customConfig))
+  , ((myMetaKey, XM.xK_backslash),    spawn (cmd $ cfgFileManager   customConfig))
 
 
 
   -- close focused window with optional shift modifier
-  , ((myMetaKey, xK_slash), kill)
+  , ((myMetaKey, XM.xK_slash), kill)
 
-  , ((myMetaKey .|. shiftMask, xK_grave),   io exitSuccess)
+  , ((myMetaKey .|. shiftMask, XM.xK_grave), XM.io exitSuccess)
   -- temporay not available
-  -- , ((myMetaKey, xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
+  -- , ((myMetaKey, XM.xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
   --                                 ++ " && xmonad --restart;"
   --                                 ++ " else xmessage xmonad not in"
   --                                 ++ " \\$PATH: \"$PATH\"; fi")
 
-  , ((myMetaKey,                 xK_space), sendMessage NextLayout)
-  , ((myMetaKey .|. controlMask, xK_space), doRepeat 2 $ sendMessage NextLayout)
-  , ((myMetaKey .|. shiftMask,   xK_space), doRepeat 3 $ sendMessage NextLayout)
-  , ((myMetaKey .|. mod1Mask,    xK_space), asks config >>= setLayout . layoutHook)
+  , ((myMetaKey,                 XM.xK_space), sendMessage XM.NextLayout)
+  , ((myMetaKey .|. controlMask, XM.xK_space), doRepeat 2 $ sendMessage XM.NextLayout)
+  , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
+  , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
-  , ((myMetaKey .|. mod1Mask,  xK_m), windows W.swapMaster)
-  , ((myMetaKey .|. shiftMask, xK_m), windows W.swapMaster)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_m), windows W.swapMaster)
+  , ((myMetaKey .|. shiftMask, XM.xK_m), windows W.swapMaster)
 
-  , ((myMetaKey .|. mod1Mask,  xK_j),       windows W.swapDown)
-  , ((myMetaKey .|. shiftMask, xK_j),       windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask,  xK_k),       windows W.swapUp)
-  , ((myMetaKey .|. shiftMask, xK_k),       windows W.swapUp)
-  , ((myMetaKey .|. mod1Mask,  xK_Down),    windows W.swapDown)
-  , ((myMetaKey .|. shiftMask, xK_Down),    windows W.swapDown)
-  , ((myMetaKey .|. mod1Mask,  xK_Up),      windows W.swapUp)
-  , ((myMetaKey .|. shiftMask, xK_Up),      windows W.swapUp)
-  , ((myMetaKey, xK_Down),                  windows W.focusDown)
-  , ((myMetaKey, xK_Up),                    windows W.focusUp)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_j),       windows W.swapDown)
+  , ((myMetaKey .|. shiftMask, XM.xK_j),       windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_k),       windows W.swapUp)
+  , ((myMetaKey .|. shiftMask, XM.xK_k),       windows W.swapUp)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_Down),    windows W.swapDown)
+  , ((myMetaKey .|. shiftMask, XM.xK_Down),    windows W.swapDown)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_Up),      windows W.swapUp)
+  , ((myMetaKey .|. shiftMask, XM.xK_Up),      windows W.swapUp)
+  , ((myMetaKey, XM.xK_Down),                  windows W.focusDown)
+  , ((myMetaKey, XM.xK_Up),                    windows W.focusUp)
 
-  , ((myMetaKey, xK_Left),                  jumpOverVisiblePrev)
-  , ((myMetaKey, xK_Right),                 jumpOverVisibleNext)
-  , ((myMetaKey .|. mod1Mask,  xK_Left),    prevWS)
-  , ((myMetaKey .|. mod1Mask,  xK_Right),   nextWS)
+  , ((myMetaKey, XM.xK_Left),                  jumpOverVisiblePrev)
+  , ((myMetaKey, XM.xK_Right),                 jumpOverVisibleNext)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_Left),    prevWS)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_Right),   nextWS)
 
   -- move windows
-  , ((myMetaKey .|. shiftMask,   xK_Left),  shiftToPrev)
-  , ((myMetaKey .|. shiftMask,   xK_Right), shiftToNext)
+  , ((myMetaKey .|. shiftMask,   XM.xK_Left),  shiftToPrev)
+  , ((myMetaKey .|. shiftMask,   XM.xK_Right), shiftToNext)
 
-  , ((myMetaKey .|. controlMask, xK_Up),    sendMessage (IncMasterN 1))
-  , ((myMetaKey .|. controlMask, xK_Down),  sendMessage (IncMasterN (-1)))
-  , ((myMetaKey .|. controlMask, xK_Left),  sendMessage Shrink)
-  , ((myMetaKey .|. controlMask, xK_Right), sendMessage Expand)
+  , ((myMetaKey .|. controlMask, XM.xK_Up),    sendMessage (XM.IncMasterN 1))
+  , ((myMetaKey .|. controlMask, XM.xK_Down),  sendMessage (XM.IncMasterN (-1)))
+  , ((myMetaKey .|. controlMask, XM.xK_Left),  sendMessage XM.Shrink)
+  , ((myMetaKey .|. controlMask, XM.xK_Right), sendMessage XM.Expand)
   ]
 
   ++
 
   -- move between displays by x,c,v keys
   let order = map screenNum $ cfgDisplaysOrder customConfig
-      screenNum :: Int -> ScreenId
+      screenNum :: Int -> XM.ScreenId
       screenNum x = [0..] !! (x-1)
   in
-  [((m .|. myMetaKey, k), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (k, sc) <- zip [xK_x, xK_c, xK_v] order
+  [((m .|. myMetaKey, k), XM.screenWorkspace sc >>= flip XM.whenJust (windows . f))
+        | (k, sc) <- zip [XM.xK_x, XM.xK_c, XM.xK_v] order
         , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
 
   -- move between workspaces
-  let keys1 = [ xK_u, xK_i, xK_o
-              , xK_8, xK_9, xK_0
-              , xK_minus, xK_equal
+  let keys1 = [ XM.xK_u, XM.xK_i, XM.xK_o
+              , XM.xK_8, XM.xK_9, XM.xK_0
+              , XM.xK_minus, XM.xK_equal
               ]
       -- support https://github.com/unclechu/X11-my-custom-layouts
-      keys2 = [ xK_u, xK_i, xK_o
-              , xK_asterisk, xK_parenleft, xK_parenright
-              , xK_minus, xK_equal
+      keys2 = [ XM.xK_u, XM.xK_i, XM.xK_o
+              , XM.xK_asterisk, XM.xK_parenleft, XM.xK_parenright
+              , XM.xK_minus, XM.xK_equal
               ]
 
-      keys3 = [ xK_q, xK_w, xK_e
-              , xK_1, xK_2, xK_3
-              , xK_4, xK_5
+      keys3 = [ XM.xK_q, XM.xK_w, XM.xK_e
+              , XM.xK_1, XM.xK_2, XM.xK_3
+              , XM.xK_4, XM.xK_5
               ]
       -- support https://github.com/unclechu/X11-my-custom-layouts
-      keys4 = [ xK_q, xK_w, xK_e
-              , xK_exclam, xK_at, xK_numbersign
-              , xK_dollar, xK_percent
+      keys4 = [ XM.xK_q, XM.xK_w, XM.xK_e
+              , XM.xK_exclam, XM.xK_at, XM.xK_numbersign
+              , XM.xK_dollar, XM.xK_percent
               ]
 
       keys5 = map numpadHackMap [ 1..8 ]
         where numpadHackMap x =
                 case x of
-                     0 -> xK_KP_Insert
-                     1 -> xK_KP_End
-                     2 -> xK_KP_Down
-                     3 -> xK_KP_Next
-                     4 -> xK_KP_Left
-                     5 -> xK_KP_Begin
-                     6 -> xK_KP_Right
-                     7 -> xK_KP_Home
-                     8 -> xK_KP_Up
-                     9 -> xK_KP_Prior
+                     0 -> XM.xK_KP_Insert
+                     1 -> XM.xK_KP_End
+                     2 -> XM.xK_KP_Down
+                     3 -> XM.xK_KP_Next
+                     4 -> XM.xK_KP_Left
+                     5 -> XM.xK_KP_Begin
+                     6 -> XM.xK_KP_Right
+                     7 -> XM.xK_KP_Home
+                     8 -> XM.xK_KP_Up
+                     9 -> XM.xK_KP_Prior
       bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
@@ -357,7 +376,7 @@ myKeys customConfig =
 
   -- do nothing by default workspaces keys
   [((m .|. myMetaKey, k), return ())
-        | k <- [ xK_6 .. xK_7 ]
+        | k <- [ XM.xK_6 .. XM.xK_7 ]
         , m <- [ 0, controlMask, shiftMask, mod1Mask ]]
 
   where
@@ -382,115 +401,6 @@ myKeys customConfig =
     cmdScrnShotX     = cmd "gnome-screenshot -i"
     cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
-
--- TODO implement independent workspaces
-data Config =
-  Config { cfgIndependentWorkspaces :: Bool
-         , cfgDisplaysOrder         :: [Int]
-         , cfgMetaKey               :: KeyMask
-         , cfgTerminal              :: String
-         , cfgTerminalDark          :: String
-         , cfgTerminalLight         :: String
-         , cfgFileManager           :: String
-         , cfgLauncher              :: String
-         } deriving Show
-
-defaultCustomConfig =
-  Config { cfgIndependentWorkspaces = False
-         , cfgDisplaysOrder         = [1,2,3]
-         , cfgMetaKey               = mod4Mask
-         , cfgTerminal              = "terminator"
-         , cfgTerminalDark          = "terminator --profile dark"
-         , cfgTerminalLight         = "terminator --profile light"
-         , cfgFileManager           = "nautilus"
-         , cfgLauncher              = "gmrun"
-         }
-
--- example of config.txt (all keys are optional, see defaultCustomConfig):
--- independent-workspaces = yes
--- displays-order = 3,2,1
-configFile :: IO String
-configFile = fmap (++ "/.xmonad/config.txt") getHomeDirectory
-
-parseCustomConfig config configFromFile =
-  case configFromFile of
-    Nothing -> config
-    Just x  -> resolvePairs config
-             . pairs
-             . lines
-             $ configFromFile
-  where isSpaceSym :: Char -> Bool
-        isSpaceSym x = x == ' ' || x == '\t'
-        lines :: Maybe String -> [String]
-        lines (Just x)
-                    | x == ""   = []
-                    | otherwise = foldr reducer [""] x
-                    where reducer symbol (x:xs)
-                            | symbol == '\n' = "":x:xs
-                            | otherwise      = (symbol:x):xs
-        pairs :: [String] -> [(String, String)]
-        pairs = map checkForAvailableKey
-              . foldr splitReducer []
-              . filter (/= "")
-              . map clearSidesSpaces
-          where clearSidesSpaces = reverse
-                                 . dropWhile isSpaceSym
-                                 . reverse
-                                 . dropWhile isSpaceSym
-                splitReducer line acc = (k, v) : acc
-                  where k = clearSidesSpaces $ takeWhile (/= '=') line
-                        v = clearSidesSpaces $ tail $ dropWhile (/= '=') line
-                checkForAvailableKey (k, v)
-                  | k `elem` availableKeys = (k, v)
-                  | otherwise = error "Unknown config key"
-                  where availableKeys = [ "independent-workspaces"
-                                        , "displays-order"
-                                        , "terminal"
-                                        , "terminal-dark"
-                                        , "terminal-light"
-                                        , "file-manager"
-                                        , "launcher"
-                                        ]
-        resolvePairs :: Config -> [(String, String)] -> Config
-        resolvePairs config [] = config
-        resolvePairs config ((k, v):pairs) = resolvePairs newConfig pairs
-          where newConfig = case k of
-                  "independent-workspaces" ->
-                    let nv = map toLower v
-                    in case nv of
-                         "yes" -> config { cfgIndependentWorkspaces = True  }
-                         "no"  -> config { cfgIndependentWorkspaces = False }
-                         _ -> error "Unexpected value of independent-workspaces in config"
-                  "displays-order" ->
-                    let cleanStr = filter (not . isSpaceSym) v
-                        isValidSym x = x `elem` ',':['0'..'9']
-                        validStr
-                          | all isValidSym cleanStr = cleanStr
-                          | otherwise = error "Unexpected value of displays-order in config"
-                        listReducer :: Char -> [String] -> [String]
-                        listReducer ',' acc = "":acc
-                        listReducer c (x:xs) = (c:x):xs
-                        order
-                          | length result >= 2 = result
-                          | otherwise = error "displays-order should have at least 2 items"
-                          where result = map read
-                                       $ foldr listReducer [""] validStr
-                    in config { cfgDisplaysOrder = order }
-                  "terminal"       -> config { cfgTerminal      = v }
-                  "terminal-dark"  -> config { cfgTerminalDark  = v }
-                  "terminal-light" -> config { cfgTerminalLight = v }
-                  "file-manager"   -> config { cfgFileManager   = v }
-                  "launcher"       -> config { cfgLauncher      = v }
-
-getCustomConfig :: IO Config
-getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile
-  where readConfigFile = do
-          filePath <- configFile
-          Exception.catch (Just <$> readFile filePath) handleExists
-        handleExists e
-          | Error.isDoesNotExistError e = return Nothing
-          | otherwise = Exception.throwIO e
-
 main :: IO ()
 main = do
 
@@ -501,21 +411,22 @@ main = do
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 
-  xmonad $ conf
-    { logHook = do
-        dynamicLogWithPP $ defaultPP
-          { ppOutput  = System.IO.hPutStrLn xmproc
-          , ppTitle   = xmobarColor "gray" "#444" . wrap " " " "
-          , ppCurrent = xmobarColor "green" ""    . wrap "[" "]"
-          , ppSep     = "  "
-          , ppWsSep   = " "
-          , ppLayout  = xmobarColor "yellow" "" . layoutNameHandler
-          , ppHiddenNoWindows = showNamedWorkspaces
+  XM.xmonad $ conf
+    { XM.logHook = do
+        DL.dynamicLogWithPP $ DL.defaultPP
+          { DL.ppOutput  = hPutStrLn xmproc
+          , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
+          , DL.ppCurrent = DL.xmobarColor "green" ""    . DL.wrap "[" "]"
+          , DL.ppSep     = "  "
+          , DL.ppWsSep   = " "
+          , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
+          , DL.ppHiddenNoWindows = showNamedWorkspaces
           }
         fadeInactiveLogHook 0.9
     } `additionalKeys` keys
       where
         showNamedWorkspaces wsId = wsId
+        layoutNameHandler :: String -> String
         layoutNameHandler x = wrap $ xmobarEscape $ case x of
           "Tall"            -> "[>]"
           "Mirror Tall"     -> "[v]"
