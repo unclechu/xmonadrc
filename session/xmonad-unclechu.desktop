@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=XMonad (unclechu's)
+Comment=Customized XMonad
+Exec=/home/unclechu/.xmonad/xmonadrc-unclechu-session.sh
+Terminal=false
+
+[Window Manager]
+SessionManaged=true

@@ -1,6 +1,8 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
+{-# LANGUAGE PatternGuards #-}
+
 module Keys
   ( myKeys
   ) where
@@ -28,7 +30,7 @@ import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 import qualified Data.List as L
 import qualified Data.Maybe as Maybe
 
-import System.Exit (exitSuccess)
+import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
 
 import Utils (doRepeat)
 import Utils.CustomConfig (Config(..))
@@ -110,13 +112,11 @@ myKeys myWorkspaces customConfig =
   -- close focused window with optional shift modifier
   , ((myMetaKey, XM.xK_slash), kill)
 
+  -- exit and restart (200 status means restart)
   , ((myMetaKey .|. shiftMask, XM.xK_grave), XM.io exitSuccess)
-  -- temporay not available
-  -- , ((myMetaKey, XM.xK_grave), spawn  $ "if type xmonad; then xmonad --recompile"
-  --                                 ++ " && xmonad --restart;"
-  --                                 ++ " else xmessage xmonad not in"
-  --                                 ++ " \\$PATH: \"$PATH\"; fi")
+  , ((myMetaKey,               XM.xK_grave), XM.io $ exitWith $ ExitFailure 200)
 
+  -- layouts switching
   , ((myMetaKey,                 XM.xK_space), sendMessage XM.NextLayout)
   , ((myMetaKey .|. controlMask, XM.xK_space), doRepeat 2 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
@@ -124,8 +124,8 @@ myKeys myWorkspaces customConfig =
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
-  , ((myMetaKey .|. mod1Mask,  XM.xK_m), windows W.swapMaster)
-  , ((myMetaKey .|. shiftMask, XM.xK_m), windows W.swapMaster)
+  , ((myMetaKey .|. mod1Mask,  XM.xK_m),       windows W.swapMaster)
+  , ((myMetaKey .|. shiftMask, XM.xK_m),       windows W.swapMaster)
 
   , ((myMetaKey .|. mod1Mask,  XM.xK_j),       windows W.swapDown)
   , ((myMetaKey .|. shiftMask, XM.xK_j),       windows W.swapDown)

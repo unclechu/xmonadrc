@@ -12,7 +12,7 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
-executable xmonadrc-exe
+executable xmonadrc-unclechu
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Utils

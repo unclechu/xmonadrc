@@ -1,8 +1,6 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
-{-# LANGUAGE PatternGuards #-}
-
 module Main (main) where
 
 import qualified XMonad as XM
