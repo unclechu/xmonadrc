@@ -58,6 +58,8 @@ myKeys myWorkspaces customConfig =
                   | otherwise = next
                   where next   = affect srcIdx
                         maxIdx = subtract 1 $ length myWorkspaces
+      incMaster = XM.IncMasterN   1
+      decMaster = XM.IncMasterN (-1)
   in
   [ ((myMetaKey, XM.xK_BackSpace), spawn (cmd "autostart.sh"))
 
@@ -147,10 +149,20 @@ myKeys myWorkspaces customConfig =
   , ((myMetaKey .|. shiftMask,   XM.xK_Left),  shiftToPrev)
   , ((myMetaKey .|. shiftMask,   XM.xK_Right), shiftToNext)
 
-  , ((myMetaKey .|. controlMask, XM.xK_Up),    sendMessage (XM.IncMasterN 1))
-  , ((myMetaKey .|. controlMask, XM.xK_Down),  sendMessage (XM.IncMasterN (-1)))
+  , ((myMetaKey .|. controlMask, XM.xK_Up),    sendMessage incMaster)
+  , ((myMetaKey .|. controlMask, XM.xK_Down),  sendMessage decMaster)
   , ((myMetaKey .|. controlMask, XM.xK_Left),  sendMessage XM.Shrink)
   , ((myMetaKey .|. controlMask, XM.xK_Right), sendMessage XM.Expand)
+
+  , ((myMetaKey .|. controlMask, XM.xK_h),      doRepeat 2 $ sendMessage XM.Shrink)
+  , ((myMetaKey .|. controlMask, XM.xK_l),      doRepeat 2 $ sendMessage XM.Expand)
+  , ((myMetaKey .|. shiftMask,   XM.xK_h),      doRepeat 3 $ sendMessage XM.Shrink)
+  , ((myMetaKey .|. shiftMask,   XM.xK_l),      doRepeat 3 $ sendMessage XM.Expand)
+
+  , ((myMetaKey .|. controlMask, XM.xK_comma),  doRepeat 2 $ sendMessage incMaster)
+  , ((myMetaKey .|. controlMask, XM.xK_period), doRepeat 2 $ sendMessage decMaster)
+  , ((myMetaKey .|. shiftMask,   XM.xK_comma),  doRepeat 3 $ sendMessage incMaster)
+  , ((myMetaKey .|. shiftMask,   XM.xK_period), doRepeat 3 $ sendMessage decMaster)
   ]
 
   ++
