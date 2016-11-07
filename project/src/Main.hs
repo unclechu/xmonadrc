@@ -65,10 +65,10 @@ myManageHook = XM.composeAll $
   , XM.title     =? "gpaste-zenity"             --> doCenterFloat
 
   -- gimp
-  , wmRole    =? "gimp-toolbox-color-dialog" --> doCenterFloat
-  , wmRole    =? "gimp-message-dialog"       --> doCenterFloat
-  , wmRole    =? "gimp-layer-new"            --> doCenterFloat
-  , wmRole    =? "gimp-image-new"            --> doCenterFloat
+  , wmRole       =? "gimp-toolbox-color-dialog" --> doCenterFloat
+  , wmRole       =? "gimp-message-dialog"       --> doCenterFloat
+  , wmRole       =? "gimp-layer-new"            --> doCenterFloat
+  , wmRole       =? "gimp-image-new"            --> doCenterFloat
 
   , XM.className =? "qjackctl"                  --> doCenterFloat
   , XM.className =? "Audacious"                 --> moveTo (last $
@@ -144,7 +144,7 @@ myConfig customConfig = XM.defaultConfig
           tabbedLayout = Tabbed.tabbed Tabbed.shrinkText myTabTheme
           mySpiral     = spiral (6/7)
 
-          lastWorkspacesLayouts = avoidStruts
+          lastWorkspacesLayouts =  avoidStruts
                                 $  simpleCross
                                ||| Circle
                                ||| centerMaster Grid

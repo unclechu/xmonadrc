@@ -179,61 +179,58 @@ myKeys myWorkspaces customConfig =
   ++
 
   -- move between workspaces
-  let keys1 = [ XM.xK_u, XM.xK_i, XM.xK_o
-              , XM.xK_8, XM.xK_9, XM.xK_0
-              , XM.xK_minus, XM.xK_equal
-              ]
-      -- support https://github.com/unclechu/X11-my-custom-layouts
-      keys2 = [ XM.xK_u, XM.xK_i, XM.xK_o
-              , XM.xK_asterisk, XM.xK_parenleft, XM.xK_parenright
-              , XM.xK_minus, XM.xK_equal
-              ]
+  let keysLists :: [[XM.KeySym]]
+      keysLists = [ -- right hand
+                    [ XM.xK_u, XM.xK_i, XM.xK_o
+                    , XM.xK_8, XM.xK_9, XM.xK_0
+                    , XM.xK_minus, XM.xK_equal
+                    ]
+                    -- left hand
+                  , [ XM.xK_q, XM.xK_w, XM.xK_e
+                    , XM.xK_1, XM.xK_2, XM.xK_3
+                    , XM.xK_4, XM.xK_5
+                    ]
+                    -- numpadKeys
+                  , [ case x of
+                           0 -> XM.xK_KP_Insert
+                           1 -> XM.xK_KP_End
+                           2 -> XM.xK_KP_Down
+                           3 -> XM.xK_KP_Next
+                           4 -> XM.xK_KP_Left
+                           5 -> XM.xK_KP_Begin
+                           6 -> XM.xK_KP_Right
+                           7 -> XM.xK_KP_Home
+                           8 -> XM.xK_KP_Up
+                           9 -> XM.xK_KP_Prior
+                    | x <- [1..8]
+                    ]
+                  ]
 
-      keys3 = [ XM.xK_q, XM.xK_w, XM.xK_e
-              , XM.xK_1, XM.xK_2, XM.xK_3
-              , XM.xK_4, XM.xK_5
-              ]
-      -- support https://github.com/unclechu/X11-my-custom-layouts
-      keys4 = [ XM.xK_q, XM.xK_w, XM.xK_e
-              , XM.xK_exclam, XM.xK_at, XM.xK_numbersign
-              , XM.xK_dollar, XM.xK_percent
-              ]
-
-      keys5 = map numpadHackMap [ 1..8 ]
-        where numpadHackMap x =
-                case x of
-                     0 -> XM.xK_KP_Insert
-                     1 -> XM.xK_KP_End
-                     2 -> XM.xK_KP_Down
-                     3 -> XM.xK_KP_Next
-                     4 -> XM.xK_KP_Left
-                     5 -> XM.xK_KP_Begin
-                     6 -> XM.xK_KP_Right
-                     7 -> XM.xK_KP_Home
-                     8 -> XM.xK_KP_Up
-                     9 -> XM.xK_KP_Prior
+      -- helper to map this keys
+      bind :: [XM.KeySym] -> [((XM.KeyMask, XM.KeySym), XM.X ())]
       bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
               , (f, m) <- [ (myView, 0)
                           , (W.greedyView, mod1Mask)
-                          , (W.shift, shiftMask) ]]
+                          , (W.shift, shiftMask)
+                          ]
+        ]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
-      myView :: (Eq s, Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
+      myView :: (Eq s, Eq i) => i
+             -> W.StackSet i l a s sd
+             -> W.StackSet i l a s sd
       myView i s
         | Just x <- L.find ((i==) . W.tag) (W.hidden s)
         = s { W.current = (W.current s) { W.workspace = x }
             , W.hidden  = W.workspace (W.current s)
-                        : L.deleteBy (equating W.tag) x (W.hidden s) }
+                        : L.deleteBy (equating W.tag) x (W.hidden s)
+            }
         | otherwise = s
         where equating f x y = f x == f y
 
-  in ( bind keys1
-    ++ bind keys2
-    ++ bind keys3
-    ++ bind keys4
-    ++ bind keys5 )
+  in foldr ((++) . bind) [] keysLists
 
   ++
 
@@ -245,7 +242,7 @@ myKeys myWorkspaces customConfig =
   where
     myMetaKey = cfgMetaKey customConfig
 
-    cmd = (++ " &>/dev/null")
+    cmd = (++ " 0</dev/null 1>/dev/null 2>/dev/null")
 
     cmdActiveSink =
       "\"`(pactl info"
