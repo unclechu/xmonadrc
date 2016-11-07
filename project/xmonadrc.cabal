@@ -25,4 +25,5 @@ executable xmonadrc-unclechu
                      , X11-xft ==0.3.1
                      , xmonad-contrib ==0.12
                      , xmonad ==0.12
+                     , data-default ==0.7.1.1
   default-language:    Haskell2010

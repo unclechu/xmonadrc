@@ -30,6 +30,7 @@ import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO (hPutStrLn)
+import qualified Data.Default
 
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
@@ -94,7 +95,7 @@ myManageHook = XM.composeAll $
     where wmRole = XM.stringProperty "WM_WINDOW_ROLE"
           moveTo = XM.doF . W.shift
 
-myConfig customConfig = XM.defaultConfig
+myConfig customConfig = Data.Default.def
   { XM.manageHook        = manageDocks <+> myManageHook
   , XM.layoutHook        = myLayoutHook
 
@@ -150,7 +151,7 @@ myConfig customConfig = XM.defaultConfig
                                ||| centerMaster Grid
                                ||| tabbedLayout
 
-myTabTheme = Tabbed.defaultTheme
+myTabTheme = Data.Default.def
   { Tabbed.activeColor         = "#3c5863"
   , Tabbed.activeBorderColor   = "#000000"
   , Tabbed.inactiveColor       = "#666666"
@@ -175,7 +176,7 @@ main = do
 
   XM.xmonad $ conf
     { XM.logHook = do
-        DL.dynamicLogWithPP $ DL.defaultPP
+        DL.dynamicLogWithPP $ Data.Default.def
           { DL.ppOutput  = hPutStrLn xmproc
           , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
           , DL.ppCurrent = DL.xmobarColor "green" ""    . DL.wrap "[" "]"
