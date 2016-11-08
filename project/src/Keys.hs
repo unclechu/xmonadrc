@@ -16,6 +16,7 @@ import XMonad ( (.|.)
               , sendMessage
               , setLayout
               , asks
+              , withFocused
 
               , shiftMask
               , controlMask
@@ -25,10 +26,11 @@ import XMonad ( (.|.)
 import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
 import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
+import XMonad.Actions.NoBorders (toggleBorder)
 
 import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 
-import qualified Data.List as L
+import qualified Data.List  as L
 import qualified Data.Maybe as Maybe
 
 import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
@@ -66,9 +68,7 @@ myKeys myWorkspaces customConfig =
 
 
   -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey,              XM.xK_b),          spawn (cmd "gpaste-zenity.sh"))
   , ((myMetaKey,              XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey .|. mod1Mask, XM.xK_b),          spawn (cmd "gpaste-zenity.sh -m=delete"))
   , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=delete"))
 
 
@@ -126,6 +126,7 @@ myKeys myWorkspaces customConfig =
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
+  , ((myMetaKey, XM.xK_b), withFocused toggleBorder)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
