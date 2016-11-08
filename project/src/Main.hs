@@ -23,6 +23,7 @@ import XMonad.Layout.Cross (simpleCross)
 import XMonad.Layout.Circle (Circle(Circle))
 import XMonad.Layout.CenteredMaster (centerMaster)
 import XMonad.Layout.ThreeColumns (ThreeCol(ThreeColMid))
+import XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
 
 import XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
 import qualified XMonad.Hooks.DynamicLog as DL
@@ -38,7 +39,7 @@ import Keys (myKeys)
 
 
 myWorkspacesBareList :: [String]
-myWorkspacesBareList  = map show [1..8]
+myWorkspacesBareList = map show [1..8]
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
@@ -110,46 +111,49 @@ myConfig customConfig = Data.Default.def
   }
   where
     myLayoutHook =
-
       onWorkspace (last myWorkspaces)        lastWorkspacesLayouts $
       onWorkspace (last $ init myWorkspaces) lastWorkspacesLayouts $
-
-      onWorkspace (myWorkspaces !! 2) -- 3th ws
-                  ((avoidStruts $ simpleCross
-                               ||| Circle
-                               ||| centerMaster Grid
-                               ||| tabbedLayout
-                               ||| tiled
-                               ||| Mirror tiled
-                               ||| Grid
-                               ||| mySpiral)
-                  ||| simplestFloat
-                  ||| noBorders Full) $
-
-      (avoidStruts $  tiled
-                  ||| Mirror tiled
-                  ||| Grid
-                  ||| mySpiral
-                  ||| simpleCross
-                  ||| Circle
-                  ||| centerMaster Grid
-                  ||| tabbedLayout
-                  ||| ThreeColMid 1 delta (1/2))
-      ||| simplestFloat
-      ||| noBorders Full
-
+      onWorkspace (myWorkspaces !! 2)        startWithCrossLayouts $
+      usualLayouts
         where
           tiled        = Tall 1 delta ration
           ration       = 2/3 -- master proportion
-          delta        = 3/100 -- percent of master resize
+          delta        = 1/100 -- percent of master resize
           tabbedLayout = Tabbed.tabbed Tabbed.shrinkText myTabTheme
           mySpiral     = spiral (6/7)
+          rTiled       = ResizableTall 1 delta ration []
 
-          lastWorkspacesLayouts =  avoidStruts
-                                $  simpleCross
-                               ||| Circle
-                               ||| centerMaster Grid
-                               ||| tabbedLayout
+          usualLayouts =
+            ( avoidStruts  $  rTiled
+                          ||| Mirror rTiled
+                          ||| Grid
+                          ||| mySpiral
+                          ||| simpleCross
+                          ||| Circle
+                          ||| centerMaster Grid
+                          ||| tabbedLayout
+                          ||| ThreeColMid 1 delta (1/2)
+            ) ||| simplestFloat
+              ||| noBorders Full
+
+          startWithCrossLayouts =
+            ( avoidStruts  $  simpleCross
+                          ||| Circle
+                          ||| centerMaster Grid
+                          ||| tabbedLayout
+                          ||| rTiled
+                          ||| Mirror rTiled
+                          ||| Grid
+                          ||| mySpiral
+            ) ||| simplestFloat
+              ||| noBorders Full
+
+          lastWorkspacesLayouts =
+            avoidStruts  $  simpleCross
+                        ||| Circle
+                        ||| centerMaster Grid
+                        ||| tabbedLayout
+
 
 myTabTheme = Data.Default.def
   { Tabbed.activeColor         = "#3c5863"
@@ -190,16 +194,17 @@ main = do
       where
         showNamedWorkspaces wsId = wsId
         layoutNameHandler :: String -> String
-        layoutNameHandler x = wrap $ xmobarEscape $ case x of
-          "Tall"            -> "[>]"
-          "Mirror Tall"     -> "[v]"
-          "Grid"            -> "[+]"
-          "Spiral"          -> "[0]"
-          "Tabbed Simplest" -> "[t]"
-          "Cross"           -> "[x]"
-          "Circle"          -> "[o]"
-          "ThreeCol"        -> "[3]"
-          "SimplestFloat"   -> "[f]"
-          "Full"            -> "[ ]"
-          _                 ->   x
+        layoutNameHandler x = wrap $ xmobarEscape $
+          case x of
+               "ResizableTall"        -> "[>]"
+               "Mirror ResizableTall" -> "[v]"
+               "Grid"                 -> "[+]"
+               "Spiral"               -> "[0]"
+               "Tabbed Simplest"      -> "[t]"
+               "Cross"                -> "[x]"
+               "Circle"               -> "[o]"
+               "ThreeCol"             -> "[3]"
+               "SimplestFloat"        -> "[f]"
+               "Full"                 -> "[ ]"
+               otherwise              ->   x
           where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"

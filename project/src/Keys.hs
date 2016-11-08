@@ -27,6 +27,7 @@ import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
 import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
 import XMonad.Actions.NoBorders (toggleBorder)
+import XMonad.Layout.ResizableTile (MirrorResize(MirrorShrink, MirrorExpand))
 
 import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 
@@ -102,12 +103,9 @@ myKeys myWorkspaces customConfig =
 
   , ((myMetaKey, XM.xK_p),            spawn (cmd $ cfgLauncher      customConfig))
 
-  , ((myMetaKey, XM.xK_d),            spawn (cmd $ cfgTerminalDark  customConfig))
   , ((myMetaKey, XM.xK_bracketleft),  spawn (cmd $ cfgTerminalDark  customConfig))
-  , ((myMetaKey, XM.xK_s),            spawn (cmd $ cfgTerminalLight customConfig))
   , ((myMetaKey, XM.xK_bracketright), spawn (cmd $ cfgTerminalLight customConfig))
 
-  , ((myMetaKey, XM.xK_f),            spawn (cmd $ cfgFileManager   customConfig))
   , ((myMetaKey, XM.xK_backslash),    spawn (cmd $ cfgFileManager   customConfig))
 
 
@@ -167,6 +165,13 @@ myKeys myWorkspaces customConfig =
   , ((myMetaKey .|. controlMask, XM.xK_period), doRepeat 2 $ sendMessage decMaster)
   , ((myMetaKey .|. shiftMask,   XM.xK_comma),  doRepeat 3 $ sendMessage incMaster)
   , ((myMetaKey .|. shiftMask,   XM.xK_period), doRepeat 3 $ sendMessage decMaster)
+
+  , ((myMetaKey,                 XM.xK_f), sendMessage MirrorShrink) -- inc
+  , ((myMetaKey,                 XM.xK_d), sendMessage MirrorExpand) -- dec
+  , ((myMetaKey .|. controlMask, XM.xK_f), doRepeat 2 $ sendMessage MirrorShrink)
+  , ((myMetaKey .|. controlMask, XM.xK_d), doRepeat 2 $ sendMessage MirrorExpand)
+  , ((myMetaKey .|. shiftMask,   XM.xK_f), doRepeat 3 $ sendMessage MirrorShrink)
+  , ((myMetaKey .|. shiftMask,   XM.xK_d), doRepeat 3 $ sendMessage MirrorExpand)
   ]
 
   ++
