@@ -36,28 +36,8 @@ import qualified Data.Default
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
 import Keys (myKeys)
+import Workspaces (myWorkspacesBareList, myWorkspaces)
 
-
-myWorkspacesBareList :: [String]
-myWorkspacesBareList = map show [1..8]
-
-myWorkspaces :: [String]
-myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
-  where
-    clickable l = [ "<action=xdotool key super+" ++ k ++ ">" ++ ws ++ "</action>"
-                  | (k, ws) <- zip myWorkspacesKeysList l ]
-    myWorkspacesKeysList = map numpadHackMap [1..8]
-    numpadHackMap x = case x of
-                           0 -> "KP_Insert"
-                           1 -> "KP_End"
-                           2 -> "KP_Down"
-                           3 -> "KP_Next"
-                           4 -> "KP_Left"
-                           5 -> "KP_Begin"
-                           6 -> "KP_Right"
-                           7 -> "KP_Home"
-                           8 -> "KP_Up"
-                           9 -> "KP_Prior"
 
 myManageHook :: XM.ManageHook
 myManageHook = XM.composeAll $
@@ -173,8 +153,7 @@ main = do
   customConfig <- getCustomConfig
 
   let conf = myConfig customConfig
-      keys = myKeys myWorkspaces
-                    customConfig
+      keys = myKeys myWorkspaces customConfig
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 

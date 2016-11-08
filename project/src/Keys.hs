@@ -38,6 +38,7 @@ import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
 
 import Utils (doRepeat)
 import Utils.CustomConfig (Config(..))
+import Workspaces (myWorkspacesBareList)
 
 
 type KeyHook = ((XM.ButtonMask, XM.KeySym), XM.X ())
@@ -191,13 +192,13 @@ myKeys myWorkspaces customConfig =
   let keysLists :: [[XM.KeySym]]
       keysLists = [ -- right hand
                     [ XM.xK_u, XM.xK_i, XM.xK_o
-                    , XM.xK_8, XM.xK_9, XM.xK_0
-                    , XM.xK_minus, XM.xK_equal
+                    , XM.xK_7, XM.xK_8, XM.xK_9
+                    , XM.xK_0, XM.xK_minus, XM.xK_equal
                     ]
                     -- left hand
                   , [ XM.xK_q, XM.xK_w, XM.xK_e
                     , XM.xK_1, XM.xK_2, XM.xK_3
-                    , XM.xK_4, XM.xK_5
+                    , XM.xK_4, XM.xK_5, XM.xK_6
                     ]
                     -- numpadKeys
                   , [ case x of
@@ -211,7 +212,7 @@ myKeys myWorkspaces customConfig =
                            7 -> XM.xK_KP_Home
                            8 -> XM.xK_KP_Up
                            9 -> XM.xK_KP_Prior
-                    | x <- [1..8]
+                    | x <- [1..length myWorkspacesBareList]
                     ]
                   ]
 
@@ -240,13 +241,6 @@ myKeys myWorkspaces customConfig =
         where equating f x y = f x == f y
 
   in foldr ((++) . bind) [] keysLists
-
-  ++
-
-  -- do nothing by default workspaces keys
-  [((m .|. myMetaKey, k), return ())
-        | k <- [ XM.xK_6 .. XM.xK_7 ]
-        , m <- [ 0, controlMask, shiftMask, mod1Mask ]]
 
   where
     myMetaKey = cfgMetaKey customConfig
