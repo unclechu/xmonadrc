@@ -24,6 +24,7 @@ import XMonad ( (.|.)
               )
 import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
+import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
 
 import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 
@@ -123,6 +124,8 @@ myKeys myWorkspaces customConfig =
   , ((myMetaKey .|. controlMask, XM.xK_space), doRepeat 2 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
+
+  , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
