@@ -32,6 +32,7 @@ import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO (hPutStrLn)
 import qualified Data.Default
+import qualified Data.Maybe as Maybe
 
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
@@ -62,6 +63,9 @@ myManageHook = XM.composeAll $
   , XM.className =? "qTox"                      --> moveTo (last myWorkspaces)
   , XM.className =? "Gnome-ring"                --> moveTo (last myWorkspaces)
 
+  , XM.className =? "Firefox" <&&> nameStartsWith "Riot"
+      --> moveTo (last myWorkspaces)
+
   , XM.className =? "Firefox"                   --> moveTo (head myWorkspaces)
   ]
   -- audacious
@@ -74,7 +78,13 @@ myManageHook = XM.composeAll $
             ]
      ]
     where wmRole = XM.stringProperty "WM_WINDOW_ROLE"
+          wmName = XM.stringProperty "WM_NAME"
           moveTo = XM.doF . W.shift
+
+          nameStartsWith :: String -> XM.Query Bool
+          nameStartsWith startPart =
+            fmap (take $ length startPart) wmName =? startPart
+
 
 myConfig customConfig = Data.Default.def
   { XM.manageHook        = manageDocks <+> myManageHook
