@@ -27,7 +27,7 @@ import XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
 
 import XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
 import qualified XMonad.Hooks.DynamicLog as DL
-import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
+import XMonad.Hooks.FadeInactive (fadeInactiveLogHook, fadeInactiveCurrentWSLogHook)
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO (hPutStrLn)
@@ -169,6 +169,7 @@ main = do
 
   XM.xmonad $ conf
     { XM.logHook = do
+
         DL.dynamicLogWithPP $ Data.Default.def
           { DL.ppOutput  = hPutStrLn xmproc
           , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
@@ -178,7 +179,12 @@ main = do
           , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
           , DL.ppHiddenNoWindows = showNamedWorkspaces
           }
-        fadeInactiveLogHook $ cfgInactiveWindowOpacity customConfig
+
+        let inactiveOpacity = cfgInactiveWindowOpacity customConfig
+        if cfgInactiveWindowOpacityOnlyForCurrentWs customConfig
+           then fadeInactiveCurrentWSLogHook inactiveOpacity
+           else fadeInactiveLogHook inactiveOpacity
+
     } `additionalKeys` keys
       where
         showNamedWorkspaces wsId = wsId
@@ -195,5 +201,5 @@ main = do
                "ThreeCol"             -> "[3]"
                "SimplestFloat"        -> "[f]"
                "Full"                 -> "[ ]"
-               otherwise              ->   x
+               _                      ->   x
           where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
