@@ -26,6 +26,7 @@ data Config =
          , cfgTerminalLight         :: String
          , cfgFileManager           :: String
          , cfgLauncher              :: String
+         , cfgBorderWidth           :: Int
          , cfgInactiveWindowOpacity :: Rational
          , cfgInactiveWindowOpacityOnlyForCurrentWs :: Bool
          } deriving Show
@@ -39,6 +40,7 @@ defaultCustomConfig =
          , cfgTerminalLight         = "terminator --profile light"
          , cfgFileManager           = "nautilus"
          , cfgLauncher              = "gmrun"
+         , cfgBorderWidth           = 1
          , cfgInactiveWindowOpacity = 0.7
          , cfgInactiveWindowOpacityOnlyForCurrentWs = True
          }
@@ -87,6 +89,7 @@ parseCustomConfig config configFromFile =
                                         , "terminal-light"
                                         , "file-manager"
                                         , "launcher"
+                                        , "border-width"
                                         , "inactive-window-opacity"
                                         , "inactive-window-opacity-only-for-current-workspace"
                                         ]
@@ -129,6 +132,7 @@ parseCustomConfig config configFromFile =
                   "terminal-light" -> config { cfgTerminalLight = v }
                   "file-manager"   -> config { cfgFileManager   = v }
                   "launcher"       -> config { cfgLauncher      = v }
+                  "border-width"   -> config { cfgBorderWidth   = read v }
 
                   "inactive-window-opacity" ->
                     config { cfgInactiveWindowOpacity =

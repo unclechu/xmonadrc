@@ -90,7 +90,7 @@ myConfig customConfig = Data.Default.def
   { XM.manageHook        = manageDocks <+> myManageHook
   , XM.layoutHook        = myLayoutHook
 
-  , XM.borderWidth       = 1
+  , XM.borderWidth       = (read . show) (cfgBorderWidth customConfig)
 
   , XM.modMask           = cfgMetaKey customConfig
   , XM.terminal          = cfgTerminal customConfig
