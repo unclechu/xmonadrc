@@ -178,7 +178,7 @@ main = do
           , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
           , DL.ppHiddenNoWindows = showNamedWorkspaces
           }
-        fadeInactiveLogHook 0.9
+        fadeInactiveLogHook $ cfgInactiveWindowOpacity customConfig
     } `additionalKeys` keys
       where
         showNamedWorkspaces wsId = wsId

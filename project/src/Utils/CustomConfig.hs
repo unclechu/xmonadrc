@@ -26,6 +26,7 @@ data Config =
          , cfgTerminalLight         :: String
          , cfgFileManager           :: String
          , cfgLauncher              :: String
+         , cfgInactiveWindowOpacity :: Rational
          } deriving Show
 
 defaultCustomConfig =
@@ -37,6 +38,7 @@ defaultCustomConfig =
          , cfgTerminalLight         = "terminator --profile light"
          , cfgFileManager           = "nautilus"
          , cfgLauncher              = "gmrun"
+         , cfgInactiveWindowOpacity = 0.9
          }
 
 -- example of config.txt (all keys are optional, see defaultCustomConfig):
@@ -83,6 +85,7 @@ parseCustomConfig config configFromFile =
                                         , "terminal-light"
                                         , "file-manager"
                                         , "launcher"
+                                        , "inactive-window-opacity"
                                         ]
         resolvePairs :: Config -> [(String, String)] -> Config
         resolvePairs config [] = config
@@ -93,27 +96,33 @@ parseCustomConfig config configFromFile =
                     in case nv of
                          "yes" -> config { cfgIndependentWorkspaces = True  }
                          "no"  -> config { cfgIndependentWorkspaces = False }
-                         _ -> error "Unexpected value of independent-workspaces in config"
+                         _ -> error "Unexpected value of\
+                                \ independent-workspaces in config"
                   "displays-order" ->
                     let cleanStr = filter (not . isSpaceSym) v
                         isValidSym x = x `elem` ',':['0'..'9']
                         validStr
                           | all isValidSym cleanStr = cleanStr
-                          | otherwise = error "Unexpected value of displays-order in config"
+                          | otherwise = error "Unexpected value of\
+                                          \ displays-order in config"
                         listReducer :: Char -> [String] -> [String]
                         listReducer ',' acc = "":acc
                         listReducer c (x:xs) = (c:x):xs
                         order
                           | length result >= 2 = result
-                          | otherwise = error "displays-order should have at least 2 items"
+                          | otherwise = error "displays-order should have\
+                                          \ at least 2 items"
                           where result = map read
                                        $ foldr listReducer [""] validStr
                     in config { cfgDisplaysOrder = order }
-                  "terminal"       -> config { cfgTerminal      = v }
-                  "terminal-dark"  -> config { cfgTerminalDark  = v }
-                  "terminal-light" -> config { cfgTerminalLight = v }
-                  "file-manager"   -> config { cfgFileManager   = v }
-                  "launcher"       -> config { cfgLauncher      = v }
+                  "terminal"                -> config { cfgTerminal      = v }
+                  "terminal-dark"           -> config { cfgTerminalDark  = v }
+                  "terminal-light"          -> config { cfgTerminalLight = v }
+                  "file-manager"            -> config { cfgFileManager   = v }
+                  "launcher"                -> config { cfgLauncher      = v }
+                  "inactive-window-opacity" ->
+                    config { cfgInactiveWindowOpacity =
+                              toRational (read v :: Float) }
 
 getCustomConfig :: IO Config
 getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile
