@@ -71,7 +71,7 @@ myKeys myWorkspaces customConfig =
 
   -- required https://github.com/unclechu/gpaste-zenity
   , ((myMetaKey,              XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=delete"))
+  , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=choose"))
 
 
   -- screenshots (basic keyboard)
