@@ -65,8 +65,6 @@ myManageHook = XM.composeAll $
 
   , XM.className =? "Firefox" <&&> nameStartsWith "Riot"
       --> moveTo (last myWorkspaces)
-
-  , XM.className =? "Firefox"                   --> moveTo (head myWorkspaces)
   ]
   -- audacious
   ++ [ XM.className =? "Audacious" <&&> XM.title =? x --> doCenterFloat
