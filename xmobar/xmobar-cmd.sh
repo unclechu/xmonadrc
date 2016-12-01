@@ -44,25 +44,25 @@ fi
 
 numlock_is=off
 capslock_is=off
-level3_is=off
+alternative_is=off
 
 msg () {
 	local numlock='<fc=#999>num</fc>'
 	local capslock='<fc=#999>caps</fc>'
-	local level3='<fc=#999>level3</fc>'
+	local alternative='<fc=#999>hax</fc>'
 	if [ $numlock_is == on ]; then
 		numlock='<fc=#eee>num</fc>'
 	fi
 	if [ $capslock_is == on ]; then
 		capslock='<fc=orange>CAPS</fc>'
 	fi
-	if [ $level3_is == on ]; then
-		level3='<fc=yellow>LEVEL3</fc>'
+	if [ $alternative_is == on ]; then
+		alternative='<fc=yellow>HAX</fc>'
 	fi
 	numlock="<action=simulate-keys NumLock>$numlock</action>"
 	capslock="<action=simulate-keys CapsLock>$capslock</action>"
-	level3="<action=simulate-keys --toggle Level3Shift>$level3</action>"
-	echo "$numlock $capslock $level3"
+	alternative="$alternative" # TODO both alts simulate (needs changes in 'xlib-keys-combo-simulator')
+	echo "$numlock $capslock $alternative"
 }
 
 while true; do
@@ -76,10 +76,10 @@ while true; do
 			capslock_is=on
 		elif [ "$line" == "capslock:off" ]; then
 			capslock_is=off
-		elif [ "$line" == "level3:on" ]; then
-			level3_is=on
-		elif [ "$line" == "level3:off" ]; then
-			level3_is=off
+		elif [ "$line" == "alternative:on" ]; then
+			alternative_is=on
+		elif [ "$line" == "alternative:off" ]; then
+			alternative_is=off
 		fi
 	fi
 done
