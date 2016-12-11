@@ -5,9 +5,15 @@ module Main (main) where
 
 import qualified XMonad as XM
 import XMonad ( (=?), (-->), (<&&>), (<+>), (|||)
+
               , Mirror(Mirror)
               , Full(Full)
               , Tall(Tall)
+
+              , ManageHook
+
+              , composeAll
+              , className, title, stringProperty
               )
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig (additionalKeys)
@@ -27,7 +33,9 @@ import XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
 
 import XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
 import qualified XMonad.Hooks.DynamicLog as DL
-import XMonad.Hooks.FadeInactive (fadeInactiveLogHook, fadeInactiveCurrentWSLogHook)
+import XMonad.Hooks.FadeInactive ( fadeInactiveLogHook
+                                 , fadeInactiveCurrentWSLogHook
+                                 )
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO (hPutStrLn)
@@ -36,48 +44,54 @@ import qualified Data.Maybe as Maybe
 
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
+import Utils.FocusHook (focusHookConfig)
 import Keys (myKeys)
 import Workspaces (myWorkspacesBareList, myWorkspaces)
 
 
-myManageHook :: XM.ManageHook
-myManageHook = XM.composeAll $
+myManageHook :: ManageHook
+myManageHook = composeAll $
 
-  [ XM.className =? "Gmrun"                     --> doCenterFloat
+  [ className =? "Gmrun"                     --> doCenterFloat
 
-  , XM.title     =? "gpaste-zenity"             --> doCenterFloat
+  , title     =? "gpaste-zenity"             --> doCenterFloat
 
-  -- gimp
-  , wmRole       =? "gimp-toolbox-color-dialog" --> doCenterFloat
-  , wmRole       =? "gimp-message-dialog"       --> doCenterFloat
-  , wmRole       =? "gimp-layer-new"            --> doCenterFloat
-  , wmRole       =? "gimp-image-new"            --> doCenterFloat
+  -- GIMP
+  , wmRole    =? "gimp-toolbox-color-dialog" --> doCenterFloat
+  , wmRole    =? "gimp-message-dialog"       --> doCenterFloat
+  , wmRole    =? "gimp-layer-new"            --> doCenterFloat
+  , wmRole    =? "gimp-image-new"            --> doCenterFloat
 
-  , XM.className =? "qjackctl"                  --> doCenterFloat
-  , XM.className =? "Audacious"                 --> moveTo (last $
-                                                            init myWorkspaces)
+  , className =? "qjackctl"                  --> doCenterFloat
+  , className =? "Audacious"                 --> moveTo (last $
+                                                         init myWorkspaces)
 
-  , XM.className =? "Gajim"                     --> moveTo (last myWorkspaces)
-  , XM.className =? "Hexchat"                   --> moveTo (last myWorkspaces)
-  , XM.className =? "utox"                      --> moveTo (last myWorkspaces)
-  , XM.className =? "qTox"                      --> moveTo (last myWorkspaces)
-  , XM.className =? "Gnome-ring"                --> moveTo (last myWorkspaces)
-
-  , XM.className =? "Firefox" <&&> nameStartsWith "Riot"
-      --> moveTo (last myWorkspaces)
+  -- Move messangers to last workspace
+  , className =? "Gajim"                     --> moveTo lastWs
+  , className =? "Hexchat"                   --> moveTo lastWs
+  , className =? "utox"                      --> moveTo lastWs
+  , className =? "qTox"                      --> moveTo lastWs
+  , className =? "Gnome-ring"                --> moveTo lastWs
+  , className =? "Firefox" <&&>
+    nameStartsWith "Riot"                    --> moveTo lastWs
   ]
-  -- audacious
-  ++ [ XM.className =? "Audacious" <&&> XM.title =? x --> doCenterFloat
-     | x <- [ "Song Info"
-            , "Audacious Settings"
-            , "JACK Output Settings"
-            , "Add Files"
-            , "Open Files"
-            ]
-     ]
-    where wmRole = XM.stringProperty "WM_WINDOW_ROLE"
-          wmName = XM.stringProperty "WM_NAME"
+
+  ++
+
+  -- Audacious
+  [ className =? "Audacious" <&&> title =? x --> doCenterFloat
+  | x <- [ "Song Info"
+         , "Audacious Settings"
+         , "JACK Output Settings"
+         , "Add Files"
+         , "Open Files"
+         ]
+  ]
+
+    where wmRole = stringProperty "WM_WINDOW_ROLE"
+          wmName = stringProperty "WM_NAME"
           moveTo = XM.doF . W.shift
+          lastWs = last myWorkspaces
 
           nameStartsWith :: String -> XM.Query Bool
           nameStartsWith startPart =
@@ -165,7 +179,7 @@ main = do
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 
-  XM.xmonad $ conf
+  XM.xmonad $ focusHookConfig $ conf
     { XM.logHook = do
 
         DL.dynamicLogWithPP $ Data.Default.def
@@ -175,17 +189,16 @@ main = do
           , DL.ppSep     = "  "
           , DL.ppWsSep   = " "
           , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
-          , DL.ppHiddenNoWindows = showNamedWorkspaces
+          , DL.ppHiddenNoWindows = id
           }
 
         let inactiveOpacity = cfgInactiveWindowOpacity customConfig
-        if cfgInactiveWindowOpacityOnlyForCurrentWs customConfig
-           then fadeInactiveCurrentWSLogHook inactiveOpacity
-           else fadeInactiveLogHook inactiveOpacity
+         in if cfgInactiveWindowOpacityOnlyForCurrentWs customConfig
+               then fadeInactiveCurrentWSLogHook inactiveOpacity
+               else fadeInactiveLogHook inactiveOpacity
 
     } `additionalKeys` keys
       where
-        showNamedWorkspaces wsId = wsId
         layoutNameHandler :: String -> String
         layoutNameHandler x = wrap $ xmobarEscape $
           case x of

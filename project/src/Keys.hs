@@ -28,11 +28,12 @@ import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
 import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
 import XMonad.Actions.NoBorders (toggleBorder)
 import XMonad.Layout.ResizableTile (MirrorResize(MirrorShrink, MirrorExpand))
+import XMonad.Hooks.Focus (toggleLock)
 
 import qualified Graphics.X11.ExtraTypes.XF86 as XF86
 
-import qualified Data.List  as L
-import qualified Data.Maybe as Maybe
+import Data.List (elemIndex, find, deleteBy)
+import Data.Maybe (Maybe(Just, Nothing), fromJust)
 
 import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
 
@@ -41,7 +42,9 @@ import Utils.CustomConfig (Config(..))
 import Workspaces (myWorkspacesBareList)
 
 
-type KeyHook = ((XM.ButtonMask, XM.KeySym), XM.X ())
+type KeyCombo = (XM.ButtonMask, XM.KeySym)
+type KeyHook  = (KeyCombo, XM.X ())
+
 myKeys :: [String] -> Config -> [KeyHook]
 myKeys myWorkspaces customConfig =
   let jumpOverVisibleNext = windows $ jumpOverVisibleView (+1)
@@ -49,8 +52,7 @@ myKeys myWorkspaces customConfig =
       jumpOverVisibleView affect s =
         W.greedyView (myWorkspaces !! getIdx getCurIdx) s
         where getCurIdx :: Int
-              getCurIdx = Maybe.fromJust
-                        $ L.elemIndex (W.currentTag s) myWorkspaces
+              getCurIdx = fromJust $ elemIndex (W.currentTag s) myWorkspaces
               getIdx fromIdx
                 | isHidden x = x
                 | otherwise = getIdx x
@@ -126,6 +128,7 @@ myKeys myWorkspaces customConfig =
 
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
   , ((myMetaKey, XM.xK_b), withFocused toggleBorder)
+  , ((myMetaKey, XM.xK_y), toggleLock)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
@@ -232,10 +235,10 @@ myKeys myWorkspaces customConfig =
              -> W.StackSet i l a s sd
              -> W.StackSet i l a s sd
       myView i s
-        | Just x <- L.find ((i==) . W.tag) (W.hidden s)
+        | Just x <- find ((i==) . W.tag) (W.hidden s)
         = s { W.current = (W.current s) { W.workspace = x }
             , W.hidden  = W.workspace (W.current s)
-                        : L.deleteBy (equating W.tag) x (W.hidden s)
+                        : deleteBy (equating W.tag) x (W.hidden s)
             }
         | otherwise = s
         where equating f x y = f x == f y

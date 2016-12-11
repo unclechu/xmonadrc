@@ -1,0 +1,3 @@
+[submodule "project/xmonad-contrib"]
+	path = project/xmonad-contrib
+	url = https://github.com/sgf-dma/xmonad-contrib
