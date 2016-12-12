@@ -61,6 +61,11 @@ newFocusHook = composeOne $
   , focused (className =? "Gmrun") -?> keepFocus
   ]
   ++ withDialogs [ className =? "Firefox"
+                 , className =? "Tor Browser"
+
+                 -- Prevent lost focus for all messangers
+                 -- but allow dialog windows of these applications
+                 -- to grab focus.
                  , className =? "Gajim"
                  , className =? "Hexchat"
                  , className =? "utox"
@@ -82,21 +87,23 @@ newFocusHook = composeOne $
           ]
 
 activateFocusHook :: FocusHook
-activateFocusHook = composeAll
-  [ focused (className =? "Gmrun")      --> keepFocus
+activateFocusHook = composeAll $
+  keepFocusFor [ className =? "Gmrun"
 
-  , focused (className =? "Firefox")    --> keepFocus
+               , className =? "Firefox"
+               , className =? "Tor Browser"
 
-  -- Prevent lost focus for all messangers
-  , focused (className =? "Gajim")      --> keepFocus
-  , focused (className =? "Hexchat")    --> keepFocus
-  , focused (className =? "utox")       --> keepFocus
-  , focused (className =? "qTox")       --> keepFocus
-  , focused (className =? "Gnome-ring") --> keepFocus
+               -- Prevent lost focus for all messangers
+               , className =? "Gajim"
+               , className =? "Hexchat"
+               , className =? "utox"
+               , className =? "qTox"
+               , className =? "Gnome-ring"
 
-  , focused (className =? "Keepassx")   --> keepFocus
-  , focused (title =? "gpaste-zenity")  --> keepFocus
-
-  , return True                         --> switchWorkspace
-                                        <+> switchFocus
-  ]
+               , className =? "Keepassx"
+               , title =? "gpaste-zenity"
+               ]
+  ++
+  [ return True --> switchWorkspace <+> switchFocus ]
+  where keepFocusFor = foldr ((:) . f) []
+        f cond = focused cond --> keepFocus
