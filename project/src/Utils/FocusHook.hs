@@ -59,6 +59,11 @@ newFocusHook = composeOne $
   [ new     (className =? "Gmrun") -?> switchFocus
   -- Prevent lost focus for 'gmrun' (new 'gmrun' steal focus from old one)
   , focused (className =? "Gmrun") -?> keepFocus
+
+  -- Always switch focus to 'gpaste-zenity'
+  , new     (title =? "gpaste-zenity") -?> switchFocus
+  -- Prevent lost focus for 'gpaste-zenity'
+  , focused (title =? "gpaste-zenity") -?> keepFocus
   ]
   ++ withDialogs [ className =? "Firefox"
                  , className =? "Tor Browser"
@@ -75,11 +80,8 @@ newFocusHook = composeOne $
                  , className =? "Keepassx"
                  ]
   ++
-  [ focused (title =? "gpaste-zenity") -?> keepFocus
-
   -- Default behavior for new window, just usual switching focus.
-  , return True -?> switchFocus
-  ]
+  [ return True -?> switchFocus ]
   where withDialogs = foldr ((++) . withDialog) []
         withDialog c =
           [ new (c <&&> isDialog) -?> switchFocus
