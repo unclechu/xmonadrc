@@ -10,6 +10,7 @@ module Keys
 import qualified XMonad as XM
 import XMonad ( (.|.)
 
+              , io
               , windows
               , spawn
               , kill
@@ -21,21 +22,27 @@ import XMonad ( (.|.)
               , shiftMask
               , controlMask
               , mod1Mask
-
               )
 import qualified XMonad.StackSet as W
 import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
 import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
+import XMonad.Hooks.Focus (toggleLock, FocusLock(FocusLock))
 import XMonad.Actions.NoBorders (toggleBorder)
 import XMonad.Layout.ResizableTile (MirrorResize(MirrorShrink, MirrorExpand))
-import XMonad.Hooks.Focus (toggleLock)
+import qualified XMonad.Util.ExtensibleState as XS
 
 import qualified Graphics.X11.ExtraTypes.XF86 as XF86
+
+import Control.Concurrent (forkIO)
+import Control.Monad (when)
 
 import Data.List (elemIndex, find, deleteBy)
 import Data.Maybe (Maybe(Just, Nothing), fromJust)
 
 import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
+import System.IO (IOMode(WriteMode))
+import GHC.IO.Handle (hFlushAll, hPutStr, hIsWritable, hClose)
+import GHC.IO.Handle.FD (openFile)
 
 import Utils (doRepeat)
 import Utils.CustomConfig (Config(..))
@@ -45,8 +52,8 @@ import Workspaces (myWorkspacesBareList)
 type KeyCombo = (XM.ButtonMask, XM.KeySym)
 type KeyHook  = (KeyCombo, XM.X ())
 
-myKeys :: [String] -> Config -> [KeyHook]
-myKeys myWorkspaces customConfig =
+myKeys :: [String] -> Config -> String -> [KeyHook]
+myKeys myWorkspaces customConfig homeDir =
   let jumpOverVisibleNext = windows $ jumpOverVisibleView (+1)
       jumpOverVisiblePrev = windows $ jumpOverVisibleView (subtract 1)
       jumpOverVisibleView affect s =
@@ -128,7 +135,7 @@ myKeys myWorkspaces customConfig =
 
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
   , ((myMetaKey, XM.xK_b), withFocused toggleBorder)
-  , ((myMetaKey, XM.xK_y), toggleLock)
+  , ((myMetaKey, XM.xK_y), myToggleLock)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
@@ -266,3 +273,18 @@ myKeys myWorkspaces customConfig =
     cmdScrnShotArea  = cmd "gnome-screenshot -a"
     cmdScrnShotX     = cmd "gnome-screenshot -i"
     cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
+
+    myToggleLock :: XM.X ()
+    myToggleLock = do
+      FocusLock b <- XS.get
+      let newValue = not b
+      io $ forkIO $ notify newValue
+      XS.put $ FocusLock newValue
+      where notify :: Bool -> IO ()
+            notify v = do
+              fd <- openFile (homeDir ++ "/.xmonad/xmobar.fifo") WriteMode
+              let msg = if v then "focuslock:on\n"
+                             else "focuslock:off\n"
+               in hIsWritable fd >>= flip when
+                    (hPutStr fd msg >> hFlushAll fd)
+              hClose fd

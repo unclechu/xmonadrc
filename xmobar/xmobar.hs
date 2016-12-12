@@ -16,5 +16,8 @@ Config {
              ],
   sepChar = "%",
   alignSep = "}{",
-  template = "%UnsafeStdinReader% }{ %cmd% <fc=#666>/</fc> <action=simulate-keys LShift RShift>%kbd%</action> <fc=#666>/</fc> <action=gnome-calendar><fc=#999>%date%</fc></action>"
+  template = "%UnsafeStdinReader% }{ %cmd% <fc=#666>/</fc>\
+             \ <action=simulate-keys LShift RShift>%kbd%</action>\
+             \ <fc=#666>/</fc>\
+             \ <action=gnome-calendar><fc=#999>%date%</fc></action>"
 }

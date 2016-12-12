@@ -39,6 +39,8 @@ import XMonad.Hooks.FadeInactive ( fadeInactiveLogHook
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import System.IO (hPutStrLn)
+import System.Directory (getHomeDirectory)
+
 import qualified Data.Default
 import qualified Data.Maybe as Maybe
 
@@ -173,9 +175,10 @@ main :: IO ()
 main = do
 
   customConfig <- getCustomConfig
+  homeDir <- getHomeDirectory
 
   let conf = myConfig customConfig
-      keys = myKeys myWorkspaces customConfig
+      keys = myKeys myWorkspaces customConfig homeDir
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 

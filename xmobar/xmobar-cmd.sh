@@ -45,11 +45,13 @@ fi
 numlock_is=off
 capslock_is=off
 alternative_is=off
+focuslock_is=off
 
 msg () {
 	local numlock='<fc=#999>num</fc>'
 	local capslock='<fc=#999>caps</fc>'
 	local alternative='<fc=#999>hax</fc>'
+	local focuslock='<fc=#999>[ ]</fc>'
 	if [ $numlock_is == on ]; then
 		numlock='<fc=#eee>num</fc>'
 	fi
@@ -59,10 +61,13 @@ msg () {
 	if [ $alternative_is == on ]; then
 		alternative='<fc=yellow>HAX</fc>'
 	fi
+	if [ $focuslock_is == on ]; then
+		focuslock='<fc=aqua>[x]</fc>'
+	fi
 	numlock="<action=simulate-keys NumLock>$numlock</action>"
 	capslock="<action=simulate-keys CapsLock>$capslock</action>"
 	alternative="$alternative" # TODO both alts simulate (needs changes in 'xlib-keys-combo-simulator')
-	echo "$numlock $capslock $alternative"
+	echo "$numlock $capslock $alternative $focuslock"
 }
 
 while true; do
@@ -80,6 +85,10 @@ while true; do
 			alternative_is=on
 		elif [ "$line" == "alternative:off" ]; then
 			alternative_is=off
+		elif [ "$line" == "focuslock:on" ]; then
+			focuslock_is=on
+		elif [ "$line" == "focuslock:off" ]; then
+			focuslock_is=off
 		fi
 	fi
 done
