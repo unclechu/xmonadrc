@@ -58,6 +58,8 @@ myManageHook = composeAll $
 
   , title     =? "gpaste-zenity"             --> doCenterFloat
 
+  , className =? "Gnome-calculator"          --> doCenterFloat
+
   -- GIMP
   , wmRole    =? "gimp-toolbox-color-dialog" --> doCenterFloat
   , wmRole    =? "gimp-message-dialog"       --> doCenterFloat
@@ -74,6 +76,7 @@ myManageHook = composeAll $
   , className =? "utox"                      --> moveTo lastWs
   , className =? "qTox"                      --> moveTo lastWs
   , className =? "Gnome-ring"                --> moveTo lastWs
+  , className =? "Riot"                      --> moveTo lastWs
   , className =? "Firefox" <&&>
     nameStartsWith "Riot"                    --> moveTo lastWs
   ]

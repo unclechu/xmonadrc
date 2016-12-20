@@ -55,38 +55,42 @@ focusHookConfig = handleFocusQuery Nothing myManageHook
 
 newFocusHook :: FocusHook
 newFocusHook = composeOne $
-  -- Always switch focus to 'gmrun'
-  [ new     (className =? "Gmrun") -?> switchFocus
-  -- Prevent lost focus for 'gmrun' (new 'gmrun' steal focus from old one)
-  , focused (className =? "Gmrun") -?> keepFocus
 
-  -- Always switch focus to 'gpaste-zenity'
-  , new     (title =? "gpaste-zenity") -?> switchFocus
-  -- Prevent lost focus for 'gpaste-zenity'
-  , focused (title =? "gpaste-zenity") -?> keepFocus
-  ]
-  ++ withDialogs [ className =? "Firefox"
-                 , className =? "Tor Browser"
+  raiseNewAndKeep [ className =? "Gmrun"
+                  , title     =? "gpaste-zenity"
+                  , className =? "Gnome-calculator"
+                  ]
+  ++
+  withDialogs [ className =? "Firefox"
+              , className =? "Tor Browser"
 
-                 -- Prevent lost focus for all messangers
-                 -- but allow dialog windows of these applications
-                 -- to grab focus.
-                 , className =? "Gajim"
-                 , className =? "Hexchat"
-                 , className =? "utox"
-                 , className =? "qTox"
-                 , className =? "Gnome-ring"
+              -- Prevent lost focus for all messangers
+              -- but allow dialog windows of these applications
+              -- to grab focus.
+              , className =? "Gajim"
+              , className =? "Hexchat"
+              , className =? "utox"
+              , className =? "qTox"
+              , className =? "Gnome-ring"
+              , className =? "Riot"
 
-                 , className =? "Keepassx"
-                 ]
+              , className =? "Keepassx"
+              ]
   ++
   -- Default behavior for new window, just usual switching focus.
   [ return True -?> switchFocus ]
-  where withDialogs = foldr ((++) . withDialog) []
-        withDialog c =
-          [ new (c <&&> isDialog) -?> switchFocus
-          , focused c             -?> keepFocus
-          ]
+
+  where withDialogs = foldr ((++) . f) []
+          where f c = [ new (c <&&> isDialog) -?> switchFocus
+                      , focused c             -?> keepFocus ]
+
+        -- Always switch to new window even
+        -- if focus is kept by another window
+        -- and keep focus for this window.
+        raiseNewAndKeep = foldr ((++) . f) []
+          where f c = [ new     c -?> switchFocus
+                      , focused c -?> keepFocus ]
+
 
 activateFocusHook :: FocusHook
 activateFocusHook = composeAll $
@@ -101,9 +105,10 @@ activateFocusHook = composeAll $
                , className =? "utox"
                , className =? "qTox"
                , className =? "Gnome-ring"
+               , className =? "Riot"
 
                , className =? "Keepassx"
-               , title =? "gpaste-zenity"
+               , title     =? "gpaste-zenity"
                ]
   ++
   [ return True --> switchWorkspace <+> switchFocus ]
