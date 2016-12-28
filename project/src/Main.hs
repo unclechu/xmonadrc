@@ -70,6 +70,10 @@ myManageHook = composeAll $
   , className =? "Audacious"                 --> moveTo (last $
                                                          init myWorkspaces)
 
+  , className =? "Doublecmd"
+      <&&> fmap not (nameContains "Double Commander ")
+                                             --> doCenterFloat
+
   -- Move messangers to last workspace
   , className =? "Gajim"                     --> moveTo lastWs
   , className =? "Hexchat"                   --> moveTo lastWs
@@ -77,8 +81,8 @@ myManageHook = composeAll $
   , className =? "qTox"                      --> moveTo lastWs
   , className =? "Gnome-ring"                --> moveTo lastWs
   , className =? "Riot"                      --> moveTo lastWs
-  , className =? "Firefox" <&&>
-    nameStartsWith "Riot"                    --> moveTo lastWs
+  , className =? "Firefox"
+      <&&> nameStartsWith "Riot"             --> moveTo lastWs
   ]
 
   ++
@@ -102,12 +106,21 @@ myManageHook = composeAll $
           nameStartsWith startPart =
             fmap (take $ length startPart) wmName =? startPart
 
+          nameContains :: String -> XM.Query Bool
+          nameContains namePart = fmap f wmName
+            where f :: String -> Bool
+                  f x | x == ""            = False
+                      | part x == namePart = True
+                      | otherwise          = f $ tail x
+                  len  = length namePart :: Int
+                  part = take len        :: String -> String
+
 
 myConfig customConfig = Data.Default.def
   { XM.manageHook        = manageDocks <+> myManageHook
   , XM.layoutHook        = myLayoutHook
 
-  , XM.borderWidth       = (read . show) (cfgBorderWidth customConfig)
+  , XM.borderWidth       = read $ show $ cfgBorderWidth customConfig
 
   , XM.modMask           = cfgMetaKey customConfig
   , XM.terminal          = cfgTerminal customConfig
