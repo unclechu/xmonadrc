@@ -73,6 +73,7 @@ newFocusHook = composeOne $
               , className =? "qTox"
               , className =? "Gnome-ring"
               , className =? "Riot"
+              , className =? "Rambox"
 
               , className =? "Keepassx"
               ]

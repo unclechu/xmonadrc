@@ -83,6 +83,7 @@ myManageHook = composeAll $
   , className =? "Riot"                      --> moveTo lastWs
   , className =? "Firefox"
       <&&> nameStartsWith "Riot"             --> moveTo lastWs
+  , className =? "Rambox"                    --> moveTo lastWs
   ]
 
   ++
