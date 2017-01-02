@@ -1,7 +1,7 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
-module Utils.FocusHook (focusManageHook) where
+module FocusHook (focusManageHook) where
 
 import Data.Default (def)
 

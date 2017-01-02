@@ -45,7 +45,7 @@ import Data.Default (def)
 
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
-import Utils.FocusHook (focusManageHook)
+import FocusHook (focusManageHook)
 import Keys (myKeys)
 import Workspaces (myWorkspacesBareList, myWorkspaces)
 
