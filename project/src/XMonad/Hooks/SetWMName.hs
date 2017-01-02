@@ -1,0 +1,1 @@
+../../../xmonad-contrib/XMonad/Hooks/SetWMName.hs

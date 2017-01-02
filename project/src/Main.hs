@@ -41,12 +41,11 @@ import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import System.IO (hPutStrLn)
 import System.Directory (getHomeDirectory)
 
-import qualified Data.Default
-import qualified Data.Maybe as Maybe
+import Data.Default (def)
 
 import Utils (xmobarEscape)
 import Utils.CustomConfig (getCustomConfig, Config(..))
-import Utils.FocusHook (focusHookConfig)
+import Utils.FocusHook (focusManageHook)
 import Keys (myKeys)
 import Workspaces (myWorkspacesBareList, myWorkspaces)
 
@@ -117,8 +116,8 @@ myManageHook = composeAll $
                   part = take len        :: String -> String
 
 
-myConfig customConfig = Data.Default.def
-  { XM.manageHook        = manageDocks <+> myManageHook
+myConfig customConfig = def
+  { XM.manageHook        = manageDocks <+> myManageHook <+> focusManageHook
   , XM.layoutHook        = myLayoutHook
 
   , XM.borderWidth       = read $ show $ cfgBorderWidth customConfig
@@ -176,7 +175,7 @@ myConfig customConfig = Data.Default.def
                         ||| tabbedLayout
 
 
-myTabTheme = Data.Default.def
+myTabTheme = def
   { Tabbed.activeColor         = "#3c5863"
   , Tabbed.activeBorderColor   = "#000000"
   , Tabbed.inactiveColor       = "#666666"
@@ -199,10 +198,10 @@ main = do
 
   xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
 
-  XM.xmonad $ focusHookConfig $ conf
+  XM.xmonad $ conf
     { XM.logHook = do
 
-        DL.dynamicLogWithPP $ Data.Default.def
+        DL.dynamicLogWithPP $ def
           { DL.ppOutput  = hPutStrLn xmproc
           , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
           , DL.ppCurrent = DL.xmobarColor "green" ""    . DL.wrap "[" "]"
