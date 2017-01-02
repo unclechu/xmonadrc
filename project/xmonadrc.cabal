@@ -17,8 +17,8 @@ executable xmonadrc-unclechu
   main-is:             Main.hs
   other-modules:       Utils
                      , Utils.CustomConfig
-                     , Utils.FocusHook
                      , Keys
+                     , FocusHook
                      , Workspaces
 
                      -- Overwritten modules by 'xmonad-contrib' git-submodule
