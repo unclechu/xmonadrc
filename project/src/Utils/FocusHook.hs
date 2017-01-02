@@ -85,6 +85,7 @@ activateFocusHook = composeAll $
                , className =? "qTox"
                , className =? "Gnome-ring"
                , className =? "Riot"
+               , className =? "Rambox"
 
                , className =? "Keepassx"
                , title     =? "gpaste-zenity"

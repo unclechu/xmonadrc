@@ -4,7 +4,7 @@
 module Main (main) where
 
 import qualified XMonad as XM
-import XMonad ( (=?), (-->), (<&&>), (<+>), (|||)
+import XMonad ( (=?), (-->), (<&&>), (<||>), (<+>), (|||)
 
               , Mirror(Mirror)
               , Full(Full)
@@ -80,8 +80,6 @@ myManageHook = composeAll $
   , className =? "qTox"                      --> moveTo lastWs
   , className =? "Gnome-ring"                --> moveTo lastWs
   , className =? "Riot"                      --> moveTo lastWs
-  , className =? "Firefox"
-      <&&> nameStartsWith "Riot"             --> moveTo lastWs
   , className =? "Rambox"                    --> moveTo lastWs
   ]
 
@@ -101,10 +99,6 @@ myManageHook = composeAll $
           wmName = stringProperty "WM_NAME"
           moveTo = XM.doF . W.shift
           lastWs = last myWorkspaces
-
-          nameStartsWith :: String -> XM.Query Bool
-          nameStartsWith startPart =
-            fmap (take $ length startPart) wmName =? startPart
 
           nameContains :: String -> XM.Query Bool
           nameContains namePart = fmap f wmName
