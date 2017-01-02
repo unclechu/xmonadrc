@@ -111,7 +111,7 @@ myManageHook = composeAll $
 
 
 myConfig customConfig = def
-  { XM.manageHook        = manageDocks <+> myManageHook <+> focusManageHook
+  { XM.manageHook        = manageDocks <+> focusManageHook <+> myManageHook
   , XM.layoutHook        = myLayoutHook
 
   , XM.borderWidth       = read $ show $ cfgBorderWidth customConfig
