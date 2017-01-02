@@ -30,16 +30,15 @@ executable xmonadrc-unclechu
 
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
 
-  build-depends:       base >= 4.7 && < 5
-                     , directory ==1.2.6.2
-                     , X11 ==1.6.1.2
-                     , X11-xft ==0.3.1
-                     , xmonad-contrib ==0.12
-                     , xmonad ==0.12
-                     , data-default ==0.7.1.1
-                     , mtl ==2.2.1
+  build-depends:       base
+                     , directory
+                     , X11
+                     , xmonad
+                     , xmonad-contrib
+                     , data-default
 
                      -- required by 'xmonad-contrib' git-submodule
+                     , mtl
                      , unix
                      , utf8-string
 
