@@ -33,7 +33,7 @@ data Config =
 
 defaultCustomConfig =
   Config { cfgIndependentWorkspaces = False
-         , cfgDisplaysOrder         = [1,2,3]
+         , cfgDisplaysOrder         = [1,2,3,4]
          , cfgMetaKey               = mod4Mask
          , cfgTerminal              = "terminator"
          , cfgTerminalDark          = "terminator --profile dark"
@@ -54,7 +54,7 @@ configFile = fmap (++ "/.xmonad/config.txt") getHomeDirectory
 parseCustomConfig config configFromFile =
   case configFromFile of
     Nothing -> config
-    Just x  -> resolvePairs config
+    Just _  -> resolvePairs config
              . pairs
              . lines
              $ configFromFile

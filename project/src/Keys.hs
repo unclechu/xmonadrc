@@ -134,7 +134,7 @@ myKeys myWorkspaces customConfig homeDir =
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
-  , ((myMetaKey, XM.xK_b), withFocused toggleBorder)
+  , ((myMetaKey, XM.xK_a), withFocused toggleBorder)
   , ((myMetaKey, XM.xK_y), myToggleLock)
 
   -- because enter taken for right control
@@ -187,13 +187,13 @@ myKeys myWorkspaces customConfig homeDir =
 
   ++
 
-  -- move between displays by x,c,v keys
+  -- move between displays by x,c,v,b keys
   let order = map screenNum $ cfgDisplaysOrder customConfig
       screenNum :: Int -> XM.ScreenId
       screenNum x = [0..] !! (x-1)
   in
   [((m .|. myMetaKey, k), XM.screenWorkspace sc >>= flip XM.whenJust (windows . f))
-        | (k, sc) <- zip [XM.xK_x, XM.xK_c, XM.xK_v] order
+        | (k, sc) <- zip [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b] order
         , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
