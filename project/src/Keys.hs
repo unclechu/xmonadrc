@@ -191,10 +191,13 @@ myKeys myWorkspaces customConfig homeDir =
   let order = map screenNum $ cfgDisplaysOrder customConfig
       screenNum :: Int -> XM.ScreenId
       screenNum x = [0..] !! (x-1)
+      cursorToDisplay n = spawn $ cmd $ "cursor-to-display.sh " ++ show n
   in
-  [((m .|. myMetaKey, k), XM.screenWorkspace sc >>= flip XM.whenJust (windows . f))
-        | (k, sc) <- zip [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b] order
-        , (f, m)  <- [(W.view, 0), (W.shift, shiftMask)]]
+  [((m .|. myMetaKey, k), XM.screenWorkspace sc
+                            >>= flip XM.whenJust (windows . f)
+                            >>  when (m == 0) (cursorToDisplay n))
+        | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b] order [1..]
+        , (f, m)     <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
 
