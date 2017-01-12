@@ -191,6 +191,8 @@ myKeys myWorkspaces customConfig homeDir =
   let order = map screenNum $ cfgDisplaysOrder customConfig
       screenNum :: Int -> XM.ScreenId
       screenNum x = [0..] !! (x-1)
+
+      -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
       cursorToDisplay n = spawn $ cmd $ "cursor-to-display.sh " ++ show n
   in
   [((m .|. myMetaKey, k), XM.screenWorkspace sc
