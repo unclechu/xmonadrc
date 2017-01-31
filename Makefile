@@ -1,2 +1,2 @@
 rebuild:
-	(cd project && stack build)
+	(cd project && stack build --install-ghc)
