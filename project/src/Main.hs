@@ -190,7 +190,7 @@ main = do
   let conf = myConfig customConfig
       keys = myKeys myWorkspaces customConfig homeDir
 
-  xmproc <- spawnPipe "/usr/bin/xmobar ~/.xmonad/xmobar.hs"
+  xmproc <- spawnPipe "xmobar ~/.xmonad/xmobar.hs"
 
   XM.xmonad $ conf
     { XM.logHook = do
