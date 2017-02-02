@@ -6,11 +6,13 @@ module Workspaces
   , myWorkspaces
   ) where
 
+-- local imports
+
 import Utils (xmobarEscape)
 
 
 myWorkspacesBareList :: [String]
-myWorkspacesBareList = map show [1..9]
+myWorkspacesBareList = map show ([1..9] :: [Int])
 
 myWorkspaces :: [String]
 myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
@@ -29,3 +31,4 @@ myWorkspaces = clickable . map xmobarEscape $ myWorkspacesBareList
                            7 -> "KP_Home"
                            8 -> "KP_Up"
                            9 -> "KP_Prior"
+                           _ -> error "unexpected value"

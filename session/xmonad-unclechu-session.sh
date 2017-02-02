@@ -1,6 +1,6 @@
 #!/bin/bash
 
-xmonad="$HOME/.xmonad/xmonadrc-unclechu"
+xmonad="$HOME/.xmonad/xmonad-unclechu"
 
 while true; do
 	"$xmonad"

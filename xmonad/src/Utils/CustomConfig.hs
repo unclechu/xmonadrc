@@ -1,19 +1,21 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
+{-# LANGUAGE PackageImports #-}
+
 module Utils.CustomConfig
   ( Config(..)
   , getCustomConfig
   ) where
 
-import System.Directory (getHomeDirectory)
-import qualified System.IO.Error as Error
+import "directory" System.Directory (getHomeDirectory)
+import qualified "base" System.IO.Error as Error
 
-import qualified Control.Exception as Exception
+import qualified "base" Control.Exception as Exception
 
-import Data.Char (toLower)
+import "base" Data.Char (toLower)
 
-import XMonad (KeyMask, mod4Mask)
+import "xmonad" XMonad (KeyMask, mod4Mask)
 
 
 -- TODO implement independent workspaces
@@ -31,6 +33,7 @@ data Config =
          , cfgInactiveWindowOpacityOnlyForCurrentWs :: Bool
          } deriving Show
 
+defaultCustomConfig :: Config
 defaultCustomConfig =
   Config { cfgIndependentWorkspaces = False
          , cfgDisplaysOrder         = [1,2,3,4]
@@ -51,22 +54,25 @@ defaultCustomConfig =
 configFile :: IO String
 configFile = fmap (++ "/.xmonad/config.txt") getHomeDirectory
 
+parseCustomConfig :: Config -> Maybe String -> Config
 parseCustomConfig config configFromFile =
   case configFromFile of
     Nothing -> config
     Just _  -> resolvePairs config
              . pairs
-             . lines
+             . _lines
              $ configFromFile
   where isSpaceSym :: Char -> Bool
         isSpaceSym x = x == ' ' || x == '\t'
-        lines :: Maybe String -> [String]
-        lines (Just x)
-                    | x == ""   = []
-                    | otherwise = foldr reducer [""] x
-                    where reducer symbol (x:xs)
-                            | symbol == '\n' = "":x:xs
-                            | otherwise      = (symbol:x):xs
+        _lines :: Maybe String -> [String]
+        _lines (Just a)
+                     | a == ""   = []
+                     | otherwise = foldr reducer [""] a
+                     where reducer symbol (x:xs)
+                             | symbol == '\n' = "":x:xs
+                             | otherwise      = (symbol:x):xs
+                           reducer _ _ = error "unexpected value"
+        _lines _ = error "unexpected value"
         pairs :: [String] -> [(String, String)]
         pairs = map checkForAvailableKey
               . foldr splitReducer []
@@ -94,8 +100,8 @@ parseCustomConfig config configFromFile =
                                         , "inactive-window-opacity-only-for-current-workspace"
                                         ]
         resolvePairs :: Config -> [(String, String)] -> Config
-        resolvePairs config [] = config
-        resolvePairs config ((k, v):pairs) = resolvePairs newConfig pairs
+        resolvePairs cfg [] = cfg
+        resolvePairs cfg ((k, v):_pairs) = resolvePairs newConfig _pairs
           where unexpectedValueError =
                   error $ "Unexpected value of '" ++ k ++ "' in config"
 
@@ -108,7 +114,7 @@ parseCustomConfig config configFromFile =
                 newConfig = case k of
 
                   "independent-workspaces" ->
-                     config { cfgIndependentWorkspaces = boolKey v }
+                     cfg { cfgIndependentWorkspaces = boolKey v }
 
                   "displays-order" ->
                     let cleanStr = filter (not . isSpaceSym) v
@@ -119,27 +125,30 @@ parseCustomConfig config configFromFile =
                         listReducer :: Char -> [String] -> [String]
                         listReducer ',' acc = "":acc
                         listReducer c (x:xs) = (c:x):xs
+                        listReducer _ _ = error "unexpected value"
                         order
                           | length result >= 2 = result
                           | otherwise = error $ "'" ++ k ++ "' config value\
                                           \ should have at least 2 items"
                           where result = map read
                                        $ foldr listReducer [""] validStr
-                    in config { cfgDisplaysOrder = order }
+                    in cfg { cfgDisplaysOrder = order }
 
-                  "terminal"       -> config { cfgTerminal      = v }
-                  "terminal-dark"  -> config { cfgTerminalDark  = v }
-                  "terminal-light" -> config { cfgTerminalLight = v }
-                  "file-manager"   -> config { cfgFileManager   = v }
-                  "launcher"       -> config { cfgLauncher      = v }
-                  "border-width"   -> config { cfgBorderWidth   = read v }
+                  "terminal"       -> cfg { cfgTerminal      = v }
+                  "terminal-dark"  -> cfg { cfgTerminalDark  = v }
+                  "terminal-light" -> cfg { cfgTerminalLight = v }
+                  "file-manager"   -> cfg { cfgFileManager   = v }
+                  "launcher"       -> cfg { cfgLauncher      = v }
+                  "border-width"   -> cfg { cfgBorderWidth   = read v }
 
                   "inactive-window-opacity" ->
-                    config { cfgInactiveWindowOpacity =
+                    cfg { cfgInactiveWindowOpacity =
                               toRational (read v :: Float) }
                   "inactive-window-opacity-only-for-current-workspace" ->
-                    config { cfgInactiveWindowOpacityOnlyForCurrentWs =
+                    cfg { cfgInactiveWindowOpacityOnlyForCurrentWs =
                               boolKey v }
+
+                  _ -> error "unexpected value"
 
 getCustomConfig :: IO Config
 getCustomConfig = parseCustomConfig defaultCustomConfig <$> readConfigFile

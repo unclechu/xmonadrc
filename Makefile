@@ -1,2 +1,2 @@
 rebuild:
-	(cd project && stack build --install-ghc)
+	(cd xmonad && stack build --install-ghc)

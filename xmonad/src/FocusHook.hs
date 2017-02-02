@@ -1,16 +1,20 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
+{-# LANGUAGE PackageImports #-}
+
 module FocusHook (focusManageHook) where
 
-import Data.Default (def)
+import "xmonad" XMonad ( className, title
+                       , (-->), (<+>), (=?), (<&&>)
+                       , ManageHook
+                       , composeAll
+                       )
 
-import XMonad ( XConfig
-              , className, title
-              , (-->), (<+>), (=?), (<&&>), (<||>)
-              , ManageHook
-              , composeAll
-              )
+-- local imports
+
+import XMonad.Hooks.ManageHelpers (isDialog, composeOne, (-?>))
+import XMonad.Hooks.EwmhDesktops (activated)
 import XMonad.Hooks.Focus ( FocusHook
 
                           , keepFocus
@@ -21,8 +25,6 @@ import XMonad.Hooks.Focus ( FocusHook
                           , liftQuery
                           , manageFocus
                           )
-import XMonad.Hooks.ManageHelpers (isDialog, composeOne, (-?>))
-import XMonad.Hooks.EwmhDesktops (activated)
 
 
 focusManageHook :: ManageHook

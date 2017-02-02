@@ -1,53 +1,57 @@
 -- Author: Viacheslav Lotsmanov
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
+{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
+{-# LANGUAGE PackageImports #-}
+
 module Main (main) where
 
-import qualified XMonad as XM
-import XMonad ( (=?), (-->), (<&&>), (<||>), (<+>), (|||)
+import "xmonad" XMonad ( (=?), (-->), (<&&>), (<+>), (|||)
 
-              , Mirror(Mirror)
-              , Full(Full)
-              , Tall(Tall)
+                       , Mirror(Mirror)
+                       , Full(Full)
 
-              , ManageHook
+                       , ManageHook
 
-              , composeAll
-              , className, title, stringProperty
-              )
-import XMonad.Util.Run (spawnPipe)
-import XMonad.Util.EZConfig (additionalKeys)
-import qualified XMonad.StackSet as W
+                       , composeAll
+                       , className, title, stringProperty
+                       )
+import qualified "xmonad" XMonad as XM
+import qualified "xmonad" XMonad.StackSet as W
 
-import XMonad.Layout.Grid (Grid(Grid))
-import qualified XMonad.Layout.Tabbed as Tabbed
-import XMonad.Layout.Spiral (spiral)
-import XMonad.Layout.NoBorders (noBorders)
-import XMonad.Layout.SimplestFloat (simplestFloat)
-import XMonad.Layout.PerWorkspace (onWorkspace)
-import XMonad.Layout.Cross (simpleCross)
-import XMonad.Layout.Circle (Circle(Circle))
-import XMonad.Layout.CenteredMaster (centerMaster)
-import XMonad.Layout.ThreeColumns (ThreeCol(ThreeColMid))
-import XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
+import "xmonad-contrib" XMonad.Util.Run (spawnPipe)
+import "xmonad-contrib" XMonad.Util.EZConfig (additionalKeys)
 
-import XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
-import qualified XMonad.Hooks.DynamicLog as DL
-import XMonad.Hooks.FadeInactive ( fadeInactiveLogHook
-                                 , fadeInactiveCurrentWSLogHook
-                                 )
-import XMonad.Hooks.ManageHelpers (doCenterFloat)
+import "xmonad-contrib" XMonad.Layout.Grid (Grid(Grid))
+import "xmonad-contrib" XMonad.Layout.Spiral (spiral)
+import "xmonad-contrib" XMonad.Layout.NoBorders (noBorders)
+import "xmonad-contrib" XMonad.Layout.SimplestFloat (simplestFloat)
+import "xmonad-contrib" XMonad.Layout.PerWorkspace (onWorkspace)
+import "xmonad-contrib" XMonad.Layout.Cross (simpleCross)
+import "xmonad-contrib" XMonad.Layout.Circle (Circle(Circle))
+import "xmonad-contrib" XMonad.Layout.CenteredMaster (centerMaster)
+import "xmonad-contrib" XMonad.Layout.ThreeColumns (ThreeCol(ThreeColMid))
+import "xmonad-contrib" XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
+import qualified "xmonad-contrib" XMonad.Layout.Tabbed as Tabbed
 
-import System.IO (hPutStrLn)
-import System.Directory (getHomeDirectory)
+import qualified "xmonad-contrib" XMonad.Hooks.DynamicLog as DL
+import "xmonad-contrib" XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
+import "xmonad-contrib" XMonad.Hooks.ManageHelpers (doCenterFloat)
+import "xmonad-contrib" XMonad.Hooks.FadeInactive
+  ( fadeInactiveLogHook
+  , fadeInactiveCurrentWSLogHook
+  )
 
-import Data.Default (def)
+import "base" System.IO (hPutStrLn)
+import "directory" System.Directory (getHomeDirectory)
 
-import Utils (xmobarEscape)
-import Utils.CustomConfig (getCustomConfig, Config(..))
-import FocusHook (focusManageHook)
-import Keys (myKeys)
-import Workspaces (myWorkspacesBareList, myWorkspaces)
+import "data-default" Data.Default (def)
+
+import "unclechu-xmonadrc" Utils (xmobarEscape)
+import "unclechu-xmonadrc" Utils.CustomConfig (getCustomConfig, Config(..))
+import "unclechu-xmonadrc" FocusHook (focusManageHook)
+import "unclechu-xmonadrc" Keys (myKeys)
+import "unclechu-xmonadrc" Workspaces (myWorkspaces)
 
 
 myManageHook :: ManageHook
@@ -130,7 +134,6 @@ myConfig customConfig = def
       onWorkspace (myWorkspaces !! 2)        startWithCrossLayouts $
       usualLayouts
         where
-          tiled        = Tall 1 delta ration
           ration       = 2/3 -- master proportion
           delta        = 1/100 -- percent of master resize
           tabbedLayout = Tabbed.tabbed Tabbed.shrinkText myTabTheme
@@ -169,6 +172,7 @@ myConfig customConfig = def
                         ||| tabbedLayout
 
 
+myTabTheme :: Tabbed.Theme
 myTabTheme = def
   { Tabbed.activeColor         = "#3c5863"
   , Tabbed.activeBorderColor   = "#000000"

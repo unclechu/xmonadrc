@@ -2,47 +2,55 @@
 -- License: GPLv3 https://raw.githubusercontent.com/unclechu/xmonadrc/master/LICENSE
 
 {-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PackageImports #-}
 
 module Keys
   ( myKeys
   ) where
 
-import qualified XMonad as XM
-import XMonad ( (.|.)
+import "xmonad" XMonad ( (.|.)
 
-              , io
-              , windows
-              , spawn
-              , kill
-              , sendMessage
-              , setLayout
-              , asks
-              , withFocused
+                       , io
+                       , windows
+                       , spawn
+                       , kill
+                       , sendMessage
+                       , setLayout
+                       , asks
+                       , withFocused
 
-              , shiftMask
-              , controlMask
-              , mod1Mask
-              )
-import qualified XMonad.StackSet as W
-import XMonad.Actions.CycleWS (prevWS, nextWS, shiftToPrev, shiftToNext)
-import XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
-import XMonad.Hooks.Focus (toggleLock, FocusLock(FocusLock))
-import XMonad.Actions.NoBorders (toggleBorder)
-import XMonad.Layout.ResizableTile (MirrorResize(MirrorShrink, MirrorExpand))
-import qualified XMonad.Util.ExtensibleState as XS
+                       , shiftMask
+                       , controlMask
+                       , mod1Mask
+                       )
+import qualified "xmonad" XMonad as XM
+import qualified "xmonad" XMonad.StackSet as W
 
-import qualified Graphics.X11.ExtraTypes.XF86 as XF86
+import "xmonad-contrib" XMonad.Actions.CycleWS ( prevWS, nextWS
+                                               , shiftToPrev, shiftToNext
+                                               )
+import "xmonad-contrib" XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
+import "xmonad-contrib" XMonad.Actions.NoBorders (toggleBorder)
+import "xmonad-contrib" XMonad.Layout.ResizableTile
+  (MirrorResize(MirrorShrink, MirrorExpand))
+import qualified "xmonad-contrib" XMonad.Util.ExtensibleState as XS
 
-import Control.Concurrent (forkIO)
-import Control.Monad (when)
+import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
 
-import Data.List (elemIndex, find, deleteBy)
-import Data.Maybe (Maybe(Just, Nothing), fromJust)
+import "base" Control.Concurrent (forkIO)
+import "base" Control.Monad (when)
 
-import System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
-import System.IO (IOMode(WriteMode))
-import GHC.IO.Handle (hFlushAll, hPutStr, hIsWritable, hClose)
-import GHC.IO.Handle.FD (openFile)
+import "base" Data.List (elemIndex, find, deleteBy)
+import "base" Data.Maybe (fromJust)
+
+import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
+import "base" System.IO (IOMode(WriteMode))
+import "base" GHC.IO.Handle (hFlushAll, hPutStr, hIsWritable, hClose)
+import "base" GHC.IO.Handle.FD (openFile)
+
+-- local imports
+
+import XMonad.Hooks.Focus (FocusLock(FocusLock))
 
 import Utils (doRepeat)
 import Utils.CustomConfig (Config(..))
@@ -198,7 +206,9 @@ myKeys myWorkspaces customConfig homeDir =
   [((m .|. myMetaKey, k), XM.screenWorkspace sc
                             >>= flip XM.whenJust (windows . f)
                             >>  when (m == 0) (cursorToDisplay n))
-        | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b] order [1..]
+        | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
+                             order
+                             ([1..] :: [Int])
         , (f, m)     <- [(W.view, 0), (W.shift, shiftMask)]]
 
   ++
@@ -227,6 +237,7 @@ myKeys myWorkspaces customConfig homeDir =
                            7 -> XM.xK_KP_Home
                            8 -> XM.xK_KP_Up
                            9 -> XM.xK_KP_Prior
+                           _ -> error "unexpected value"
                     | x <- [1..length myWorkspacesBareList]
                     ]
                   ]
@@ -243,7 +254,7 @@ myKeys myWorkspaces customConfig homeDir =
         ]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
-      myView :: (Eq s, Eq i) => i
+      myView :: (Eq i) => i
              -> W.StackSet i l a s sd
              -> W.StackSet i l a s sd
       myView i s
@@ -270,7 +281,7 @@ myKeys myWorkspaces customConfig homeDir =
 
     cmdAudioMute     = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " true"
     cmdAudioUnmute   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " false"
-    cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
+    -- cmdAudioToggle   = cmd $ "pactl set-sink-mute " ++ cmdActiveSink ++ " toggle"
     cmdAudioInc      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "+1.0dB"
     cmdAudioDec      = cmd $  cmdAudioUnmute ++ ";" ++ cmdAudioSetVol "-1.0dB"
 
@@ -283,7 +294,7 @@ myKeys myWorkspaces customConfig homeDir =
     myToggleLock = do
       FocusLock b <- XS.get
       let newValue = not b
-      io $ forkIO $ notify newValue
+      _ <- io $ forkIO $ notify newValue
       XS.put $ FocusLock newValue
       where notify :: Bool -> IO ()
             notify v = do
