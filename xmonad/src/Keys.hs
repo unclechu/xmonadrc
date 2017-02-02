@@ -201,15 +201,30 @@ myKeys myWorkspaces customConfig homeDir =
       screenNum x = [0..] !! (x-1)
 
       -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
-      cursorToDisplay n = spawn $ cmd $ "cursor-to-display.sh " ++ show n
-  in
-  [((m .|. myMetaKey, k), XM.screenWorkspace sc
-                            >>= flip XM.whenJust (windows . f)
-                            >>  when (m == 0) (cursorToDisplay n))
-        | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
-                             order
-                             ([1..] :: [Int])
-        , (f, m)     <- [(W.view, 0), (W.shift, shiftMask)]]
+      cursorToDisplay position n =
+        spawn $ cmd $ "cursor-to-display.sh -p " ++ position ++ " " ++ show n
+
+      cursorToDisplayCmd n m
+        | m == 0                        = cursorToDisplay "rb" n
+        | m == mod1Mask                 = cursorToDisplay "lt" n
+        | m == controlMask              = cursorToDisplay "cc" n
+        | m == mod1Mask .|. controlMask = cursorToDisplay "rt" n
+        | m == mod1Mask .|. shiftMask   = cursorToDisplay "lb" n
+        | otherwise                     = return ()
+
+   in [((m .|. myMetaKey, k), XM.screenWorkspace sc
+                               >>= flip XM.whenJust (windows . f)
+                                >> cursorToDisplayCmd n m)
+            | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
+                                 order ([1..] :: [Int])
+            , (f, m)     <- [ (W.view,  0)
+                            , (W.view,  mod1Mask)
+                            , (W.view,  controlMask)
+                            , (W.view,  mod1Mask .|. controlMask)
+                            , (W.view,  mod1Mask .|. shiftMask)
+                            , (W.shift, shiftMask)
+                            ]
+      ]
 
   ++
 
@@ -254,9 +269,7 @@ myKeys myWorkspaces customConfig homeDir =
         ]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
-      myView :: (Eq i) => i
-             -> W.StackSet i l a s sd
-             -> W.StackSet i l a s sd
+      myView :: (Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
       myView i s
         | Just x <- find ((i==) . W.tag) (W.hidden s)
         = s { W.current = (W.current s) { W.workspace = x }
