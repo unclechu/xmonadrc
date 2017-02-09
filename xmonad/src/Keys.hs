@@ -38,30 +38,34 @@ import qualified "xmonad-contrib" XMonad.Util.ExtensibleState as XS
 import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
 
 import "base" Control.Concurrent (forkIO)
-import "base" Control.Monad (when)
 
 import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
 
 import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
-import "base" System.IO (IOMode(WriteMode))
-import "base" GHC.IO.Handle (hFlushAll, hPutStr, hIsWritable, hClose)
-import "base" GHC.IO.Handle.FD (openFile)
 
 -- local imports
 
 import XMonad.Hooks.Focus (FocusLock(FocusLock))
 
-import Utils (doRepeat)
-import Utils.CustomConfig (Config(..))
 import Workspaces (myWorkspacesBareList)
+import Utils (doRepeat)
+import Utils.IPC (IPCHandler, focusLockState)
+import Utils.CustomConfig ( Config ( cfgMetaKey
+                                   , cfgLauncher
+                                   , cfgFileManager
+                                   , cfgTerminalDark
+                                   , cfgTerminalLight
+                                   , cfgDisplaysOrder
+                                   )
+                          )
 
 
 type KeyCombo = (XM.ButtonMask, XM.KeySym)
 type KeyHook  = (KeyCombo, XM.X ())
 
-myKeys :: [String] -> Config -> String -> [KeyHook]
-myKeys myWorkspaces customConfig homeDir =
+myKeys :: IPCHandler -> [String] -> Config -> [KeyHook]
+myKeys ipc myWorkspaces customConfig =
   let jumpOverVisibleNext = windows $ jumpOverVisibleView (+1)
       jumpOverVisiblePrev = windows $ jumpOverVisibleView (subtract 1)
       jumpOverVisibleView affect s =
@@ -307,13 +311,5 @@ myKeys myWorkspaces customConfig homeDir =
     myToggleLock = do
       FocusLock b <- XS.get
       let newValue = not b
-      _ <- io $ forkIO $ notify newValue
+      _ <- io $ forkIO $ focusLockState ipc newValue
       XS.put $ FocusLock newValue
-      where notify :: Bool -> IO ()
-            notify v = do
-              fd <- openFile (homeDir ++ "/.xmonad/xmobar.fifo") WriteMode
-              let msg = if v then "focuslock:on\n"
-                             else "focuslock:off\n"
-               in hIsWritable fd >>= flip when
-                    (hPutStr fd msg >> hFlushAll fd)
-              hClose fd
