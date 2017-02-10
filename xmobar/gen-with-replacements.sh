@@ -17,8 +17,8 @@ SRC_FILE=$DIR/xmobar.hs
 DEST_FILE=~/.xmonad/xmobar.generated.hs
 REPLACEMENTS_FILE=~/.xmonad/xmobar.replacements.hs
 
-REPLACEMENT_REG_BEGIN='^{-^ \([a-z]\+\) ^-}$'
-REPLACEMENT_REG_END='^{-$ \([a-z]\+\) $-}$'
+REPLACEMENT_REG_BEGIN='^{-^ \([a-zA-Z]\+\) ^-}$'
+REPLACEMENT_REG_END='^{-$ \([a-zA-Z]\+\) $-}$'
 
 SED_TRIM='s/\(^\s\+\|\s\+$\)//g'
 
@@ -58,7 +58,7 @@ function preprocess {
 			continue
 		fi
 
-		if echo "$line" | grep -i "$REPLACEMENT_REG_BEGIN" 1>/dev/null; then
+		if echo "$line" | grep "$REPLACEMENT_REG_BEGIN" 1>/dev/null; then
 
 			local name=$(echo "$line" | sed "s/$REPLACEMENT_REG_BEGIN/\1/")
 
@@ -73,7 +73,7 @@ function preprocess {
 
 			current_replacement=$name
 
-		elif echo "$line" | grep -i "$REPLACEMENT_REG_END" 1>/dev/null; then
+		elif echo "$line" | grep "$REPLACEMENT_REG_END" 1>/dev/null; then
 
 			local name=$(echo "$line" | sed "s/$REPLACEMENT_REG_END/\1/")
 
