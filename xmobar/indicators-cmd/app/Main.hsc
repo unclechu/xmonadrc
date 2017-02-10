@@ -5,6 +5,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 
 module Main (main) where
 
@@ -19,8 +20,10 @@ import "base" System.IO (hPutStrLn, hFlush, stdout)
 import "base" System.Exit (die, exitSuccess)
 import "unix" System.Posix.Signals ( installHandler
                                    , Handler(Catch)
+                                   , sigHUP
                                    , sigINT
                                    , sigTERM
+                                   , sigPIPE
                                    )
 
 import "dbus" DBus ( busName_
@@ -47,6 +50,20 @@ import "X11" Graphics.X11.Xlib ( Display
                                , closeDisplay
                                , displayString
                                )
+
+
+import qualified "base" Foreign.C.Types as CTypes
+
+#include <signal.h>
+#include <linux/prctl.h>
+
+foreign import ccall "sys/prctl.h prctl"
+  prctl :: CTypes.CInt
+        -> CTypes.CULong
+        -> CTypes.CULong
+        -> CTypes.CULong
+        -> CTypes.CULong
+        -> IO CTypes.CInt
 
 
 data State = State { numLock     :: Bool
@@ -77,11 +94,11 @@ view s = intercalate " " $
   map (\f -> f s) [numLockView, capsLockView, alternativeView, focusLockView]
 
   where numLockView (numLock -> isOn) =
-          withAction "simulate-keys NumLock" $
+          withAction "xdotool key Num_Lock" $
             colored (bool "#999" "#eee") (const "num") isOn
 
         capsLockView (capsLock -> isOn) =
-          withAction "simulate-keys CapsLock" $
+          withAction "xdotool key Caps_Lock" $
             colored (bool "#999" "orange") (bool "caps" "CAPS") isOn
 
         -- TODO toggle it by mouse click (notify 'xlib-keys-hack')
@@ -143,7 +160,10 @@ main = do
                      put Nothing
 
       catch sig = installHandler sig (Catch terminate) Nothing
-   in mapM_ catch [sigINT, sigTERM]
+
+   in mapM_ catch [sigHUP, sigINT, sigTERM, sigPIPE]
+
+  _ <- prctl (#const PR_SET_PDEATHSIG) (#const SIGHUP) 0 0 0
 
   let handle :: State -> Maybe ((State -> Bool -> State), Bool) -> IO State
       handle prevState Nothing = prevState <$ exitSuccess

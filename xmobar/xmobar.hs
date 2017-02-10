@@ -20,7 +20,11 @@ Config {
   sepChar = "%",
   alignSep = "}{",
   template = "%UnsafeStdinReader% }{ %cmd% <fc=#666>/</fc>\
-             \ <action=simulate-keys LShift RShift>%kbd%</action>\
+             \ <action= xte 'keydown Shift_L' && \
+             \          xte 'keydown Shift_R' && \
+             \          xte 'keyup Shift_L' && \
+             \          xte 'keyup Shift_R' \
+             \        >%kbd%</action>\
              \ <fc=#666>/</fc>\
              \ <action=gnome-calendar><fc=#999>%date%</fc></action>"
 }
