@@ -9,6 +9,7 @@ module Keys
   ) where
 
 import "xmonad" XMonad ( (.|.)
+                       , X
 
                        , io
                        , windows
@@ -37,10 +38,9 @@ import qualified "xmonad-contrib" XMonad.Util.ExtensibleState as XS
 
 import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
 
-import "base" Control.Concurrent (forkIO)
-
 import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
+import "base" Data.Functor (void)
 
 import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
 
@@ -50,7 +50,7 @@ import XMonad.Hooks.Focus (FocusLock(FocusLock))
 
 import Workspaces (myWorkspacesBareList)
 import Utils (doRepeat)
-import Utils.IPC (IPCHandler, focusLockState)
+import Utils.IPC (IPCHandler, focusLockState, invertWindowColors)
 import Utils.CustomConfig ( Config ( cfgMetaKey
                                    , cfgLauncher
                                    , cfgFileManager
@@ -62,7 +62,7 @@ import Utils.CustomConfig ( Config ( cfgMetaKey
 
 
 type KeyCombo = (XM.ButtonMask, XM.KeySym)
-type KeyHook  = (KeyCombo, XM.X ())
+type KeyHook  = (KeyCombo, X ())
 
 myKeys :: IPCHandler -> [String] -> Config -> [KeyHook]
 myKeys ipc myWorkspaces customConfig =
@@ -148,6 +148,7 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
   , ((myMetaKey, XM.xK_a), withFocused toggleBorder)
   , ((myMetaKey, XM.xK_y), myToggleLock)
+  , ((myMetaKey, XM.xK_g), invertColors)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
@@ -262,7 +263,7 @@ myKeys ipc myWorkspaces customConfig =
                   ]
 
       -- helper to map this keys
-      bind :: [XM.KeySym] -> [((XM.KeyMask, XM.KeySym), XM.X ())]
+      bind :: [XM.KeySym] -> [((XM.KeyMask, XM.KeySym), X ())]
       bind keys =
         [((m .|. myMetaKey, k), windows $ f i)
               | (i, k) <- zip myWorkspaces keys
@@ -307,9 +308,12 @@ myKeys ipc myWorkspaces customConfig =
     cmdScrnShotX     = cmd "gnome-screenshot -i"
     cmdScrnShotAreaX = cmd "gnome-screenshot -ia"
 
-    myToggleLock :: XM.X ()
+    myToggleLock :: X ()
     myToggleLock = do
       FocusLock b <- XS.get
       let newValue = not b
-      _ <- io $ forkIO $ focusLockState ipc newValue
+      _ <- io $ focusLockState ipc newValue
       XS.put $ FocusLock newValue
+
+    invertColors :: X ()
+    invertColors = withFocused (void . io . invertWindowColors ipc)
