@@ -12,6 +12,8 @@ import "xmonad" XMonad ( (.|.)
                        , X
 
                        , io
+                       , runQuery
+                       , whenJust
                        , windows
                        , spawn
                        , kill
@@ -31,6 +33,7 @@ import "xmonad-contrib" XMonad.Actions.CycleWS ( prevWS, nextWS
                                                , shiftToPrev, shiftToNext
                                                )
 import "xmonad-contrib" XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
+import "xmonad-contrib" XMonad.Hooks.ManageHelpers (pid)
 import "xmonad-contrib" XMonad.Actions.NoBorders (toggleBorder)
 import "xmonad-contrib" XMonad.Layout.ResizableTile
   (MirrorResize(MirrorShrink, MirrorExpand))
@@ -41,8 +44,10 @@ import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
 import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
 import "base" Data.Functor (void)
+import "base" Control.Monad ((>=>))
 
 import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
+import "unix" System.Posix.Signals (signalProcess, sigKILL)
 
 -- local imports
 
@@ -133,7 +138,8 @@ myKeys ipc myWorkspaces customConfig =
 
 
   -- close focused window with optional shift modifier
-  , ((myMetaKey, XM.xK_slash), kill)
+  , ((myMetaKey,               XM.xK_slash), kill)
+  , ((myMetaKey .|. shiftMask, XM.xK_slash), exterminate)
 
   -- exit and restart (200 status means restart)
   , ((myMetaKey .|. shiftMask, XM.xK_grave), XM.io exitSuccess)
@@ -316,4 +322,9 @@ myKeys ipc myWorkspaces customConfig =
       XS.put $ FocusLock newValue
 
     invertColors :: X ()
-    invertColors = withFocused (void . io . invertWindowColors ipc)
+    invertColors = withFocused $ void . io . invertWindowColors ipc
+
+    -- Send SIGKILL to focused window
+    exterminate :: X ()
+    exterminate = withFocused $
+      runQuery pid >=> flip whenJust (io . signalProcess sigKILL)

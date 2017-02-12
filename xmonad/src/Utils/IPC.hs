@@ -52,6 +52,7 @@ import "X11" Graphics.X11.Xlib ( Display
                                , closeDisplay
                                , displayString
                                )
+import "xmonad" XMonad (whenJust)
 
 
 data IPCHandler = IPCHandler { client     :: Client
@@ -95,7 +96,7 @@ invertWindowColors :: IPCHandler -> Window -> IO ()
 invertWindowColors ipc@IPCHandler { client = c, comptonBus = bus } wnd =
 
   getWindowColorsInversionStatus ipc wnd
-    >>= maybe (return ()) (callNoReply c . mc)
+    >>= flip whenJust (callNoReply c . mc)
 
   where mc (not -> bool 0 1 -> toStatus) =
            (methodCall "/" comptonInterface "win_set")
@@ -134,7 +135,7 @@ xmobarInterface :: InterfaceName
 xmobarInterface = "com.github.unclechu.xmonadrc"
 
 getXDpyName :: Display -> String
-getXDpyName dpy = map f $ displayString dpy
+getXDpyName = map f . displayString
 
   where f ':' = '_'
         f '.' = '_'

@@ -38,10 +38,10 @@ library
                      , xmonad-contrib
                      , data-default
                      , dbus
+                     , unix
 
                      -- required by 'xmonad-contrib' git-submodule
                      , mtl
-                     , unix
                      , utf8-string
 
   ghc-options:         -Wall -O2
