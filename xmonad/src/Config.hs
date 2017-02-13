@@ -60,9 +60,9 @@ myConfig customConfig = def
   }
   where
     myLayoutHook =
-      onWorkspace (last myWorkspaces)        lastWorkspacesLayouts $
-      onWorkspace (last $ init myWorkspaces) lastWorkspacesLayouts $
-      onWorkspace (myWorkspaces !! 2)        startWithCrossLayouts $
+      onWorkspace (last myWorkspaces)        secondaryLayouts $
+      onWorkspace (last $ init myWorkspaces) secondaryLayouts $
+      onWorkspace (myWorkspaces !! 2)        secondaryLayouts $
       usualLayouts
         where
           ration       = 2/3 -- master proportion
@@ -84,23 +84,17 @@ myConfig customConfig = def
             ) ||| simplestFloat
               ||| noBorders Full
 
-          startWithCrossLayouts =
-            ( avoidStruts  $  simpleCross
-                          ||| Circle
-                          ||| centerMaster Grid
-                          ||| tabbedLayout
+          secondaryLayouts =
+            ( avoidStruts  $  centerMaster Grid
+                          ||| Grid
                           ||| rTiled
                           ||| Mirror rTiled
-                          ||| Grid
                           ||| mySpiral
+                          ||| simpleCross
+                          ||| Circle
+                          ||| tabbedLayout
             ) ||| simplestFloat
               ||| noBorders Full
-
-          lastWorkspacesLayouts =
-            avoidStruts  $  simpleCross
-                        ||| Circle
-                        ||| centerMaster Grid
-                        ||| tabbedLayout
 
 
 myManageHook :: ManageHook
