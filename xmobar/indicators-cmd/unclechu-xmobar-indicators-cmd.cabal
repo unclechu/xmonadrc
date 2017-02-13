@@ -36,6 +36,8 @@ test-suite unclechu-xmobar-indicators-cmd-test
                      , dbus
                      , process
                      , unix
+                     , directory
+                     , X11
 
 source-repository head
   type:     git
