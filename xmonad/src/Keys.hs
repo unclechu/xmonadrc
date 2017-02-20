@@ -154,7 +154,7 @@ myKeys ipc myWorkspaces customConfig =
 
   , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
   , ((myMetaKey, XM.xK_a), withFocused toggleBorder >> refresh)
-  , ((myMetaKey, XM.xK_n), doRepeat 2 $ withFocused toggleBorder >> refresh)
+  , ((myMetaKey, XM.xK_n), refresh)
   , ((myMetaKey, XM.xK_y), myToggleLock)
   , ((myMetaKey, XM.xK_g), invertColors)
 
