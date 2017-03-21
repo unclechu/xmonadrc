@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Generates xmobar config with some customizations
 # taken from '~/.xmonad/xmobar.replacements.hs'

@@ -3,18 +3,18 @@ clean: clean-xmonad clean-xmobar clean-xmobar-indicators-cmd
 test: test-xmobar-indicators-cmd
 
 xmonad:
-	(cd xmonad && stack build --install-ghc && stack install)
+	./make.pl xmonad
 clean-xmonad:
-	(cd xmonad && stack clean)
+	./make.pl clean-xmonad
 
 xmobar:
-	(cd xmobar && ./gen-with-replacements.sh)
+	./make.pl xmobar
 clean-xmobar:
-	(cd xmobar && ./gen-with-replacements.sh --clean)
+	./make.pl clean-xmobar
 
 test-xmobar-indicators-cmd:
-	(cd xmobar/indicators-cmd && stack build --install-ghc && stack test)
+	./make.pl test-xmobar-indicators-cmd
 xmobar-indicators-cmd:
-	(cd xmobar/indicators-cmd && stack build --install-ghc && stack install)
+	./make.pl xmobar-indicators-cmd
 clean-xmobar-indicators-cmd:
-	(cd xmobar/indicators-cmd && stack clean)
+	./make.pl clean-xmobar-indicators-cmd
