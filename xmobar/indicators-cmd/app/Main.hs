@@ -5,7 +5,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ForeignFunctionInterface #-}
 
 module Main (main) where
 
@@ -51,19 +50,9 @@ import "X11" Graphics.X11.Xlib ( Display
                                , displayString
                                )
 
+-- local imports
 
-import qualified "base" Foreign.C.Types as CTypes
-
-#include <signal.h>
-#include <linux/prctl.h>
-
-foreign import ccall "sys/prctl.h prctl"
-  prctl :: CTypes.CInt
-        -> CTypes.CULong
-        -> CTypes.CULong
-        -> CTypes.CULong
-        -> CTypes.CULong
-        -> IO CTypes.CInt
+import "unclechu-xmobar-indicators-cmd" ParentProc (dieWithParent)
 
 
 data State = State { numLock     :: Bool
@@ -163,7 +152,7 @@ main = do
 
    in mapM_ catch [sigHUP, sigINT, sigTERM, sigPIPE]
 
-  _ <- prctl (#const PR_SET_PDEATHSIG) (#const SIGHUP) 0 0 0
+  dieWithParent
 
   let handle :: State -> Maybe ((State -> Bool -> State), Bool) -> IO State
       handle prevState Nothing = prevState <$ exitSuccess

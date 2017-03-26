@@ -71,18 +71,21 @@ import "X11" Graphics.X11.Xlib ( Display
 
 main :: IO ()
 main = do
-
-  (Nothing, _, _, pHandle) <-
-    createProcess
-      (proc "stack" ["build", "unclechu-xmobar-indicators-cmd"])
-        { std_in  = NoStream
-        , std_out = Inherit
-        , std_err = Inherit
-        }
-
-  ExitSuccess <- waitForProcess pHandle
-
+  successfullyExec "stack" ["clean", "unclechu-xmobar-indicators-cmd"]
+  successfullyExec "stack" ["build", "unclechu-xmobar-indicators-cmd"]
   () <$ runTestTT tests
+
+  where successfullyExec :: String -> [String] -> IO ()
+        successfullyExec app args = do
+
+          (Nothing, _, _, pHandle) <-
+            createProcess (proc app args) { std_in  = NoStream
+                                          , std_out = Inherit
+                                          , std_err = Inherit
+                                          }
+
+          ExitSuccess <- waitForProcess pHandle
+          return ()
 
 
 tests :: Test
