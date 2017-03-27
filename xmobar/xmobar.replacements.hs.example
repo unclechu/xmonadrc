@@ -1,0 +1,14 @@
+x = y { z = 1
+
+
+{-^ position ^-}
+, position = Static { xpos = 0, ypos = 0, width = 1440, height = 12 }
+{-$ position $-}
+
+
+{-^ textOffset ^-}
+, textOffset = 10
+{-$ textOffset $-}
+
+
+}

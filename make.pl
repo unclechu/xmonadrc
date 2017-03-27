@@ -21,12 +21,12 @@ if ($ARGV[0] eq 'xmonad') {
 elsif ($ARGV[0] eq 'xmobar') {
 
   chdir 'xmobar';
-  runx qw<./gen-with-replacements.sh>;
+  runx qw<./gen-with-replacements.pl>;
 
 } elsif ($ARGV[0] eq 'clean-xmobar') {
 
   chdir 'xmobar';
-  runx qw<./gen-with-replacements.sh --clean>;
+  runx qw<./gen-with-replacements.pl --clean>;
 }
 
 
