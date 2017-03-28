@@ -35,8 +35,7 @@ if (scalar(@ARGV) == 1 && $ARGV[0] eq '--clean') {
 	unlink $dest_file if -e $dest_file;
 	exit 0;
 } elsif (scalar(@ARGV) != 0) {
-	say STDERR "Incorrect arguments: @ARGV";
-	exit 1;
+	die "Incorrect arguments: @ARGV";
 }
 
 my %replacements = ();
@@ -62,14 +61,11 @@ sub preprocess {
 		if ($_ =~ $replacement_reg_begin) {
 
 			if (defined $current_replacement) {
-
-				say STDERR
+				die
 					'Preprocessing error: ' .
 					"Found opening of '$1' replacement " .
 					"but previously opened '$current_replacement' " .
 					'replacement is not closed yet';
-
-				exit 1;
 			}
 
 			$current_replacement = $1;
@@ -77,22 +73,15 @@ sub preprocess {
 		} elsif ($_ =~ $replacement_reg_end) {
 
 			unless (defined $current_replacement) {
-
-				say STDERR
+				die
 					'Preprocessing error: ' .
 					"Found closing of '$1' replacement " .
 					'but it was not previously opened';
-
-				exit 1;
-
 			} elsif ($current_replacement ne $1) {
-
-				say STDERR
+				die
 					'Preprocessing error: ' .
 					"Found closing of '$1' replacement " .
 					"but previously opened was '$current_replacement'";
-
-				exit 1;
 			}
 
 			push @res, exists($replacements{$1}) ?
@@ -109,12 +98,9 @@ sub preprocess {
 	}
 
 	if (defined $current_replacement) {
-
-		say STDERR
+		die
 			'Preprocessing error: ' .
 			"It's EOF but replacement '$current_replacement' isn't closed";
-
-		exit 1;
 	}
 
 	@res;
@@ -138,14 +124,11 @@ foreach (@r_lines) {
 	if ($_ =~ $replacement_reg_begin) {
 
 		if (defined $current_replacement) {
-
-			say STDERR
+			die
 				"Extracting replacement from '$replacements_file' error: " .
 				"Found opening of '$1' replacement " .
 				"but previously opened '$current_replacement' " .
 				'replacement is not closed yet';
-
-			exit 1;
 		}
 
 		$current_replacement = $1;
@@ -154,22 +137,16 @@ foreach (@r_lines) {
 	} elsif ($_ =~ $replacement_reg_end) {
 
 		unless (defined $current_replacement) {
-
-			say STDERR
+			die
 				"Extracting replacement from '$replacements_file' error: " .
 				"Found closing of '$1' replacement " .
 				'but it was not previously opened';
 
-			exit 1;
-
 		} elsif ($current_replacement ne $1) {
-
-			say STDERR
+			die
 				"Extracting replacement from '$replacements_file' error: " .
 				"Found closing of '$1' replacement " .
 				"but previously opened was '$current_replacement'";
-
-			exit 1;
 		}
 
 		$current_replacement = undef;
@@ -183,12 +160,9 @@ foreach (@r_lines) {
 }
 
 if (defined $current_replacement) {
-
-	say STDERR
+	die
 		"Extracting replacement from '$replacements_file' error: " .
 		"It's EOF but replacement '$current_replacement' isn't closed";
-
-	exit 1;
 }
 
 generate_and_save;
