@@ -68,6 +68,10 @@ import "X11" Graphics.X11.Xlib ( Display
                                , displayString
                                )
 
+-- local imports
+
+import "unclechu-xmobar-indicators-cmd" Test.Utils (getTmpDBusSocketPath)
+
 
 main :: IO ()
 main = do
@@ -271,12 +275,7 @@ withApp m = withTmpDBus $ \client addr -> do
 withTmpDBus :: (Client -> Address -> IO ()) -> IO ()
 withTmpDBus m = do
 
-  (lines -> head -> tmpSocketPath) <-
-    (\args -> readProcess "mktemp" args "")
-      [ "--dry-run"
-      , "--suffix=--unclechu-xmobar-indicators-cmd--testing-dbus-socket"
-      ]
-
+  tmpSocketPath <- getTmpDBusSocketPath
   let addrPath = "unix:path=" ++ tmpSocketPath
 
   (Nothing, _, _, pHandle) <-
