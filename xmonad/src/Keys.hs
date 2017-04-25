@@ -45,7 +45,9 @@ import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
 import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
 import "base" Data.Functor (void)
+
 import "base" Control.Monad ((>=>))
+import "base" Control.Concurrent (threadDelay)
 
 import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
 import "unix" System.Posix.Signals (signalProcess, sigKILL)
@@ -152,11 +154,17 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
-  , ((myMetaKey, XM.xK_z), sendMessage ToggleStruts)
-  , ((myMetaKey, XM.xK_a), withFocused toggleBorder >> refresh)
-  , ((myMetaKey, XM.xK_n), refresh)
-  , ((myMetaKey, XM.xK_y), myToggleLock)
-  , ((myMetaKey, XM.xK_g), invertColors)
+  , ((myMetaKey,               XM.xK_z), sendMessage ToggleStruts)
+  , ((myMetaKey,               XM.xK_a), withFocused toggleBorder >> refresh)
+  , ((myMetaKey,               XM.xK_n), refresh)
+  , ((myMetaKey,               XM.xK_y), myToggleLock)
+  , ((myMetaKey,               XM.xK_g), invertColors)
+
+  , ((myMetaKey .|. shiftMask, XM.xK_a), withFocused toggleBorder
+                                         >> refresh
+                                         >> io (threadDelay $ 500 * 1000)
+                                         >> withFocused toggleBorder
+                                         >> refresh)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
