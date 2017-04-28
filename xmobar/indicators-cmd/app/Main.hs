@@ -17,6 +17,7 @@ import "base" Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import "base" System.IO (hPutStrLn, hFlush, stdout)
 import "base" System.Exit (die, exitSuccess)
+
 import "unix" System.Posix.Signals ( installHandler
                                    , Handler(Catch)
                                    , sigHUP
@@ -25,11 +26,15 @@ import "unix" System.Posix.Signals ( installHandler
                                    , sigPIPE
                                    )
 
-import "dbus" DBus ( busName_
+import "dbus" DBus ( objectPath_
+                   , busName_
+                   , ObjectPath
                    , InterfaceName
-                   , Signal(signalBody)
+                   , Signal(signalBody, signalSender, signalDestination)
                    , IsVariant(fromVariant)
+                   , signal
                    )
+
 import "dbus" DBus.Client ( connectSession
                           , disconnect
                           , requestName
@@ -38,12 +43,16 @@ import "dbus" DBus.Client ( connectSession
                           , addMatch
                           , removeMatch
                           , matchAny
+                          , emit
+
                           , MatchRule ( matchPath
+                                      , matchSender
                                       , matchDestination
                                       , matchInterface
                                       , matchMember
                                       )
                           )
+
 import "X11" Graphics.X11.Xlib ( Display
                                , openDisplay
                                , closeDisplay
@@ -69,6 +78,11 @@ instance Default State where
               , focusLock   = False
               }
 
+objPath :: ObjectPath
+objPath = "/"
+
+flushObjPathPfx :: String
+flushObjPathPfx = "/com/github/unclechu/xmonadrc/"
 
 -- To add current Display suffix
 busNamePfx :: String
@@ -110,11 +124,12 @@ main = do
   client  <- connectSession
 
   -- Getting bus name for our service that depends on Display name
-  busName <- do dpy <- openDisplay ""
-                let name = busNamePfx ++ getDisplayName dpy
-                    busName = busName_ name
-                busName `seq` closeDisplay dpy
-                return busName
+  dpyView <- do dpy <- openDisplay ""
+                let x = getDisplayName dpy
+                x <$ (x `seq` closeDisplay dpy)
+
+  let busName = busName_ $ busNamePfx ++ dpyView
+      flushObjPath = objectPath_ $ flushObjPathPfx ++ dpyView
 
   -- Grab the bus name for our service
   requestName client busName [] >>= \reply ->
@@ -124,10 +139,19 @@ main = do
   mVar <- newEmptyMVar
 
   let put = putMVar mVar
-      basicMatchRule = matchAny { matchPath        = Just "/"
+
+      basicMatchRule = matchAny { matchPath        = Just objPath
                                 , matchInterface   = Just interfaceName
                                 , matchDestination = Just busName
+                                , matchSender      = Nothing
                                 }
+
+  -- If `xlib-keys-hack` started before ask it to reflush indicators
+  emit client (signal flushObjPath interfaceName "request_flush_all")
+                { signalSender = Just busName
+                , signalDestination = Nothing
+                , signalBody = []
+                }
 
   sigHandlers <-
     let listen (member, lens) = addMatch client (matchRule member) $ handle lens
@@ -135,6 +159,7 @@ main = do
 
         handle lens (signalBody -> map fromVariant -> [Just (v :: Bool)]) =
           put $ Just (lens, v)
+
         handle _ _ = return () -- Incorrect arguments, just ignoring it
 
      in mapM listen [ ("numlock",     \s v -> s { numLock     = v })
@@ -156,6 +181,7 @@ main = do
 
   let handle :: State -> Maybe ((State -> Bool -> State), Bool) -> IO State
       handle prevState Nothing = prevState <$ exitSuccess
+
       handle prevState (Just (lens, v)) =
         let newState = lens prevState v
          in if newState == prevState
