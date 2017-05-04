@@ -120,6 +120,9 @@ myManageHook = composeAll $
       <&&> fmap not (nameContains "Double Commander ")
                                              --> doCenterFloat
 
+  -- Force child windows of Ardour to be float
+  , ardourChildWindow                        --> doCenterFloat
+
   -- Move messangers to last workspace
   , className =? "Gajim"                     --> moveTo lastWs
   , className =? "Hexchat"                   --> moveTo lastWs
@@ -146,6 +149,11 @@ myManageHook = composeAll $
           wmName = stringProperty "WM_NAME"
           moveTo = XM.doF . W.shift
           lastWs = last myWorkspaces
+
+          ardourChildWindow = fmap m className
+            where m :: String -> Bool
+                  m ('A':'r':'d':'o':'u':'r':'-':'5':'.':_) = True
+                  m _ = False
 
           nameContains :: String -> XM.Query Bool
           nameContains namePart = fmap f wmName
