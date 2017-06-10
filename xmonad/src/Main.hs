@@ -21,12 +21,12 @@ import "base" System.IO (hPutStrLn)
 
 import "data-default" Data.Default (def)
 
-import "unclechu-xmonadrc" Workspaces (myWorkspaces)
-import "unclechu-xmonadrc" Config (myConfig)
-import "unclechu-xmonadrc" Keys (myKeys)
-import "unclechu-xmonadrc" Utils (xmobarEscape)
-import "unclechu-xmonadrc" Utils.IPC (initIPC, deinitIPC)
-import "unclechu-xmonadrc" Utils.CustomConfig
+import Workspaces (myWorkspaces)
+import Config (myConfig)
+import Keys (myKeys)
+import Utils (xmobarEscape)
+import Utils.IPC (initIPC, deinitIPC)
+import Utils.CustomConfig
   ( getCustomConfig
   , Config ( cfgInactiveWindowOpacity
            , cfgInactiveWindowOpacityOnlyForCurrentWs

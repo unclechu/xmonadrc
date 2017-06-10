@@ -1,0 +1,30 @@
+name:         unclechu-xmonadrc
+license:      GPL-3
+license-file: LICENSE
+author:       Viacheslav Lotsmanov
+maintainer:   <lotsmanov89@gmail.com>
+category:     System
+
+dependencies:
+  - base
+  - directory
+  - X11
+  - xmonad
+  - xmonad-contrib
+  - data-default
+  - dbus
+  - unix
+
+  # required by 'xmonad-contrib' git-submodule
+  - mtl
+  - utf8-string
+
+ghc-options:
+  - -Wall
+  - -threaded
+  - -O2
+
+executables:
+  xmonad-unclechu:
+    source-dirs: src
+    main:        Main.hs

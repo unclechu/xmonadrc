@@ -4,7 +4,7 @@
 {-# LANGUAGE PackageImports #-}
 
 module Utils.CustomConfig
-  ( Config(..)
+  ( Config (..)
   , getCustomConfig
   ) where
 

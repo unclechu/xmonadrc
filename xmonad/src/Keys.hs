@@ -33,11 +33,11 @@ import qualified "xmonad" XMonad.StackSet as W
 import "xmonad-contrib" XMonad.Actions.CycleWS ( prevWS, nextWS
                                                , shiftToPrev, shiftToNext
                                                )
-import "xmonad-contrib" XMonad.Hooks.ManageDocks (ToggleStruts(ToggleStruts))
+import "xmonad-contrib" XMonad.Hooks.ManageDocks (ToggleStruts (ToggleStruts))
 import "xmonad-contrib" XMonad.Hooks.ManageHelpers (pid)
 import "xmonad-contrib" XMonad.Actions.NoBorders (toggleBorder)
 import "xmonad-contrib" XMonad.Layout.ResizableTile
-  (MirrorResize(MirrorShrink, MirrorExpand))
+  (MirrorResize (MirrorShrink, MirrorExpand))
 import qualified "xmonad-contrib" XMonad.Util.ExtensibleState as XS
 
 import qualified "X11" Graphics.X11.ExtraTypes.XF86 as XF86
@@ -49,12 +49,12 @@ import "base" Data.Functor (void)
 import "base" Control.Monad ((>=>))
 import "base" Control.Concurrent (threadDelay)
 
-import "base" System.Exit (exitSuccess, exitWith, ExitCode(ExitFailure))
+import "base" System.Exit (exitSuccess, exitWith, ExitCode (ExitFailure))
 import "unix" System.Posix.Signals (signalProcess, sigKILL)
 
 -- local imports
 
-import XMonad.Hooks.Focus (FocusLock(FocusLock))
+import XMonad.Hooks.Focus (FocusLock (FocusLock))
 
 import Workspaces (myWorkspacesBareList)
 import Utils (doRepeat)

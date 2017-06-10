@@ -28,11 +28,11 @@ import "unix" System.Posix.Signals ( Signal
                                    , sigPIPE
                                    , sigKILL
                                    )
-import "process" System.Process.Internals ( ProcessHandle__(OpenHandle)
+import "process" System.Process.Internals ( ProcessHandle__ (OpenHandle)
                                           , withProcessHandle
                                           )
-import "process" System.Process ( StdStream(NoStream, Inherit, CreatePipe)
-                                , CreateProcess(std_in, std_out, std_err, env)
+import "process" System.Process ( StdStream (NoStream, Inherit, CreatePipe)
+                                , CreateProcess (std_in, std_out, std_err, env)
                                 , ProcessHandle
                                 , createProcess
                                 , readProcess
@@ -41,7 +41,7 @@ import "process" System.Process ( StdStream(NoStream, Inherit, CreatePipe)
                                 , waitForProcess
                                 )
 
-import "HUnit" Test.HUnit ( Test(TestList, TestCase)
+import "HUnit" Test.HUnit ( Test (TestList, TestCase)
                           , runTestTT
                           , assertEqual
                           , assertBool
@@ -70,7 +70,7 @@ import "X11" Graphics.X11.Xlib ( Display
 
 -- local imports
 
-import "unclechu-xmobar-indicators-cmd" Test.Utils (getTmpDBusSocketPath)
+import Test.Utils (getTmpDBusSocketPath)
 
 
 main :: IO ()

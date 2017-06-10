@@ -10,8 +10,8 @@ module Config
 
 import "xmonad" XMonad ( (=?), (-->), (<&&>), (<+>), (|||)
 
-                       , Mirror(Mirror)
-                       , Full(Full)
+                       , Mirror (Mirror)
+                       , Full (Full)
 
                        , ManageHook
 
@@ -21,19 +21,19 @@ import "xmonad" XMonad ( (=?), (-->), (<&&>), (<+>), (|||)
 import qualified "xmonad" XMonad as XM
 import qualified "xmonad" XMonad.StackSet as W
 
-import "xmonad-contrib" XMonad.Layout.Grid (Grid(Grid))
+import "xmonad-contrib" XMonad.Layout.Grid (Grid (Grid))
 import "xmonad-contrib" XMonad.Layout.Spiral (spiral)
 import "xmonad-contrib" XMonad.Layout.NoBorders (noBorders)
 import "xmonad-contrib" XMonad.Layout.SimplestFloat (simplestFloat)
 import "xmonad-contrib" XMonad.Layout.PerWorkspace (onWorkspace)
 import "xmonad-contrib" XMonad.Layout.Cross (simpleCross)
-import "xmonad-contrib" XMonad.Layout.Circle (Circle(Circle))
+import "xmonad-contrib" XMonad.Layout.Circle (Circle (Circle))
 import "xmonad-contrib" XMonad.Layout.CenteredMaster (centerMaster)
-import "xmonad-contrib" XMonad.Layout.ThreeColumns (ThreeCol(ThreeColMid))
-import "xmonad-contrib" XMonad.Layout.ResizableTile (ResizableTall(ResizableTall))
+import "xmonad-contrib" XMonad.Layout.ThreeColumns (ThreeCol (ThreeColMid))
+import "xmonad-contrib" XMonad.Layout.ResizableTile (ResizableTall (ResizableTall))
 import qualified "xmonad-contrib" XMonad.Layout.Tabbed as Tabbed
 
-import "xmonad-contrib" XMonad.Hooks.ManageDocks (manageDocks, avoidStruts)
+import "xmonad-contrib" XMonad.Hooks.ManageDocks (manageDocks, avoidStruts, docksEventHook)
 import "xmonad-contrib" XMonad.Hooks.ManageHelpers (doCenterFloat)
 
 import "data-default" Data.Default (def)
@@ -42,12 +42,13 @@ import "data-default" Data.Default (def)
 
 import Workspaces (myWorkspaces)
 import FocusHook (focusManageHook)
-import Utils.CustomConfig (Config(cfgMetaKey, cfgTerminal, cfgBorderWidth))
+import Utils.CustomConfig (Config (cfgMetaKey, cfgTerminal, cfgBorderWidth))
 
 
 myConfig customConfig = def
   { XM.manageHook        = manageDocks <+> focusManageHook <+> myManageHook
   , XM.layoutHook        = myLayoutHook
+  , XM.handleEventHook   = docksEventHook <+> XM.handleEventHook def
 
   , XM.borderWidth       = read $ show $ cfgBorderWidth customConfig
 

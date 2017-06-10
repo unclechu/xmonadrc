@@ -1,0 +1,42 @@
+name:         unclechu-xmobar-indicators-cmd
+license:      GPL-3
+license-file: LICENSE
+homepage:     https://github.com/unclechu/xmonadrc/tree/master/xmobar/indicators-cmd
+author:       Viacheslav Lotsmanov
+maintainer:   <lotsmanov89@gmail.com>
+copyright:    2017 Viacheslav Lotsmanov
+category:     System
+
+dependencies:
+  - base
+  - process
+  - directory
+  - dbus
+  - unix
+  - data-default
+  - X11
+
+ghc-options:
+  - -Wall
+  - -O2
+
+library:
+  source-dirs: src/linux
+  when:
+    - condition: os(freebsd)
+      source-dirs: src/freebsd
+  when:
+    - condition: os(linux)
+      build-tools: [hsc2hs]
+
+executables:
+  unclechu-xmobar-indicators-cmd:
+    source-dirs:  app
+    main:         Main.hs
+    dependencies: [unclechu-xmobar-indicators-cmd]
+
+tests:
+  unclechu-xmobar-indicators-cmd-test:
+    main:         Spec.hs
+    source-dirs:  test
+    dependencies: [unclechu-xmobar-indicators-cmd, HUnit]

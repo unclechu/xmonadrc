@@ -3,3 +3,4 @@
 .lvimrc
 tags
 .stack-work
+*.cabal

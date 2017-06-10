@@ -19,7 +19,7 @@ import "base" System.IO (hPutStrLn, hFlush, stdout)
 import "base" System.Exit (die, exitSuccess)
 
 import "unix" System.Posix.Signals ( installHandler
-                                   , Handler(Catch)
+                                   , Handler (Catch)
                                    , sigHUP
                                    , sigINT
                                    , sigTERM
@@ -30,8 +30,8 @@ import "dbus" DBus ( objectPath_
                    , busName_
                    , ObjectPath
                    , InterfaceName
-                   , Signal(signalBody, signalSender, signalDestination)
-                   , IsVariant(fromVariant)
+                   , Signal (signalBody, signalSender, signalDestination)
+                   , IsVariant (fromVariant)
                    , signal
                    )
 
@@ -39,7 +39,7 @@ import "dbus" DBus.Client ( connectSession
                           , disconnect
                           , requestName
                           , releaseName
-                          , RequestNameReply(NamePrimaryOwner)
+                          , RequestNameReply (NamePrimaryOwner)
                           , addMatch
                           , removeMatch
                           , matchAny
@@ -61,7 +61,7 @@ import "X11" Graphics.X11.Xlib ( Display
 
 -- local imports
 
-import "unclechu-xmobar-indicators-cmd" ParentProc (dieWithParent)
+import ParentProc (dieWithParent)
 
 
 data State = State { numLock     :: Bool
