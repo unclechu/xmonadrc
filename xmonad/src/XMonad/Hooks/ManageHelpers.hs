@@ -1,1 +1,0 @@
-../../../xmonad-contrib/XMonad/Hooks/ManageHelpers.hs

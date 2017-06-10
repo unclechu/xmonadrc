@@ -3,12 +3,16 @@ system-ghc: false
 
 packages:
   - '.'
+  - location:
+      git: https://github.com/sgf-dma/xmonad-contrib
+      commit: 5ce60496afd5bc5a161b0ad09b5f7b3afe64fe8c
+    extra-dep: true
 
 extra-deps:
   - X11-1.8
   - X11-xft-0.3.1
   - xmonad-0.13
-  - xmonad-contrib-0.13
+  # - xmonad-contrib-0.13
 
 flags: {}
 extra-package-dbs: []
