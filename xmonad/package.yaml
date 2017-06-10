@@ -6,18 +6,14 @@ maintainer:   <lotsmanov89@gmail.com>
 category:     System
 
 dependencies:
-  - base
-  - directory
   - X11
-  - xmonad
-  - xmonad-contrib
+  - base
   - data-default
   - dbus
+  - directory
   - unix
-
-  # required by 'xmonad-contrib' git-submodule
-  - mtl
-  - utf8-string
+  - xmonad
+  - xmonad-contrib
 
 ghc-options:
   - -Wall
