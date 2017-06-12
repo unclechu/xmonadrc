@@ -1,0 +1,37 @@
+-- This file has been generated from package.yaml by hpack version 0.15.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           unclechu-xmonadrc
+version:        0.0.0
+category:       System
+author:         Viacheslav Lotsmanov
+maintainer:     <lotsmanov89@gmail.com>
+license:        GPL-3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+executable xmonad-unclechu
+  main-is: Main.hs
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -threaded -O2
+  build-depends:
+      X11
+    , base
+    , data-default
+    , dbus
+    , directory
+    , unix
+    , xmonad
+    , xmonad-contrib
+  other-modules:
+      Config
+      FocusHook
+      Keys
+      Utils
+      Utils.CustomConfig
+      Utils.IPC
+      Workspaces
+  default-language: Haskell2010
