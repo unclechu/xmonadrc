@@ -46,7 +46,7 @@ import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
 import "base" Data.Functor (void)
 
-import "base" Control.Monad ((>=>))
+import "base" Control.Monad ((>=>), when)
 import "base" Control.Concurrent (threadDelay)
 
 import "base" System.Exit (exitSuccess, exitWith, ExitCode (ExitFailure))
@@ -217,34 +217,21 @@ myKeys ipc myWorkspaces customConfig =
   ++
 
   -- move between displays by x,c,v,b keys
-  let order = map screenNum $ cfgDisplaysOrder customConfig
-      screenNum :: Int -> XM.ScreenId
-      screenNum x = [0..] !! (x-1)
+  let order = cfgDisplaysOrder customConfig ; order     :: [Int]
+      screenNum x = [0..] !! (x-1)          ; screenNum :: Int -> XM.ScreenId
+      hookKeys = [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
 
+      -- see https://github.com/unclechu/place-cursor-at
       -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
-      cursorToDisplay position n =
-        spawn $ cmd $ "cursor-to-display.sh -p " ++ position ++ " " ++ show n
+      handler n sc f m = do
+        when (m == mod1Mask) $ spawn $ cmd $ "killall place-cursor-at"
+        XM.screenWorkspace (screenNum sc) >>= flip XM.whenJust (windows . f)
+        spawn $ cmd $ "cursor-to-display.sh -p rb " ++ show n
+        when (m == mod1Mask) $ spawn $ cmd $ "place-cursor-at " ++ show sc
 
-      cursorToDisplayCmd n m
-        | m == 0                        = cursorToDisplay "rb" n
-        | m == mod1Mask                 = cursorToDisplay "lt" n
-        | m == controlMask              = cursorToDisplay "cc" n
-        | m == mod1Mask .|. controlMask = cursorToDisplay "rt" n
-        | m == mod1Mask .|. shiftMask   = cursorToDisplay "lb" n
-        | otherwise                     = return ()
-
-   in [((m .|. myMetaKey, k), XM.screenWorkspace sc
-                               >>= flip XM.whenJust (windows . f)
-                                >> cursorToDisplayCmd n m)
-            | (k, sc, n) <- zip3 [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
-                                 order ([1..] :: [Int])
-            , (f, m)     <- [ (W.view,  0)
-                            , (W.view,  mod1Mask)
-                            , (W.view,  controlMask)
-                            , (W.view,  mod1Mask .|. controlMask)
-                            , (W.view,  mod1Mask .|. shiftMask)
-                            , (W.shift, shiftMask)
-                            ]
+   in [((m .|. myMetaKey, k), handler n sc f m)
+      | (k, sc, n) <- zip3 hookKeys order [(1 :: Int)..]
+      , (f, m)     <- [(W.view,  0), (W.view,  mod1Mask), (W.shift, shiftMask)]
       ]
 
   ++

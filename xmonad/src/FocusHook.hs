@@ -39,6 +39,7 @@ newFocusHook = composeOne $
   raiseNewAndKeep [ className =? "Gmrun"
                   , title     =? "gpaste-zenity"
                   , className =? "Gnome-calculator"
+                  , title     =? "Place Cursor At [C]"
                   ]
   ++
   withDialogs [ className =? "Firefox"
