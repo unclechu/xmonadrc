@@ -154,17 +154,17 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
-  , ((myMetaKey,               XM.xK_z), sendMessage ToggleStruts)
-  , ((myMetaKey,               XM.xK_a), withFocused toggleBorder >> refresh)
-  , ((myMetaKey,               XM.xK_n), refresh)
-  , ((myMetaKey,               XM.xK_y), myToggleLock)
-  , ((myMetaKey,               XM.xK_g), invertColors)
+  , ((myMetaKey,              XM.xK_a), sendMessage ToggleStruts)
+  , ((myMetaKey,              XM.xK_b), withFocused toggleBorder >> refresh)
+  , ((myMetaKey,              XM.xK_n), refresh)
+  , ((myMetaKey,              XM.xK_y), myToggleLock)
+  , ((myMetaKey,              XM.xK_g), invertColors)
 
-  , ((myMetaKey .|. shiftMask, XM.xK_a), withFocused toggleBorder
-                                         >> refresh
-                                         >> io (threadDelay $ 500 * 1000)
-                                         >> withFocused toggleBorder
-                                         >> refresh)
+  , ((myMetaKey .|. mod1Mask, XM.xK_b), withFocused toggleBorder
+                                        >> refresh
+                                        >> io (threadDelay $ 500 * 1000)
+                                        >> withFocused toggleBorder
+                                        >> refresh)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
@@ -219,7 +219,7 @@ myKeys ipc myWorkspaces customConfig =
   -- move between displays by x,c,v,b keys
   let order = cfgDisplaysOrder customConfig ; order     :: [Int]
       screenNum x = [0..] !! (x-1)          ; screenNum :: Int -> XM.ScreenId
-      hookKeys = [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
+      hookKeys = [XM.xK_z, XM.xK_x, XM.xK_c, XM.xK_v]
 
       -- see https://github.com/unclechu/place-cursor-at
       -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
@@ -228,7 +228,7 @@ myKeys ipc myWorkspaces customConfig =
         spawn $ cmd $ "cursor-to-display.sh -p rb " ++ show n
         when (m == mod1Mask) $ spawn $ cmd $ "place-cursor-at " ++ show sc
 
-   in [((m .|. myMetaKey, k), handler n sc f m)
+   in [ ((m .|. myMetaKey, k), handler n sc f m)
       | (k, sc, n) <- zip3 hookKeys order [(1 :: Int)..]
       , (f, m)     <- [(W.view,  0), (W.view,  mod1Mask), (W.shift, shiftMask)]
       ]
@@ -267,12 +267,12 @@ myKeys ipc myWorkspaces customConfig =
       -- helper to map this keys
       bind :: [XM.KeySym] -> [((XM.KeyMask, XM.KeySym), X ())]
       bind keys =
-        [((m .|. myMetaKey, k), windows $ f i)
-              | (i, k) <- zip myWorkspaces keys
-              , (f, m) <- [ (myView, 0)
-                          , (W.greedyView, mod1Mask)
-                          , (W.shift, shiftMask)
-                          ]
+        [ ((m .|. myMetaKey, k), windows $ f i)
+        | (i, k) <- zip myWorkspaces keys
+        , (f, m) <- [ (myView, 0)
+                    , (W.greedyView, mod1Mask)
+                    , (W.shift, shiftMask)
+                    ]
         ]
 
       -- switch to workspace only if it's hidden (not visible on any screen)
