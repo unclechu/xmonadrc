@@ -154,13 +154,13 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey .|. shiftMask,   XM.xK_space), doRepeat 3 $ sendMessage XM.NextLayout)
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
-  , ((myMetaKey,              XM.xK_a), sendMessage ToggleStruts)
-  , ((myMetaKey,              XM.xK_b), withFocused toggleBorder >> refresh)
-  , ((myMetaKey,              XM.xK_n), refresh)
-  , ((myMetaKey,              XM.xK_y), myToggleLock)
-  , ((myMetaKey,              XM.xK_g), invertColors)
+  , ((myMetaKey, XM.xK_n), refresh)
+  , ((myMetaKey, XM.xK_y), myToggleLock)
+  , ((myMetaKey, XM.xK_g), invertColors)
+  , ((myMetaKey, XM.xK_a), sendMessage ToggleStruts)
 
-  , ((myMetaKey .|. mod1Mask, XM.xK_b), withFocused toggleBorder
+  , ((myMetaKey,              XM.xK_z), withFocused toggleBorder >> refresh)
+  , ((myMetaKey .|. mod1Mask, XM.xK_z), withFocused toggleBorder
                                         >> refresh
                                         >> io (threadDelay $ 500 * 1000)
                                         >> withFocused toggleBorder
@@ -219,7 +219,7 @@ myKeys ipc myWorkspaces customConfig =
   -- move between displays by x,c,v,b keys
   let order = cfgDisplaysOrder customConfig ; order     :: [Int]
       screenNum x = [0..] !! (x-1)          ; screenNum :: Int -> XM.ScreenId
-      hookKeys = [XM.xK_z, XM.xK_x, XM.xK_c, XM.xK_v]
+      hookKeys = [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
 
       -- see https://github.com/unclechu/place-cursor-at
       -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
