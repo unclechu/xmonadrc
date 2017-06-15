@@ -155,12 +155,13 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey .|. mod1Mask,    XM.xK_space), asks XM.config >>= setLayout . XM.layoutHook)
 
   , ((myMetaKey, XM.xK_n), refresh)
+  , ((myMetaKey, XM.xK_r), refresh)
   , ((myMetaKey, XM.xK_y), myToggleLock)
   , ((myMetaKey, XM.xK_g), invertColors)
   , ((myMetaKey, XM.xK_a), sendMessage ToggleStruts)
 
-  , ((myMetaKey,              XM.xK_z), withFocused toggleBorder >> refresh)
-  , ((myMetaKey .|. mod1Mask, XM.xK_z), withFocused toggleBorder
+  , ((myMetaKey .|. mod1Mask, XM.xK_z), withFocused toggleBorder >> refresh)
+  , ((myMetaKey,              XM.xK_z), withFocused toggleBorder
                                         >> refresh
                                         >> io (threadDelay $ 500 * 1000)
                                         >> withFocused toggleBorder
@@ -286,7 +287,7 @@ myKeys ipc myWorkspaces customConfig =
         | otherwise = s
         where equating f x y = f x == f y
 
-  in foldr ((++) . bind) [] keysLists
+   in foldr ((++) . bind) [] keysLists
 
   where
     myMetaKey = cfgMetaKey customConfig
