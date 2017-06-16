@@ -225,13 +225,20 @@ myKeys ipc myWorkspaces customConfig =
       -- see https://github.com/unclechu/place-cursor-at
       -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
       handler n sc f m = do
+
         XM.screenWorkspace (screenNum sc) >>= flip XM.whenJust (windows . f)
         spawn $ cmd $ "cursor-to-display.sh -p rb " ++ show n
-        when (m == mod1Mask) $ spawn $ cmd $ "place-cursor-at " ++ show sc
+
+        when (m `elem` [mod1Mask, controlMask]) $
+          spawn $ cmd $ "place-cursor-at " ++ show sc
 
    in [ ((m .|. myMetaKey, k), handler n sc f m)
       | (k, sc, n) <- zip3 hookKeys order [(1 :: Int)..]
-      , (f, m)     <- [(W.view,  0), (W.view,  mod1Mask), (W.shift, shiftMask)]
+      , (f, m)     <- [ (W.view,  0)
+                      , (W.view,  mod1Mask)
+                      , (W.view,  controlMask)
+                      , (W.shift, shiftMask)
+                      ]
       ]
 
   ++
