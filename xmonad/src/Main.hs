@@ -6,16 +6,13 @@
 
 module Main (main) where
 
-import "xmonad" XMonad (xmonad, logHook)
+import "xmonad" XMonad (xmonad, logHook, (<+>))
 
 import "xmonad-contrib" XMonad.Util.Run (spawnPipe)
 import "xmonad-contrib" XMonad.Util.EZConfig (additionalKeys)
 
+import "xmonad-contrib" XMonad.Hooks.EwmhDesktops (ewmh)
 import qualified "xmonad-contrib" XMonad.Hooks.DynamicLog as DL
-import "xmonad-contrib" XMonad.Hooks.FadeInactive
-  ( fadeInactiveLogHook
-  , fadeInactiveCurrentWSLogHook
-  )
 
 import "base" System.IO (hPutStrLn)
 
@@ -26,12 +23,7 @@ import Config (myConfig)
 import Keys (myKeys)
 import Utils (xmobarEscape)
 import Utils.IPC (initIPC, deinitIPC)
-import Utils.CustomConfig
-  ( getCustomConfig
-  , Config ( cfgInactiveWindowOpacity
-           , cfgInactiveWindowOpacityOnlyForCurrentWs
-           )
-  )
+import Utils.CustomConfig (getCustomConfig)
 
 
 main :: IO ()
@@ -45,25 +37,8 @@ main = do
 
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobar.generated.hs"
 
-  xmonad $ conf
-    { logHook = do
-
-        DL.dynamicLogWithPP $ def
-          { DL.ppOutput  = hPutStrLn xmproc
-          , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
-          , DL.ppCurrent = DL.xmobarColor "green" ""    . DL.wrap "[" "]"
-          , DL.ppSep     = "  "
-          , DL.ppWsSep   = " "
-          , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
-          , DL.ppHiddenNoWindows = id
-          }
-
-        let inactiveOpacity = cfgInactiveWindowOpacity customConfig
-         in if cfgInactiveWindowOpacityOnlyForCurrentWs customConfig
-               then fadeInactiveCurrentWSLogHook inactiveOpacity
-               else fadeInactiveLogHook inactiveOpacity
-
-    } `additionalKeys` keys
+  xmonad $ ewmh $ conf { logHook = xmobarLogHook xmproc <+> logHook conf
+                       } `additionalKeys` keys
 
   deinitIPC ipc
 
@@ -82,3 +57,14 @@ main = do
                "Full"                 -> "[ ]"
                _                      ->   x
           where wrap t = "<action=xdotool key super+space>" ++ t ++ "</action>"
+
+        xmobarLogHook xmproc =
+          DL.dynamicLogWithPP $ def
+            { DL.ppOutput  = hPutStrLn xmproc
+            , DL.ppTitle   = DL.xmobarColor "gray" "#444" . DL.wrap " " " "
+            , DL.ppCurrent = DL.xmobarColor "green" ""    . DL.wrap "[" "]"
+            , DL.ppSep     = "  "
+            , DL.ppWsSep   = " "
+            , DL.ppLayout  = DL.xmobarColor "yellow" "" . layoutNameHandler
+            , DL.ppHiddenNoWindows = id
+            }

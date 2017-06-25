@@ -35,6 +35,12 @@ import qualified "xmonad-contrib" XMonad.Layout.Tabbed as Tabbed
 
 import "xmonad-contrib" XMonad.Hooks.ManageDocks (manageDocks, avoidStruts, docksEventHook)
 import "xmonad-contrib" XMonad.Hooks.ManageHelpers (doCenterFloat)
+import "xmonad-contrib" XMonad.Hooks.EwmhDesktops (activateLogHook)
+
+import "xmonad-contrib" XMonad.Hooks.FadeInactive
+  ( fadeInactiveLogHook
+  , fadeInactiveCurrentWSLogHook
+  )
 
 import "data-default" Data.Default (def)
 
@@ -42,11 +48,25 @@ import "data-default" Data.Default (def)
 
 import Workspaces (myWorkspaces)
 import FocusHook (focusManageHook)
-import Utils.CustomConfig (Config (cfgMetaKey, cfgTerminal, cfgBorderWidth))
+import Utils.CustomConfig (Config ( cfgMetaKey
+                                  , cfgTerminal
+                                  , cfgBorderWidth
+                                  , cfgInactiveWindowOpacity
+                                  , cfgInactiveWindowOpacityOnlyForCurrentWs
+                                  )
+                          )
 
 
 myConfig customConfig = def
-  { XM.manageHook        = manageDocks <+> focusManageHook <+> myManageHook
+  { XM.manageHook        = manageDocks
+                           <+> focusManageHook
+                           <+> myManageHook
+                           <+> XM.manageHook def
+
+  , XM.logHook           = activateLogHook focusManageHook
+                           <+> opacityLogHook
+                           <+> XM.logHook def
+
   , XM.layoutHook        = myLayoutHook
   , XM.handleEventHook   = docksEventHook <+> XM.handleEventHook def
 
@@ -96,6 +116,12 @@ myConfig customConfig = def
                           ||| tabbedLayout
             ) ||| simplestFloat
               ||| noBorders Full
+
+    opacityLogHook =
+      let inactiveOpacity = cfgInactiveWindowOpacity customConfig
+       in if cfgInactiveWindowOpacityOnlyForCurrentWs customConfig
+             then fadeInactiveCurrentWSLogHook inactiveOpacity
+             else fadeInactiveLogHook inactiveOpacity
 
 
 myManageHook :: ManageHook
