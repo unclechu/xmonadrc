@@ -19,7 +19,6 @@ import XMonad.Hooks.Focus ( FocusHook
 
                           , keepFocus
                           , switchFocus
-                          , switchWorkspace
                           , new
                           , focused
                           , liftQuery
@@ -93,8 +92,6 @@ activateFocusHook = composeAll $
                , className =? "Keepassx"
                , title     =? "gpaste-zenity"
                ]
-  ++
-  [ return True --> switchWorkspace <+> switchFocus ]
 
   where keepFocusFor = foldr ((:) . f) []
         f cond = focused cond --> keepFocus
