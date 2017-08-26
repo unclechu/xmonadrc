@@ -6,7 +6,7 @@
 module FocusHook (focusManageHook) where
 
 import "xmonad" XMonad ( className, title
-                       , (-->), (<+>), (=?), (<&&>)
+                       , (-->), (=?), (<&&>)
                        , ManageHook
                        , composeAll
                        )
