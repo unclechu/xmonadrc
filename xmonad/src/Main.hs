@@ -9,7 +9,7 @@ module Main (main) where
 import "xmonad" XMonad (xmonad, logHook, (<+>))
 
 import "xmonad-contrib" XMonad.Util.Run (spawnPipe)
-import "xmonad-contrib" XMonad.Util.EZConfig (additionalKeys)
+import "xmonad-contrib" XMonad.Util.EZConfig (additionalKeys, additionalKeysP)
 
 import "xmonad-contrib" XMonad.Hooks.EwmhDesktops (ewmh)
 import qualified "xmonad-contrib" XMonad.Hooks.DynamicLog as DL
@@ -20,7 +20,7 @@ import "data-default" Data.Default (def)
 
 import Workspaces (myWorkspaces)
 import Config (myConfig)
-import Keys (myKeys)
+import Keys (myKeys, myEZKeys)
 import Utils (xmobarEscape)
 import Utils.IPC (initIPC, deinitIPC)
 import Utils.CustomConfig (getCustomConfig)
@@ -32,13 +32,15 @@ main = do
   customConfig <- getCustomConfig
   ipc          <- initIPC
 
-  let conf = myConfig customConfig
-      keys = myKeys ipc myWorkspaces customConfig
+  let conf   = myConfig customConfig
+      keys   = myKeys ipc myWorkspaces customConfig
+      ezKeys = myEZKeys ipc myWorkspaces customConfig
 
   xmproc <- spawnPipe "xmobar ~/.xmonad/xmobar.generated.hs"
 
   xmonad $ ewmh $ conf { logHook = xmobarLogHook xmproc <+> logHook conf
                        } `additionalKeys` keys
+                         `additionalKeysP` ezKeys
 
   deinitIPC ipc
 

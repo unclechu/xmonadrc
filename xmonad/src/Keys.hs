@@ -6,6 +6,7 @@
 
 module Keys
   ( myKeys
+  , myEZKeys
   ) where
 
 import "xmonad" XMonad ( (.|.)
@@ -71,6 +72,7 @@ import Utils.CustomConfig ( Config ( cfgMetaKey
 
 type KeyCombo = (XM.ButtonMask, XM.KeySym)
 type KeyHook  = (KeyCombo, X ())
+
 
 myKeys :: IPCHandler -> [String] -> Config -> [KeyHook]
 myKeys ipc myWorkspaces customConfig =
@@ -157,7 +159,6 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey, XM.xK_n), refresh)
   , ((myMetaKey, XM.xK_r), refresh)
   , ((myMetaKey, XM.xK_y), myToggleLock)
-  , ((myMetaKey, XM.xK_g), invertColors)
   , ((myMetaKey, XM.xK_a), sendMessage ToggleStruts)
 
   , ((myMetaKey .|. mod1Mask, XM.xK_z), withFocused toggleBorder >> refresh)
@@ -217,32 +218,6 @@ myKeys ipc myWorkspaces customConfig =
 
   ++
 
-  -- move between displays by x,c,v,b keys
-  let order = cfgDisplaysOrder customConfig ; order     :: [Int]
-      screenNum x = [0..] !! (x-1)          ; screenNum :: Int -> XM.ScreenId
-      hookKeys = [XM.xK_x, XM.xK_c, XM.xK_v, XM.xK_b]
-
-      -- see https://github.com/unclechu/place-cursor-at
-      -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
-      handler n sc f m = do
-
-        XM.screenWorkspace (screenNum sc) >>= flip XM.whenJust (windows . f)
-        spawn $ cmd $ "cursor-to-display.sh -p rb " ++ show n
-
-        when (m `elem` [mod1Mask, controlMask]) $
-          spawn $ cmd $ "place-cursor-at " ++ show sc
-
-   in [ ((m .|. myMetaKey, k), handler n sc f m)
-      | (k, sc, n) <- zip3 hookKeys order [(1 :: Int)..]
-      , (f, m)     <- [ (W.view,  0)
-                      , (W.view,  mod1Mask)
-                      , (W.view,  controlMask)
-                      , (W.shift, shiftMask)
-                      ]
-      ]
-
-  ++
-
   -- move between workspaces
   let keysLists :: [[XM.KeySym]]
       keysLists = [ -- right hand
@@ -299,8 +274,6 @@ myKeys ipc myWorkspaces customConfig =
   where
     myMetaKey = cfgMetaKey customConfig
 
-    cmd = (++ " 0</dev/null 1>/dev/null 2>/dev/null")
-
     cmdActiveSink =
       "\"`(pactl info"
         ++ "| grep -i 'default sink:'"
@@ -325,10 +298,56 @@ myKeys ipc myWorkspaces customConfig =
       _ <- io $ focusLockState ipc newValue
       XS.put $ FocusLock newValue
 
-    invertColors :: X ()
-    invertColors = withFocused $ void . io . invertWindowColors ipc
-
     -- Send SIGKILL to focused window
     exterminate :: X ()
     exterminate = withFocused $
       runQuery pid >=> flip whenJust (io . signalProcess sigKILL)
+
+
+myEZKeys :: IPCHandler -> [String] -> Config -> [(String, X ())]
+myEZKeys ipc _ customConfig =
+
+  let hookKeys = ['x', 'c', 'v', 'b']                   :: [Char]
+      order = cfgDisplaysOrder customConfig ; order     :: [Int]
+      screenNum x = [0..] !! (x-1)          ; screenNum :: Int -> XM.ScreenId
+
+      -- see https://github.com/unclechu/place-cursor-at
+      -- see https://gist.github.com/unclechu/cba127f844a1816439fa18b77e0697f1
+      handler :: Int
+              -- ^ Bare screen num
+              -> Int
+              -- ^ Ordered screen num
+              -> (XM.WorkspaceId -> XM.WindowSet -> XM.WindowSet)
+              -> Bool
+              -- ^ Show GUI to place cursor more precisely on specified screen
+              -> X ()
+      handler snBare snOrdered f precise = do
+
+        XM.screenWorkspace (screenNum snOrdered)
+          >>= flip XM.whenJust (windows . f)
+
+        spawn $ cmd $ "cursor-to-display.sh -p rb " ++ show snBare
+        when precise $ spawn $ cmd $ "place-cursor-at " ++ show snOrdered
+
+   in [ (fk [k], handler snBare snOrdered f p)
+      | (k, snOrdered, snBare) <- zip3 hookKeys order [(1 :: Int)..]
+      , (p, f, fk) <- [ (False, W.view,  ("M-"     ++))
+                      , (True,  W.view,  ("M-M1-"  ++))
+                      , (True,  W.view,  ("M-C-"   ++))
+                      , (False, W.shift, ("M-S-"   ++))
+                      , (True,  W.view,  ("M-g "   ++))
+                      , (False, W.shift, ("M-g S-" ++))
+                      ]
+      ]
+
+  ++
+
+  [ ("M-g i", invertColors)
+  ]
+
+  where invertColors :: X ()
+        invertColors = withFocused $ void . io . invertWindowColors ipc
+
+
+cmd :: String -> String
+cmd = (++ " 0</dev/null 1>/dev/null 2>/dev/null")
