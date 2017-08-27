@@ -3,6 +3,7 @@
 
 {-# LANGUAGE PatternGuards #-}
 {-# LANGUAGE PackageImports #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Keys
   ( myKeys
@@ -47,6 +48,7 @@ import "base" Data.List (elemIndex, find, deleteBy)
 import "base" Data.Maybe (fromJust)
 import "base" Data.Functor (void)
 
+import "base" Control.Arrow ((***))
 import "base" Control.Monad ((>=>), when)
 import "base" Control.Concurrent (threadDelay)
 
@@ -76,6 +78,7 @@ type KeyHook  = (KeyCombo, X ())
 
 myKeys :: IPCHandler -> [String] -> Config -> [KeyHook]
 myKeys ipc myWorkspaces customConfig =
+
   let jumpOverVisibleNext = windows $ jumpOverVisibleView (+1)
       jumpOverVisiblePrev = windows $ jumpOverVisibleView (subtract 1)
       jumpOverVisibleView affect s =
@@ -208,61 +211,6 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey .|. shiftMask,   XM.xK_d), doRepeat 3 $ sendMessage MirrorExpand)
   ]
 
-  ++
-
-  -- move between workspaces
-  let keysLists :: [[XM.KeySym]]
-      keysLists = [ -- right hand
-                    [ XM.xK_u, XM.xK_i, XM.xK_o
-                    , XM.xK_7, XM.xK_8, XM.xK_9
-                    , XM.xK_0, XM.xK_minus, XM.xK_equal
-                    ]
-                    -- left hand
-                  , [ XM.xK_q, XM.xK_w, XM.xK_e
-                    , XM.xK_1, XM.xK_2, XM.xK_3
-                    , XM.xK_4, XM.xK_5, XM.xK_6
-                    ]
-                    -- numpadKeys
-                  , [ case x of
-                           0 -> XM.xK_KP_Insert
-                           1 -> XM.xK_KP_End
-                           2 -> XM.xK_KP_Down
-                           3 -> XM.xK_KP_Next
-                           4 -> XM.xK_KP_Left
-                           5 -> XM.xK_KP_Begin
-                           6 -> XM.xK_KP_Right
-                           7 -> XM.xK_KP_Home
-                           8 -> XM.xK_KP_Up
-                           9 -> XM.xK_KP_Prior
-                           _ -> error "unexpected value"
-                    | x <- [1..length myWorkspacesBareList]
-                    ]
-                  ]
-
-      -- helper to map this keys
-      bind :: [XM.KeySym] -> [((XM.KeyMask, XM.KeySym), X ())]
-      bind keys =
-        [ ((m .|. myMetaKey, k), windows $ f i)
-        | (i, k) <- zip myWorkspaces keys
-        , (f, m) <- [ (myView, 0)
-                    , (W.greedyView, mod1Mask)
-                    , (W.shift, shiftMask)
-                    ]
-        ]
-
-      -- switch to workspace only if it's hidden (not visible on any screen)
-      myView :: (Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
-      myView i s
-        | Just x <- find ((i==) . W.tag) (W.hidden s)
-        = s { W.current = (W.current s) { W.workspace = x }
-            , W.hidden  = W.workspace (W.current s)
-                        : deleteBy (equating W.tag) x (W.hidden s)
-            }
-        | otherwise = s
-        where equating f x y = f x == f y
-
-   in foldr ((++) . bind) [] keysLists
-
   where
     myMetaKey = cfgMetaKey customConfig
 
@@ -297,7 +245,79 @@ myKeys ipc myWorkspaces customConfig =
 
 
 myEZKeys :: IPCHandler -> [String] -> Config -> [(String, X ())]
-myEZKeys ipc _ customConfig =
+myEZKeys ipc myWorkspaces customConfig =
+
+  -- switching between workspaces
+  let keysLists :: [([String], Maybe [String])]
+      keysLists =
+
+        [ -- right hand
+          -- FIXME <minus> and <equal> doesn't work
+          ( ["u", "i", "o", "7", "8", "9"{-, "0", "<minus>", "<equal>"-}]
+          , Just ["u", "i", "o", "7", "8", "9"]
+          )
+
+          -- left hand
+        , ( ["q", "w", "e", "1", "2", "3"{-, "4", "5", "6"-}]
+          , Just ["q", "w", "e", "1", "2", "3"]
+          )
+
+          -- numpadKeys
+        , ( [ case x of
+                   0 -> "<KP_Insert>"
+                   1 -> "<KP_End>"
+                   2 -> "<KP_Down>"
+                   3 -> "<KP_Next>"
+                   4 -> "<KP_Left>"
+                   5 -> "<KP_Begin>"
+                   6 -> "<KP_Right>"
+                   7 -> "<KP_Home>"
+                   8 -> "<KP_Up>"
+                   9 -> "<KP_Prior>"
+                   _ -> error "unexpected value"
+            | x <- [1..length myWorkspacesBareList]
+            ]
+          , Nothing
+          )
+        ]
+
+      bindF, bindAltF :: [String] -> [(String, X ())]
+      bindF    = getBound "M-"     myWorkspaces
+      bindAltF = getBound "M-g " $ drop 3 myWorkspaces
+
+      getBound :: String -> [String] -> [String] -> [(String, X ())]
+      getBound prefix workspaces keys =
+        [ (prefix ++ m ++ k, windows $ f w)
+        | (w, k) <- zip workspaces keys
+        , (f, m) <- [ (myView,       "")
+                    , (W.greedyView, "M1-" // "M-g M1-")
+                    , (W.shift,      "S-"  // "M-g S-")
+                    ] ++ (
+                      [ (W.greedyView, "M-g M1-")
+                      , (W.shift,      "M-g S-")
+                      ] // []
+                    )
+        ]
+        where a // b = if prefix == "M-" then a else b
+
+      -- helper to map this keys
+      bind :: ([String], Maybe [String]) -> [(String, X ())]
+      bind ((bindF *** maybe [] bindAltF) -> uncurry (++) -> x) = x
+
+      -- switch to workspace only if it's hidden (not visible on any screen)
+      myView :: (Eq i) => i -> W.StackSet i l a s sd -> W.StackSet i l a s sd
+      myView i s
+        | Just x <- find ((i==) . W.tag) (W.hidden s)
+        = s { W.current = (W.current s) { W.workspace = x }
+            , W.hidden  = W.workspace (W.current s)
+                        : deleteBy (equating W.tag) x (W.hidden s)
+            }
+        | otherwise = s
+        where equating f x y = f x == f y
+
+   in foldr ((++) . bind) [] keysLists
+
+  ++
 
   let hookKeys = ['x', 'c', 'v', 'b']                   :: [Char]
       order = cfgDisplaysOrder customConfig ; order     :: [Int]
