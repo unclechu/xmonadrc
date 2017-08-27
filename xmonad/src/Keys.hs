@@ -159,14 +159,6 @@ myKeys ipc myWorkspaces customConfig =
   , ((myMetaKey, XM.xK_n), refresh)
   , ((myMetaKey, XM.xK_r), refresh)
   , ((myMetaKey, XM.xK_y), myToggleLock)
-  , ((myMetaKey, XM.xK_a), sendMessage ToggleStruts)
-
-  , ((myMetaKey .|. mod1Mask, XM.xK_z), withFocused toggleBorder >> refresh)
-  , ((myMetaKey,              XM.xK_z), withFocused toggleBorder
-                                        >> refresh
-                                        >> io (threadDelay $ 500 * 1000)
-                                        >> withFocused toggleBorder
-                                        >> refresh)
 
   -- because enter taken for right control
   -- and triggering real enter doesn't make it work
@@ -343,6 +335,14 @@ myEZKeys ipc _ customConfig =
   ++
 
   [ ("M-g i", invertColors)
+
+  , ("M-g S-z", sendMessage ToggleStruts)
+  , ("M-g z",   withFocused toggleBorder >> refresh)
+  , ("M-z",     withFocused toggleBorder
+                >> refresh
+                >> io (threadDelay $ 500 * 1000)
+                >> withFocused toggleBorder
+                >> refresh)
   ]
 
   where invertColors :: X ()
