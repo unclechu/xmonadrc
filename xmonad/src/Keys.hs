@@ -67,6 +67,8 @@ import Utils.CustomConfig ( Config ( cfgMetaKey
                                    , cfgFileManager
                                    , cfgTerminalDark
                                    , cfgTerminalLight
+                                   , cfgAltTerminalDark
+                                   , cfgAltTerminalLight
                                    , cfgDisplaysOrder
                                    )
                           )
@@ -131,18 +133,10 @@ myKeys ipc myWorkspaces customConfig =
   , ((0,         XF86.xF86XK_AudioNext), spawn (cmd "audacious --fwd"))
   , ((0,         XF86.xF86XK_AudioStop), spawn (cmd "audacious --stop"))
 
+
   -- calculator
 
   , ((0, XF86.xF86XK_Calculator), spawn (cmd "gnome-calculator"))
-
-
-  , ((myMetaKey, XM.xK_p),            spawn (cmd $ cfgLauncher      customConfig))
-
-  , ((myMetaKey, XM.xK_bracketleft),  spawn (cmd $ cfgTerminalDark  customConfig))
-  , ((myMetaKey, XM.xK_bracketright), spawn (cmd $ cfgTerminalLight customConfig))
-
-  , ((myMetaKey, XM.xK_backslash),    spawn (cmd $ cfgFileManager   customConfig))
-
 
 
   -- close focused window with optional shift modifier
@@ -252,13 +246,12 @@ myEZKeys ipc myWorkspaces customConfig =
       keysLists =
 
         [ -- right hand
-          -- FIXME <minus> and <equal> doesn't work
-          ( ["u", "i", "o", "7", "8", "9"{-, "0", "<minus>", "<equal>"-}]
+          ( ["u", "i", "o", "7", "8", "9", "0", "-", "="]
           , Just ["u", "i", "o"]
           )
 
           -- left hand
-        , ( ["q", "w", "e", "1", "2", "3"{-, "4", "5", "6"-}]
+        , ( ["q", "w", "e", "1", "2", "3", "4", "5", "6"]
           , Just ["q", "w", "e"]
           )
 
@@ -363,6 +356,16 @@ myEZKeys ipc myWorkspaces customConfig =
                 >> io (threadDelay $ 500 * 1000)
                 >> withFocused toggleBorder
                 >> refresh)
+
+  , ("M-p",   spawn $ cmd $ cfgLauncher         customConfig)
+
+  , ("M-[",   spawn $ cmd $ cfgTerminalDark     customConfig)
+  , ("M-]",   spawn $ cmd $ cfgTerminalLight    customConfig)
+  , ("M-g [", spawn $ cmd $ cfgAltTerminalDark  customConfig)
+  , ("M-g ]", spawn $ cmd $ cfgAltTerminalLight customConfig)
+
+  , ("M-\\",  spawn $ cmd $ cfgFileManager      customConfig)
+
   ]
 
   where invertColors :: X ()

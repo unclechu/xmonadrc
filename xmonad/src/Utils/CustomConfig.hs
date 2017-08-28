@@ -26,6 +26,9 @@ data Config =
          , cfgTerminal              :: String
          , cfgTerminalDark          :: String
          , cfgTerminalLight         :: String
+         , cfgAltTerminal           :: String
+         , cfgAltTerminalDark       :: String
+         , cfgAltTerminalLight      :: String
          , cfgFileManager           :: String
          , cfgLauncher              :: String
          , cfgBorderWidth           :: Int
@@ -41,6 +44,9 @@ defaultCustomConfig =
          , cfgTerminal              = "terminator"
          , cfgTerminalDark          = "terminator --profile dark"
          , cfgTerminalLight         = "terminator --profile light"
+         , cfgAltTerminal           = "xterm"
+         , cfgAltTerminalDark       = "xterm"
+         , cfgAltTerminalLight      = "xterm"
          , cfgFileManager           = "nautilus"
          , cfgLauncher              = "gmrun"
          , cfgBorderWidth           = 1
@@ -93,11 +99,15 @@ parseCustomConfig config configFromFile =
                                         , "terminal"
                                         , "terminal-dark"
                                         , "terminal-light"
+                                        , "alternative-terminal"
+                                        , "alternative-terminal-dark"
+                                        , "alternative-terminal-light"
                                         , "file-manager"
                                         , "launcher"
                                         , "border-width"
                                         , "inactive-window-opacity"
-                                        , "inactive-window-opacity-only-for-current-workspace"
+                                        , "inactive-window-opacity-\
+                                          \only-for-current-workspace"
                                         ]
         resolvePairs :: Config -> [(String, String)] -> Config
         resolvePairs cfg [] = cfg
@@ -134,12 +144,24 @@ parseCustomConfig config configFromFile =
                                        $ foldr listReducer [""] validStr
                     in cfg { cfgDisplaysOrder = order }
 
-                  "terminal"       -> cfg { cfgTerminal      = v }
-                  "terminal-dark"  -> cfg { cfgTerminalDark  = v }
-                  "terminal-light" -> cfg { cfgTerminalLight = v }
-                  "file-manager"   -> cfg { cfgFileManager   = v }
-                  "launcher"       -> cfg { cfgLauncher      = v }
-                  "border-width"   -> cfg { cfgBorderWidth   = read v }
+                  "terminal" ->
+                    cfg { cfgTerminal = v }
+                  "terminal-dark" ->
+                    cfg { cfgTerminalDark = v }
+                  "terminal-light" ->
+                    cfg { cfgTerminalLight = v }
+                  "alternative-terminal" ->
+                    cfg { cfgAltTerminal = v }
+                  "alternative-terminal-dark" ->
+                    cfg { cfgAltTerminalDark = v }
+                  "alternative-terminal-light" ->
+                    cfg { cfgAltTerminalLight = v }
+                  "file-manager" ->
+                    cfg { cfgFileManager = v }
+                  "launcher" ->
+                    cfg { cfgLauncher = v }
+                  "border-width" ->
+                    cfg { cfgBorderWidth = read v }
 
                   "inactive-window-opacity" ->
                     cfg { cfgInactiveWindowOpacity =
