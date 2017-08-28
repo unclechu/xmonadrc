@@ -254,12 +254,12 @@ myEZKeys ipc myWorkspaces customConfig =
         [ -- right hand
           -- FIXME <minus> and <equal> doesn't work
           ( ["u", "i", "o", "7", "8", "9"{-, "0", "<minus>", "<equal>"-}]
-          , Just ["u", "i", "o", "7", "8", "9"]
+          , Just ["u", "i", "o"]
           )
 
           -- left hand
         , ( ["q", "w", "e", "1", "2", "3"{-, "4", "5", "6"-}]
-          , Just ["q", "w", "e", "1", "2", "3"]
+          , Just ["q", "w", "e"]
           )
 
           -- numpadKeys
@@ -282,23 +282,23 @@ myEZKeys ipc myWorkspaces customConfig =
         ]
 
       bindF, bindAltF :: [String] -> [(String, X ())]
-      bindF    = getBound "M-"     myWorkspaces
-      bindAltF = getBound "M-g " $ drop 3 myWorkspaces
+      bindF    = getBound False    myWorkspaces
+      bindAltF = getBound True  $ drop 6 myWorkspaces
 
-      getBound :: String -> [String] -> [String] -> [(String, X ())]
-      getBound prefix workspaces keys =
-        [ (prefix ++ m ++ k, windows $ f w)
+      getBound :: Bool -> [String] -> [String] -> [(String, X ())]
+      getBound isAlt workspaces keys =
+        [ (m ++ k, windows $ f w)
         | (w, k) <- zip workspaces keys
-        , (f, m) <- [ (myView,       "")
-                    , (W.greedyView, "M1-" // "M-g M1-")
-                    , (W.shift,      "S-"  // "M-g S-")
+        , (f, m) <- [ (myView,       "M-"    // "M-s ")
+                    , (W.greedyView, "M-M1-" // "M-s M1-")
+                    , (W.shift,      "M-S-"  // "M-s S-")
                     ] ++ (
                       [ (W.greedyView, "M-g M1-")
                       , (W.shift,      "M-g S-")
                       ] // []
                     )
         ]
-        where a // b = if prefix == "M-" then a else b
+        where a // b = if not isAlt then a else b
 
       -- helper to map this keys
       bind :: ([String], Maybe [String]) -> [(String, X ())]
