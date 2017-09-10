@@ -54,6 +54,7 @@ newFocusHook = composeOne $
               , className =? "Gnome-ring"
               , className =? "Riot"
               , className =? "Rambox"
+              , className =? "Thunderbird"
 
               , className =? "Keepassx"
               ]
@@ -88,6 +89,7 @@ activateFocusHook = composeAll $
                , className =? "Gnome-ring"
                , className =? "Riot"
                , className =? "Rambox"
+               , className =? "Thunderbird"
 
                , className =? "Keepassx"
                , title     =? "gpaste-zenity"

@@ -81,7 +81,7 @@ myConfig customConfig = def
   }
   where
     myLayoutHook =
-      onWorkspace (last myWorkspaces)        secondaryLayouts $
+      onWorkspace (last myWorkspaces)        lastLayouts      $
       onWorkspace (last $ init myWorkspaces) secondaryLayouts $
       onWorkspace (myWorkspaces !! 2)        secondaryLayouts $
       usualLayouts
@@ -113,6 +113,18 @@ myConfig customConfig = def
                           ||| mySpiral
                           ||| simpleCross
                           ||| Circle
+                          ||| tabbedLayout
+            ) ||| simplestFloat
+              ||| noBorders Full
+
+          lastLayouts =
+            ( avoidStruts  $  Grid
+                          ||| rTiled
+                          ||| Mirror rTiled
+                          ||| mySpiral
+                          ||| simpleCross
+                          ||| Circle
+                          ||| centerMaster Grid
                           ||| tabbedLayout
             ) ||| simplestFloat
               ||| noBorders Full
@@ -158,6 +170,7 @@ myManageHook = composeAll $
   , className =? "Gnome-ring"                --> moveTo lastWs
   , className =? "Riot"                      --> moveTo lastWs
   , className =? "Rambox"                    --> moveTo lastWs
+  , className =? "Thunderbird"               --> moveTo lastWs
   ]
 
   ++
