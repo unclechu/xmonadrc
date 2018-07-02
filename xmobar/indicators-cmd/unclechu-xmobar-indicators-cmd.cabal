@@ -1,6 +1,8 @@
--- This file has been generated from package.yaml by hpack version 0.15.0.
+-- This file has been generated from package.yaml by hpack version 0.28.2.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: ed76cbfa0a3a74e3c54aa2a10cb56d2eb526e506d01b2f8ddd9548d6f27aa005
 
 name:           unclechu-xmobar-indicators-cmd
 version:        0.0.0
@@ -8,7 +10,7 @@ category:       System
 homepage:       https://github.com/unclechu/xmonadrc/tree/master/xmobar/indicators-cmd
 author:         Viacheslav Lotsmanov
 maintainer:     <lotsmanov89@gmail.com>
-copyright:      2017 Viacheslav Lotsmanov
+copyright:      2016-2018 Viacheslav Lotsmanov
 license:        GPL-3
 license-file:   LICENSE
 build-type:     Simple
@@ -19,51 +21,57 @@ library
       src/linux
   ghc-options: -Wall -O2
   build-depends:
-      base
-    , process
-    , directory
-    , dbus
-    , unix
+      X11
+    , base
     , data-default
-    , X11
+    , dbus
+    , directory
+    , process
+    , unix
   if os(linux)
     build-tools:
         hsc2hs
   exposed-modules:
       ParentProc
       Test.Utils
+  other-modules:
+      Paths_unclechu_xmobar_indicators_cmd
   default-language: Haskell2010
 
 executable unclechu-xmobar-indicators-cmd
   main-is: Main.hs
+  other-modules:
+      Paths_unclechu_xmobar_indicators_cmd
   hs-source-dirs:
       app
   ghc-options: -Wall -O2
   build-depends:
-      base
-    , process
-    , directory
-    , dbus
-    , unix
+      X11
+    , base
     , data-default
-    , X11
+    , dbus
+    , directory
+    , process
     , unclechu-xmobar-indicators-cmd
+    , unix
   default-language: Haskell2010
 
 test-suite unclechu-xmobar-indicators-cmd-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
+  other-modules:
+      Paths_unclechu_xmobar_indicators_cmd
   hs-source-dirs:
       test
   ghc-options: -Wall -O2
   build-depends:
-      base
-    , process
-    , directory
-    , dbus
-    , unix
-    , data-default
+      HUnit
     , X11
+    , base
+    , data-default
+    , dbus
+    , directory
+    , process
     , unclechu-xmobar-indicators-cmd
-    , HUnit
+    , unix
   default-language: Haskell2010

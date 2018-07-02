@@ -18,3 +18,6 @@ xmobar-indicators-cmd:
 	./make.pl xmobar-indicators-cmd
 clean-xmobar-indicators-cmd:
 	./make.pl clean-xmobar-indicators-cmd
+
+session:
+	./make.pl session

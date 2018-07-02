@@ -4,7 +4,7 @@ license-file: LICENSE
 homepage:     https://github.com/unclechu/xmonadrc/tree/master/xmobar/indicators-cmd
 author:       Viacheslav Lotsmanov
 maintainer:   <lotsmanov89@gmail.com>
-copyright:    2017 Viacheslav Lotsmanov
+copyright:    2016-2018 Viacheslav Lotsmanov
 category:     System
 
 dependencies:
