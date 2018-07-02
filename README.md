@@ -5,7 +5,7 @@ to build and use it.
 
 ## Parts
 
-- [xmonad config](xmoand)
+- [xmonad config](xmonad)
 - [xmobar config](xmobar)
 - [indicators application](xmobar/indicators-cmd) - used in xmobar
 - [custom xmonad session files](session)
