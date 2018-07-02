@@ -105,9 +105,9 @@ myKeys ipc myWorkspaces customConfig =
   [ ((myMetaKey, XM.xK_BackSpace), spawn (cmd "autostart.sh"))
 
 
-  -- required https://github.com/unclechu/gpaste-zenity
-  , ((myMetaKey,              XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh"))
-  , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-zenity.sh -m=choose"))
+  -- required https://github.com/unclechu/gpaste-gui
+  , ((myMetaKey,              XM.xK_apostrophe), spawn (cmd "gpaste-gui.pl"))
+  , ((myMetaKey .|. mod1Mask, XM.xK_apostrophe), spawn (cmd "gpaste-gui.pl -m=choose"))
 
 
   -- screenshots (basic keyboard)

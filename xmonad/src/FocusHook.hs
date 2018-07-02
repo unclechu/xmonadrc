@@ -37,6 +37,7 @@ newFocusHook = composeOne $
 
   raiseNewAndKeep [ className =? "Gmrun"
                   , title     =? "gpaste-zenity"
+                  , className =? "Gpaste-gui.pl"
                   , className =? "Gnome-calculator"
                   , title     =? "Place Cursor At [C]"
                   ]
@@ -52,8 +53,6 @@ newFocusHook = composeOne $
               , className =? "utox"
               , className =? "qTox"
               , className =? "Gnome-ring"
-              , className =? "Riot"
-              , className =? "Rambox"
               , className =? "Thunderbird"
 
               , className =? "Keepassx"
@@ -87,12 +86,11 @@ activateFocusHook = composeAll $
                , className =? "utox"
                , className =? "qTox"
                , className =? "Gnome-ring"
-               , className =? "Riot"
-               , className =? "Rambox"
                , className =? "Thunderbird"
 
                , className =? "Keepassx"
                , title     =? "gpaste-zenity"
+               , className =? "Gpaste-gui.pl"
                ]
 
   where keepFocusFor = foldr ((:) . f) []

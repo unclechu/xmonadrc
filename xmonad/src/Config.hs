@@ -142,6 +142,7 @@ myManageHook = composeAll $
   [ className =? "Gmrun"                     --> doCenterFloat
 
   , title     =? "gpaste-zenity"             --> doCenterFloat
+  , className =? "Gpaste-gui.pl"             --> doCenterFloat
 
   , className =? "Gnome-calculator"          --> doCenterFloat
 

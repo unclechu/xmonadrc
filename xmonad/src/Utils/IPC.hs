@@ -23,8 +23,6 @@ module Utils.IPC
 import "base" Data.Word (Word16, Word32)
 import "base" Data.Bool (bool)
 
-import "base" Control.Monad ((>=>))
-
 import "dbus" DBus ( BusName
                    , busName_
                    , InterfaceName
@@ -122,10 +120,9 @@ getWindowColorsInversionStatus IPCHandler { client = c, comptonBus = bus } wnd =
                }
 
         extractStatus :: [Variant] -> Maybe Bool
-        extractStatus = ifMaybe ((== 1) . length)
-                          >=> fromVariant . head
-                          >=> return . \case (1 :: Word16) -> True
-                                             (_ :: Word16) -> False
+        extractStatus [x] = fromVariant x <&> \case (1 :: Word16) -> True
+                                                    _             -> False
+        extractStatus _ = Nothing
 
 
 comptonInterface :: InterfaceName
@@ -145,6 +142,4 @@ getXDpyName = map f . displayString
 (<&>) :: Functor f => f a -> (a -> b) -> f b
 (<&>) = flip (<$>)
 infixr 4 <&>
-
-ifMaybe :: (a -> Bool) -> a -> Maybe a
-ifMaybe f x = if f x then Just x else Nothing
+{-# INLINE (<&>) #-}
